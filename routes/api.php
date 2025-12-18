@@ -7,4 +7,5 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/products', [App\Http\Controllers\API\ProductController::class, 'index']);
+Route::get('/products', [App\Http\Controllers\Api\ProductController::class, 'index']);
+Route::get('/products/{id}', [App\Http\Controllers\Api\ProductController::class, 'show']);

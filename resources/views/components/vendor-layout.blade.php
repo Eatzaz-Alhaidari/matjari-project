@@ -17,7 +17,7 @@
     </style>
 </head>
 
-<body class="font-sans antialiased bg-slate-100">
+<body class="font-sans antialiased bg-slate-100 overflow-hidden">
     <div x-data="{ sidebarOpen: true }" class="flex h-screen bg-slate-100">
 
         <aside
