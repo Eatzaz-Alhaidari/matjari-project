@@ -23,6 +23,14 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
+                            <!-- Brand -->
+                            <div>
+                                <x-input-label for="brand" :value="__('الماركة')" />
+                                <x-text-input id="brand" class="block mt-1 w-full" type="text" name="brand"
+                                    :value="old('brand', $product->brand)" />
+                                <x-input-error :messages="$errors->get('brand')" class="mt-2" />
+                            </div>
+
                             <!-- Price -->
                             <div>
                                 <x-input-label for="price" :value="__('السعر')" />
@@ -37,6 +45,17 @@
                                 <x-text-input id="stock" class="block mt-1 w-full" type="number" name="stock"
                                     :value="old('stock', $product->stock)" required />
                                 <x-input-error :messages="$errors->get('stock')" class="mt-2" />
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <x-input-label for="status" :value="__('الحالة')" />
+                                <select id="status" name="status"
+                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>نشط</option>
+                                    <option value="inactive" {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>معطل</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
 
                             <!-- Store -->
@@ -84,11 +103,19 @@
 
                         <!-- Description -->
                         <div class="mt-6">
-                            <x-input-label for="description" :value="__('وصف المنتج')" />
-                            <textarea id="description" name="description" rows="4"
+                            <x-input-label for="description" :value="__('وصف مختصر')" />
+                            <textarea id="description" name="description" rows="3"
                                 class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 required>{{ old('description', $product->description) }}</textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                        </div>
+
+                        <!-- Full Description -->
+                        <div class="mt-6">
+                            <x-input-label for="full_description" :value="__('الوصف الكامل')" />
+                            <textarea id="full_description" name="full_description" rows="5"
+                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('full_description', $product->full_description) }}</textarea>
+                            <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end mt-6">

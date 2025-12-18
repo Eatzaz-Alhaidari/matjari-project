@@ -47,10 +47,16 @@
                                         المنتج</th>
                                     <th
                                         class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        الماركة</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         السعر</th>
                                     <th
                                         class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         المخزون</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        الحالة</th>
                                     <th
                                         class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         المتجر</th>
@@ -83,10 +89,19 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
+                                            {{ $product->brand ?? 'غير محدد' }}
+                                        </td>
+                                        <td class="px-5 py-4 text-sm text-gray-900">
                                             {{ number_format($product->price, 2) }} ر.س
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
                                             {{ $product->stock }}
+                                        </td>
+                                        <td class="px-5 py-4 text-sm text-gray-900">
+                                            <span class="px-2 py-1 text-xs rounded-full font-semibold 
+                                                {{ $product->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                {{ $product->status === 'active' ? 'نشط' : 'معطل' }}
+                                            </span>
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-500">
                                             {{ $product->store->name ?? 'غير محدد' }}
@@ -96,6 +111,25 @@
                                         </td>
                                         <td class="px-5 py-4 text-center text-sm font-medium">
                                             <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                                <a href="{{ route('admin.products.show', $product->id) }}"
+                                                    class="px-2 py-1 text-xs rounded-full font-semibold bg-gray-100 text-gray-800 hover:bg-gray-200"
+                                                    title="عرض التفاصيل">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                </a>
+                                                <form action="{{ route('admin.products.toggleStatus', $product->id) }}"
+                                                    method="POST"
+                                                    class="inline-block">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                        class="px-2 py-1 text-xs rounded-full font-semibold 
+                                                        {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                        {{ $product->status === 'active' ? 'تعطيل' : 'تفعيل' }}
+                                                    </button>
+                                                </form>
                                                 <a href="{{ route('admin.products.edit', $product->id) }}"
                                                     class="px-2 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200">تعديل</a>
                                                 <form action="{{ route('admin.products.destroy', $product->id) }}"
@@ -112,7 +146,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">لا توجد منتجات حالياً.
+                                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">لا توجد منتجات حالياً.
                                         </td>
                                     </tr>
                                 @endforelse

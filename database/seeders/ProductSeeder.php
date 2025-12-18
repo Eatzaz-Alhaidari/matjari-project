@@ -48,14 +48,13 @@ class ProductSeeder extends Seeder
             Product::create([
                 'store_id' => $store->id,
                 'category_id' => $category->id,
-                'name_ar' => 'منتج تجريبي ' . ($i + 1),
-                'name_en' => 'Test Product ' . ($i + 1),
-                'slug' => 'test-product-' . ($i + 1) . '-' . Str::random(5),
-                'description_ar' => 'وصف تجريبي للمنتج رقم ' . ($i + 1),
-                'description_en' => 'Test description for product ' . ($i + 1),
+                'name' => 'منتج تجريبي ' . ($i + 1),
+                'brand' => ['سامسونج', 'أبل', 'هواوي', 'شاومي', 'لينوفو', 'ديل', 'HP', 'أسوس', 'إل جي', 'سوني'][rand(0, 9)],
+                'description' => 'وصف مختصر للمنتج رقم ' . ($i + 1),
+                'full_description' => 'وصف كامل ومفصل للمنتج رقم ' . ($i + 1) . '. هذا المنتج يتميز بمواصفات عالية الجودة وأداء ممتاز. يأتي مع ضمان شامل وخدمة ما بعد البيع الممتازة.',
                 'price' => rand(10, 500),
                 'stock' => rand(0, 100),
-                'is_active' => true,
+                'status' => rand(0, 1) ? 'active' : 'inactive',
             ]);
         }
     }

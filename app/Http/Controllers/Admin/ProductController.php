@@ -42,15 +42,26 @@ class ProductController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Product $product)
+    {
+        return view('admin.products.show', compact('product'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:255',
             'description' => 'required|string',
+            'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -85,9 +96,12 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'nullable|string|max:255',
             'description' => 'required|string',
+            'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -122,5 +136,16 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم حذف المنتج بنجاح');
+    }
+
+    public function toggleStatus(Product $product)
+    {
+        $product->status = $product->status === 'active' ? 'inactive' : 'active';
+        $product->save();
+
+        $message = $product->status === 'active' ? 'تم تفعيل المنتج بنجاح' : 'تم تعطيل المنتج بنجاح';
+
+        return redirect()->route('admin.products.index')
+            ->with('success', $message);
     }
 }

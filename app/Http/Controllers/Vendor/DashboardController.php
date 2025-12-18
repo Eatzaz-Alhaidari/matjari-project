@@ -3,6 +3,16 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Store;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\Advertisement;
+use App\Models\Discount;
+use App\Models\Review;
+use App\Models\OrderItem;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Vendor\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -10,8 +20,107 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        // حالياً، لا نحتاج لإرسال أي بيانات.
-        // سنضيف الإحصائيات لاحقاً.
-        return view('vendor.dashboard');
+        // حساب الإحصائيات
+        $stats = [
+            'total_products' => Product::where('store_id', auth()->user()->store->id)->count(),
+            'active_products' => Product::where('store_id', auth()->user()->store->id)->where('status', 'active')->count(),
+            'inactive_products' => Product::where('store_id', auth()->user()->store->id)->where('status', 'inactive')->count(),
+            'total_orders' => Order::where('store_id', auth()->user()->store->id)->count(),
+            'pending_orders' => Order::where('store_id', auth()->user()->store->id)->where('status', 'pending')->count(),
+            'processing_orders' => Order::where('store_id', auth()->user()->store->id)->where('status', 'processing')->count(),
+            'shipped_orders' => Order::where('store_id', auth()->user()->store->id)->where('status', 'shipped')->count(),
+            'delivered_orders' => Order::where('store_id', auth()->user()->store->id)->where('status', 'delivered')->count(),
+            'total_sales' => Order::where('store_id', auth()->user()->store->id)->where('status', 'delivered')->sum('total_amount'),
+            'low_stock_products' => Product::where('store_id', auth()->user()->store->id)->where('stock', '>', 0)->where('stock', '<=', 5)->count(),
+            'active_advertisements' => Advertisement::where('store_id', auth()->user()->store->id)->where('status', 'active')->count(),
+            'active_discounts' => Discount::where('store_id', auth()->user()->store->id)->where('status', 'active')->count(),
+            'total_reviews' => Review::whereHas('product', function ($q) {
+                $q->where('store_id', auth()->user()->store->id);
+            })->count(),
+            'pending_reviews' => Review::whereHas('product', function ($q) {
+                $q->where('store_id', auth()->user()->store->id);
+            })->where('status', 'pending')->count(),
+            'average_rating' => Review::whereHas('product', function ($q) {
+                $q->where('store_id', auth()->user()->store->id);
+            })->where('status', 'approved')->avg('rating') ?? 0,
+        ];
+
+        // حساب أفضل 5 منتجات بناءً على المبيعات (آخر 30 يوم)
+        $storeId = auth()->user()->store->id;
+        $startDate = now()->subDays(30)->startOfDay();
+
+        $top5Products = Product::where('products.store_id', $storeId)
+            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+            ->leftJoin('orders', function ($join) use ($startDate) {
+                $join->on('order_items.order_id', '=', 'orders.id')
+                    ->where('orders.created_at', '>=', $startDate)
+                    ->where('orders.status', 'delivered');
+            })
+            ->select(
+                'products.*',
+                DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_quantity_sold')
+            )
+            ->groupBy(
+                'products.id',
+                'products.name',
+                'products.brand',
+                'products.description',
+                'products.full_description',
+                'products.price',
+                'products.stock',
+                'products.status',
+                'products.image',
+                'products.store_id',
+                'products.category_id',
+                'products.created_at',
+                'products.updated_at',
+                'products.warranty'
+            )
+            ->orderByDesc('total_quantity_sold')
+            ->limit(5)
+            ->get();
+
+        $stats['top_products_count'] = $top5Products->count();
+        $stats['top_products_total_sold'] = $top5Products->sum('total_quantity_sold');
+
+        // إضافة معلومات المحفظة
+        $wallet = Wallet::where('vendor_id', auth()->user()->id)->first();
+        $stats['wallet_balance'] = $wallet ? $wallet->balance : 0;
+        $stats['total_earnings'] = $wallet ? $wallet->total_earnings : 0;
+
+        return view('vendor.dashboard', compact('stats', 'top5Products'));
+    }
+
+    public function editStore(): View
+    {
+        $store = auth()->user()->store;
+        return view('vendor.store.edit', compact('store'));
+    }
+
+    public function updateStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'commercial_registration' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $store = auth()->user()->store;
+
+        $data = $request->except('logo_path');
+
+        if ($request->hasFile('logo_path')) {
+            // Delete old logo if exists
+            if ($store->logo_path) {
+                \Storage::disk('public')->delete($store->logo_path);
+            }
+            $data['logo_path'] = $request->file('logo_path')->store('logos', 'public');
+        }
+
+        $store->update($data);
+
+        return redirect()->route('vendor.dashboard')->with('success', 'تم تحديث بيانات المتجر بنجاح');
     }
 }

@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
        // استدعاء الـ Seeder الخاص بنا هنا
         $this->call([
             RolesAndPermissionsSeeder::class,
+            CategorySeeder::class,
+            AdvertisementSeeder::class,
+            DiscountSeeder::class,
             // يمكنكِ إضافة Seeders أخرى هنا لاحقاً لبيانات تجريبية للمنتجات، المتاجر، إلخ.
         ]);
     }
