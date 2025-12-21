@@ -27,7 +27,7 @@
                             </label>
                             <input type="text" id="title" name="title" value="{{ old('title') }}"
                                 class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-orange focus:border-brand-orange @error('title') border-red-500 @enderror"
-                                placeholder="مثال: خصم عيد الأم">
+                                placeholder="مثال: خصومات بداية السنه ">
                             @error('title')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror

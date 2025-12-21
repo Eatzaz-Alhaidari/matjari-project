@@ -33,7 +33,7 @@
                                     @endif
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">السعر:</span>
-                                        <span class="text-green-600 font-semibold">{{ number_format($product->price, 2) }} ر.س</span>
+                                        <span class="text-green-600 font-semibold">{{ number_format($product->price, 2) }} ر.ي</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">المخزون:</span>

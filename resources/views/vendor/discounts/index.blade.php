@@ -102,13 +102,13 @@
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
                                             <span class="px-2 py-1 text-xs rounded-full font-semibold
-                                                            @if($discount->status === 'active')
-                                                                bg-green-100 text-green-800
-                                                            @elseif($discount->status === 'inactive')
-                                                                bg-red-100 text-red-800
-                                                            @else
-                                                                bg-gray-100 text-gray-800
-                                                            @endif">
+                                                                @if($discount->status === 'active')
+                                                                    bg-green-100 text-green-800
+                                                                @elseif($discount->status === 'inactive')
+                                                                    bg-red-100 text-red-800
+                                                                @else
+                                                                    bg-gray-100 text-gray-800
+                                                                @endif">
                                                 {{ $discount->status_text }}
                                             </span>
                                             @if($discount->isExpired() && $discount->status === 'active')
@@ -146,7 +146,7 @@
                                                         @method('PATCH')
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                    {{ $discount->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                                                            {{ $discount->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
                                                             {{ $discount->status === 'active' ? 'تعطيل' : 'تفعيل' }}
                                                         </button>
                                                     </form>

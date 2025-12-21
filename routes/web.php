@@ -113,7 +113,10 @@ Route::prefix('vendor')
         Route::patch('products/{product}/toggle-status', [\App\Http\Controllers\Vendor\ProductController::class, 'toggleStatus'])->name('products.toggleStatus');
 
         // إدارة الطلبات
-        Route::resource('orders', \App\Http\Controllers\Vendor\OrderController::class)->except(['create', 'store', 'edit', 'destroy']);
+        Route::resource('orders', \App\Http\Controllers\Vendor\OrderController::class)->except(['edit', 'destroy']);
+        // إضافة مسارات إنشاء الطلبات للبائع (إن لم تكن ضمن الـresource)
+        Route::get('orders/create', [\App\Http\Controllers\Vendor\OrderController::class, 'create'])->name('orders.create');
+        Route::post('orders', [\App\Http\Controllers\Vendor\OrderController::class, 'store'])->name('orders.store');
 
         // إدارة المخازن
         Route::get('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'import'])->name('warehouse.import');

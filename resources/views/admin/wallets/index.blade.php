@@ -37,13 +37,13 @@
                                             <div class="text-xs text-gray-500">{{ $wallet->vendor?->email }}</div>
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->balance, 2) }} ر.س
+                                            {{ number_format($wallet->balance, 2) }} ر.ي
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->total_earnings, 2) }} ر.س
+                                            {{ number_format($wallet->total_earnings, 2) }} ر.ي
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->withdrawn_amount, 2) }} ر.س
+                                            {{ number_format($wallet->withdrawn_amount, 2) }} ر.ي
                                         </td>
                                     </tr>
                                 @empty

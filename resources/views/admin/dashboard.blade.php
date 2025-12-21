@@ -78,8 +78,8 @@
                 </div>
                 <div class="mr-4">
                     <h3 class="text-lg font-bold text-gray-800">إدارة المحافظ</h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        <span class="font-extrabold text-purple-600">{{ number_format($walletTotalBalance, 2) }}</span> ر.س
+                        <p class="mt-1 text-sm text-gray-500">
+                        <span class="font-extrabold text-purple-600">{{ number_format($walletTotalBalance, 2) }}</span> ر.ي
                     </p>
                 </div>
             </div>

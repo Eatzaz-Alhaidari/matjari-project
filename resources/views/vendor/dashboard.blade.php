@@ -90,7 +90,7 @@
                     </svg>
                 </div>
                 <div class="mr-4">
-                    <h3 class="text-lg font-bold text-gray-800">إدارة الخصومات</h3>
+                    <h3 class="text-lg font-bold text-gray-800">إدارة الخصومات </h3>
                     <p class="mt-1 text-sm text-gray-500"><span
                             class="font-extrabold text-pink-600">{{ $stats['active_discounts'] ?? 0 }}</span> كوبون فعال
                     </p>
