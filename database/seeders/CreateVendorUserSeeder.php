@@ -20,7 +20,7 @@ class CreateVendorUserSeeder extends Seeder
             Role::create(['name' => 'vendor']);
         }
 
-        // 2. Create the user
+        // 2. Create or Update the user
         $email = 'vendor@app.com';
         $user = User::where('email', $email)->first();
 
@@ -28,8 +28,15 @@ class CreateVendorUserSeeder extends Seeder
             $user = User::create([
                 'name' => 'تاجر تجريبي',
                 'email' => $email,
-                'password' => Hash::make('password'), // كلمة المرور
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'status' => 'active', // Ensure active status
+            ]);
+        } else {
+            // Update existing user ensuring active status
+            $user->update([
+                'status' => 'active',
+                'password' => Hash::make('password'), // Ensure known password
             ]);
         }
 
@@ -52,5 +59,6 @@ class CreateVendorUserSeeder extends Seeder
         $this->command->info("Vendor User Created/Updated Successfully.");
         $this->command->info("Email: {$email}");
         $this->command->info("Password: password");
+        $this->command->info("Status: Active");
     }
 }

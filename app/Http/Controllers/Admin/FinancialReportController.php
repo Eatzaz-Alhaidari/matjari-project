@@ -104,6 +104,24 @@ class FinancialReportController extends Controller
             ->limit(10)
             ->get();
 
+        // 1. حساب صافي أرباح المنصة (العمولة - افتراضياً 10%)
+        $platformCommissionRate = 0.10; // 10%
+        $platformNetProfit = $totalSales * $platformCommissionRate;
+
+        // 2. قائمة أفضل المتاجر أداءً
+        $topStoresByRevenue = Order::where('status', 'delivered')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                'store_id',
+                DB::raw('SUM(total_amount) as revenue'),
+                DB::raw('COUNT(id) as orders_count')
+            )
+            ->groupBy('store_id')
+            ->with('store') // لجلب اسم المتجر
+            ->orderByDesc('revenue')
+            ->limit(5)
+            ->get();
+
         // مقارنة مع الفترة السابقة
         $previousPeriod = $this->getPreviousPeriod($period, $startDate, $endDate);
         $previousSales = Order::where('status', 'delivered')
@@ -151,7 +169,9 @@ class FinancialReportController extends Controller
             'startDate',
             'endDate',
             'customStart',
-            'customEnd'
+            'customEnd',
+            'platformNetProfit',
+            'topStoresByRevenue'
         ));
     }
 

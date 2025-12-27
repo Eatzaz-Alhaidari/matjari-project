@@ -1,265 +1,237 @@
 <x-admin-layout>
     <x-slot name="title">
-        التقارير المالية
+        التقارير المالية للمنصة
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
-
-            <!-- فلتر الفترة الزمنية (مطابق لتابِع البائع لكن توجيه للادمن) -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <h2 class="text-2xl font-bold text-black mb-6">التقارير المالية</h2>
-                    <form action="{{ route('admin.reports.financial') }}" method="GET" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">الفترة الزمنية</label>
-                                <select name="period" id="period" onchange="toggleCustomDates()"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm">
-                                    <option value="week" {{ $period == 'week' ? 'selected' : '' }}>هذا الأسبوع</option>
-                                    <option value="month" {{ $period == 'month' ? 'selected' : '' }}>هذا الشهر</option>
-                                    <option value="year" {{ $period == 'year' ? 'selected' : '' }}>هذا العام</option>
-                                    <option value="last_month" {{ $period == 'last_month' ? 'selected' : '' }}>الشهر الماضي</option>
-                                    <option value="last_year" {{ $period == 'last_year' ? 'selected' : '' }}>العام الماضي</option>
-                                    <option value="custom" {{ $period == 'custom' ? 'selected' : '' }}>مخصص</option>
-                                </select>
-                            </div>
-                            <div id="custom-dates" style="{{ $period == 'custom' ? '' : 'display: none;' }}">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">من تاريخ</label>
-                                <input type="date" name="start_date"
-                                    value="{{ $customStart ?? $startDate->format('Y-m-d') }}"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm">
-                            </div>
-                            <div id="custom-dates-end" style="{{ $period == 'custom' ? '' : 'display: none;' }}">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">إلى تاريخ</label>
-                                <input type="date" name="end_date" value="{{ $customEnd ?? $endDate->format('Y-m-d') }}"
-                                    class="w-full border-gray-300 rounded-lg shadow-sm">
-                            </div>
-                            <div class="flex items-end">
-                                <button type="submit"
-                                    class="w-full px-4 py-2 bg-brand-orange text-white font-semibold rounded-lg shadow-md hover:bg-brand-orange-700">
-                                    تطبيق
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            
+            <!-- Filter Tabs -->
+            <div class="bg-white border-b border-gray-200 mb-6 flex overflow-x-auto shadow-sm sm:rounded-lg">
+                <a href="{{ route('admin.reports.financial', ['period' => 'week']) }}" 
+                   class="px-6 py-4 font-bold text-sm focus:outline-none border-b-2 transition-colors duration-150 {{ $period == 'week' ? 'border-brand-blue text-brand-blue bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    تقرير أسبوعي
+                </a>
+                <a href="{{ route('admin.reports.financial', ['period' => 'month']) }}" 
+                   class="px-6 py-4 font-bold text-sm focus:outline-none border-b-2 transition-colors duration-150 {{ $period == 'month' ? 'border-brand-blue text-brand-blue bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    تقرير شهري
+                </a>
+                <a href="{{ route('admin.reports.financial', ['period' => 'year']) }}" 
+                   class="px-6 py-4 font-bold text-sm focus:outline-none border-b-2 transition-colors duration-150 {{ $period == 'year' ? 'border-brand-blue text-brand-blue bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    تقرير سنوي
+                </a>
+                <a href="{{ route('admin.reports.financial', ['period' => 'custom']) }}" 
+                   class="px-6 py-4 font-bold text-sm focus:outline-none border-b-2 transition-colors duration-150 {{ $period == 'custom' ? 'border-brand-blue text-brand-blue bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50' }}">
+                    فترة مخصصة
+                </a>
             </div>
 
-            <!-- بطاقات المحفظة (ابقى على ألوان الادمن للبطاقات الثلاثة الأولى) -->
-            <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-3">
-                <div class="p-6 bg-orange-100 rounded-lg shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">إجمالي الأرصدة الحالية</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">{{ number_format($totalBalances, 2) }} ر.ي</p>
-                        </div>
-                        <div class="p-3 bg-orange-50 rounded-full">
-                            <svg class="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
-                                <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
+            <!-- Custom Date Form -->
+            @if($period == 'custom')
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6 p-6 border-t-4 border-brand-blue">
+                <form action="{{ route('admin.reports.financial') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                    <input type="hidden" name="period" value="custom">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">من تاريخ</label>
+                        <input type="date" name="start_date" value="{{ $customStart }}" class="rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-sm">
                     </div>
-                </div>
-
-                <div class="p-6 bg-green-100 rounded-lg shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">إجمالي أرباح التجار</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">{{ number_format($totalEarnings, 2) }} ر.ي</p>
-                        </div>
-                        <div class="p-3 bg-green-50 rounded-full">
-                            <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4z"></path>
-                            </svg>
-                        </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">إلى تاريخ</label>
+                        <input type="date" name="end_date" value="{{ $customEnd }}" class="rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-sm">
                     </div>
-                </div>
-
-                <div class="p-6 bg-blue-100 rounded-lg shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">إجمالي المبالغ المسحوبة</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">{{ number_format($totalWithdrawals, 2) }} ر.ي</p>
-                        </div>
-                        <div class="p-3 bg-blue-50 rounded-full">
-                            <svg class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                    <button type="submit" class="bg-brand-blue hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">تحديث التقرير</button>
+                </form>
             </div>
+            @endif
 
-            <!-- إحصائيات المبيعات (مطابقة لتصميم البائع لكن مع ألوان متناسقة) -->
-            <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-4">
-                <div class="p-6 bg-purple-100 rounded-xl shadow-md">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Platform Net Profit (NEW) -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg border-b-4 border-yellow-500 p-6 relative">
+                    <div class="absolute top-0 left-0 p-2">
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">عمولة 10%</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 mb-1">صافي أرباح المنصة</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ number_format($platformNetProfit, 2) }} <span class="text-sm font-normal text-gray-400">ر.س</span></h3>
+                        </div>
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500">
+                        الدخل الصافي للمنصة من العمولات
+                    </div>
+                </div>
+
+                <!-- Total Sales (GMV) -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg border-b-4 border-blue-500 p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">إجمالي المبيعات</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($summary['total_sales'], 2) }} ر.ي</p>
-                            @if($summary['sales_growth'] != 0)
-                                <p class="text-xs mt-1 {{ $summary['sales_growth'] > 0 ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $summary['sales_growth'] > 0 ? '↑' : '↓' }} {{ number_format(abs($summary['sales_growth']), 1) }}%
-                                </p>
-                            @endif
+                            <p class="text-sm font-medium text-gray-500 mb-1">إجمالي مبيعات المتاجر (GMV)</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ number_format($summary['total_sales'], 2) }} <span class="text-sm font-normal text-gray-400">ر.س</span></h3>
                         </div>
-                        <div class="p-3 bg-purple-50 rounded-full">
-                            <svg class="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                             </svg>
                         </div>
                     </div>
-                </div>
-
-                <div class="p-6 bg-yellow-100 rounded-xl shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">إجمالي الطلبات</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($summary['total_orders']) }}</p>
-                        </div>
-                        <div class="p-3 bg-yellow-50 rounded-full">
-                            <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                        </div>
+                    @if($summary['sales_growth'] != 0)
+                    <div class="mt-4 text-sm {{ $summary['sales_growth'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                        <span class="font-bold">{{ $summary['sales_growth'] >= 0 ? '+' : '' }}{{ number_format($summary['sales_growth'], 1) }}%</span> 
+                        نمو عن الفترة السابقة
                     </div>
+                    @endif
                 </div>
 
-                <div class="p-6 bg-orange-100 rounded-xl shadow-md">
+                <!-- Total Orders -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg border-b-4 border-purple-500 p-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600">متوسط قيمة الطلب</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($summary['average_order_value'], 2) }} ر.ي</p>
+                            <p class="text-sm font-medium text-gray-500 mb-1">إجمالي الطلبات</p>
+                            <h3 class="text-2xl font-bold text-gray-800">{{ number_format($summary['total_orders']) }} <span class="text-sm font-normal text-gray-400">طلب</span></h3>
                         </div>
-                        <div class="p-3 bg-orange-50 rounded-full">
-                            <svg class="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-6 bg-indigo-100 rounded-xl shadow-md">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600">الكمية المباعة</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($summary['total_quantity_sold']) }}</p>
-                            <p class="text-xs text-gray-500 mt-1">قطعة</p>
-                        </div>
-                        <div class="p-3 bg-indigo-50 rounded-full">
-                            <svg class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- المبيعات حسب حالة الطلب وطرق الدفع (مطابق للبائع) -->
-            <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">المبيعات حسب حالة الطلب</h3>
-                        <div class="space-y-3">
-                            @foreach(['delivered' => 'مسلمة', 'processing' => 'قيد المعالجة', 'shipped' => 'تم الشحن', 'pending' => 'في الانتظار', 'cancelled' => 'ملغاة'] as $status => $label)
-                                @php
-                                    $statusData = $salesByStatus->get($status);
-                                    $count = $statusData ? $statusData->count : 0;
-                                    $total = $statusData ? $statusData->total : 0;
-                                @endphp
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div>
-                                        <p class="font-semibold text-gray-800">{{ $label }}</p>
-                                        <p class="text-sm text-gray-600">{{ $count }} طلب</p>
-                                    </div>
-                                    <div class="text-left">
-                                        <p class="font-bold text-gray-900">{{ number_format($total, 2) }} ر.ي</p>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <span class="font-bold text-gray-800">{{ $summary['delivered_orders'] }}</span> طلب مكتمل
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">المبيعات حسب طريقة الدفع</h3>
-                        <div class="space-y-3">
-                            @php
-                                $paymentLabels = [
-                                    'cash_on_delivery' => 'الدفع عند الاستلام',
-                                    'credit_card' => 'بطاقة ائتمانية',
-                                    'bank_transfer' => 'تحويل بنكي',
-                                ];
-                            @endphp
-                            @foreach($paymentLabels as $method => $label)
-                                @php
-                                    $paymentData = $salesByPayment->get($method);
-                                    $count = $paymentData ? $paymentData->count : 0;
-                                    $total = $paymentData ? $paymentData->total : 0;
-                                @endphp
-                                @if($count > 0)
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div>
-                                            <p class="font-semibold text-gray-800">{{ $label }}</p>
-                                            <p class="text-sm text-gray-600">{{ $count }} طلب</p>
-                                        </div>
-                                        <div class="text-left">
-                                            <p class="font-bold text-gray-900">{{ number_format($total, 2) }} ر.ي</p>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
+                <!-- Wallet Balance -->
+                <div class="bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg border-b-4 border-gray-600 p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-300 mb-1">مستحقات التجار</p>
+                            <h3 class="text-2xl font-bold">{{ number_format($walletStats['balance'], 2) }} <span class="text-sm font-normal text-gray-400">ر.س</span></h3>
                         </div>
+                        <div class="p-3 rounded-full bg-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-400 flex justify-between">
+                        <span>تم سحبه: {{ number_format($walletStats['withdrawn_amount'], 2) }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- أفضل المنتجات حسب الإيرادات -->
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">أفضل المنتجات حسب الإيرادات</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead class="bg-brand-orange-50">
-                                <tr>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-orange-800 uppercase">المنتج</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-orange-800 uppercase">الكمية المباعة</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-orange-800 uppercase">الإيرادات</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($topProductsByRevenue->where('revenue', '>', 0) as $product)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-5 py-4">
-                                            <div class="flex items-center">
-                                                @if($product->image)
-                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-10 h-10 rounded-lg object-cover ml-3">
-                                                @endif
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900">{{ $product->name }}</p>
-                                                    @if($product->brand)
-                                                        <p class="text-xs text-gray-500">{{ $product->brand }}</p>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-5 py-4 text-center">
-                                            <span class="text-sm font-semibold text-gray-700">{{ number_format($product->quantity_sold) }}</span>
-                                        </td>
-                                        <td class="px-5 py-4 text-center">
-                                            <span class="text-sm font-bold text-gray-700">{{ number_format($product->revenue, 2) }} ر.ي</span>
-                                        </td>
-                                    </tr>
-                                @empty
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Sales Chart -->
+                <div class="lg:col-span-2 bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">منحنى مبيعات المنصة</h3>
+                    <div class="relative h-72">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Status Chart -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">توزيع حالات الطلبات</h3>
+                    <div class="relative h-56 flex justify-center">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500 text-center">
+                        إجمالي عدد الطلبات: {{ $summary['total_orders'] }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Top Stores Table (NEW) -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            المتاجر الأعلى أداءً
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
                                     <tr>
-                                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">لا توجد بيانات في الفترة المحددة</td>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">المتجر</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">عدد الطلبات</th>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">إجمالي المبيعات</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse($topStoresByRevenue as $storeData)
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-4 py-4 whitespace-nowrap font-bold text-gray-800">
+                                            {{ $storeData->store->name ?? 'متجر غير معروف' }}
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-center text-sm">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                {{ $storeData->orders_count }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                                            {{ number_format($storeData->revenue, 2) }} ر.س
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500 text-sm">
+                                            لا توجد بيانات.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Products Table -->
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">المنتجات الأكثر مبيعاً</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">المنتج</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">مباع</th>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">الإيرادات</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse($topProductsByRevenue->take(5) as $product)
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="px-4 py-4 whitespace-nowrap flex items-center gap-2">
+                                            @if($product->image)
+                                                <img src="{{ Storage::url($product->image) }}" class="w-8 h-8 rounded object-cover border">
+                                            @endif
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[150px]" title="{{ $product->name }}">{{ $product->name }}</div>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-center">
+                                            <span class="text-sm text-gray-600">{{ $product->quantity_sold }}</span>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                                            {{ number_format($product->revenue, 2) }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-8 text-center text-gray-500 text-sm">
+                                            لا توجد بيانات.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -267,19 +239,79 @@
         </div>
     </div>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        function toggleCustomDates() {
-            const period = document.getElementById('period').value;
-            const customDates = document.getElementById('custom-dates');
-            const customDatesEnd = document.getElementById('custom-dates-end');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Shared Options
+            Chart.defaults.font.family = "'Cairo', sans-serif";
+            
+            // Sales Chart
+            const ctxSales = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctxSales, {
+                type: 'line',
+                data: {
+                    labels: @json($dailySales->pluck('date')),
+                    datasets: [{
+                        label: 'مبيعات المنصة (ر.س)',
+                        data: @json($dailySales->pluck('total')),
+                        borderColor: '#2563EB', // brand-blue-600 approx
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563EB',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4] }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
 
-            if (period === 'custom') {
-                customDates.style.display = 'block';
-                customDatesEnd.style.display = 'block';
-            } else {
-                customDates.style.display = 'none';
-                customDatesEnd.style.display = 'none';
-            }
-        }
+            // Status Chart
+            const arabicStatus = {
+                'pending': 'قيد الانتظار',
+                'processing': 'جاري التجهيز',
+                'shipped': 'تم الشحن',
+                'delivered': 'تم التوصيل',
+                'cancelled': 'ملغي'
+            };
+            const statusKeys = @json(array_keys($salesByStatus->toArray()));
+            const statusLabels = statusKeys.map(k => arabicStatus[k] || k);
+            
+            new Chart(document.getElementById('statusChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: @json(array_column($salesByStatus->toArray(), 'count')),
+                        backgroundColor: ['#fbbf24', '#60a5fa', '#818cf8', '#34d399', '#f87171'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12 } }
+                    }
+                }
+            });
+        });
     </script>
 </x-admin-layout>

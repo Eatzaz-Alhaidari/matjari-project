@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
@@ -14,19 +14,25 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             'لابتوبات',
-            'كاميرات',
-            'سماعات',
-            'هارد',
-            'رام',
-            'لوحة مفاتيح',
+            'أجهزة كمبيوتر مكتبية',
+            'شواحن',
+            'فلاشات USB',
+            'فارات (فأرة)',
+            'كيبوردات',
             'طابعات',
-            'ماوس',
+            'سماعات',
+            'شاشات كمبيوتر',
+            'برمجيات وبرامج',
         ];
 
-        foreach ($categories as $category) {
-            \App\Models\Category::create([
-                'name' => $category,
-            ]);
+        foreach ($categories as $cat) {
+            Category::firstOrCreate(
+                ['name' => $cat],
+                [
+                    'slug' => \Illuminate\Support\Str::slug($cat),
+                    'status' => 'active'
+                ]
+            );
         }
     }
 }

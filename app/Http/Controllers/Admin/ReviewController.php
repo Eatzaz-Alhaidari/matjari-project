@@ -9,11 +9,30 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reviews = Review::with(['user', 'product'])->latest()->paginate(10);
+        $query = Review::with(['user', 'product.store']);
 
-        // Summary stats similar to vendor view
+        // Filter by Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by Rating
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+
+        // Filter by Store (via Product)
+        if ($request->filled('store_id')) {
+            $query->whereHas('product', function ($q) use ($request) {
+                $q->where('store_id', $request->store_id);
+            });
+        }
+
+        $reviews = $query->latest()->paginate(10);
+
+        // Summary stats
         $total = Review::count();
         $average = Review::avg('rating') ? round(Review::avg('rating'), 1) : 0;
         $pending = Review::where('status', 'pending')->count();
@@ -26,8 +45,9 @@ class ReviewController extends Controller
             'approved' => $approved,
         ];
 
-        $products = Product::select('id', 'name')->orderBy('name')->get();
+        // Fetch stores for the filter dropdown
+        $stores = \App\Models\Store::select('id', 'name')->orderBy('name')->get();
 
-        return view('admin.reviews.index', compact('reviews', 'stats', 'products'));
+        return view('admin.reviews.index', compact('reviews', 'stats', 'stores'));
     }
 }

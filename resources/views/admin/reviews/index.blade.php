@@ -87,12 +87,12 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">المنتج</label>
-                                <select name="product_id" class="w-full border-gray-300 rounded-lg shadow-sm">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">المتجر</label>
+                                <select name="store_id" class="w-full border-gray-300 rounded-lg shadow-sm">
                                     <option value="">الكل</option>
-                                    @foreach($products as $product)
-                                        <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
-                                            {{ $product->name }}
+                                    @foreach($stores as $store)
+                                        <option value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
+                                            {{ $store->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -121,7 +121,8 @@
                         <table class="min-w-full">
                             <thead class="bg-brand-blue-50">
                                 <tr>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">المنتج</th>
+                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">المتجر</th>
+                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">المنتج المقيم</th>
                                     <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">اسم العميل</th>
                                     <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التقييم</th>
                                     <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التعليق</th>
@@ -135,13 +136,23 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-5 py-4">
                                             <div class="flex items-center">
-                                                @if($review->product->image)
+                                                @if($review->product && $review->product->store && $review->product->store->logo_path)
                                                     <div class="flex-shrink-0 w-10 h-10 ml-3">
-                                                        <img class="w-10 h-10 rounded-full object-cover" src="{{ asset('storage/' . $review->product->image) }}" alt="{{ $review->product->name }}">
+                                                        <img class="w-10 h-10 rounded-full object-cover" src="{{ asset('storage/' . $review->product->store->logo_path) }}" alt="{{ $review->product->store->name }}">
                                                     </div>
+                                                @else
+                                                     <div class="flex-shrink-0 w-10 h-10 ml-3 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs">
+                                                        {{ substr($review->product->store->name ?? 'S', 0, 1) }}
+                                                     </div>
                                                 @endif
-                                                <div class="text-sm font-medium text-gray-900">{{ $review->product->name ?? 'منتج محذوف' }}</div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ $review->product->store->name ?? 'متجر غير معروف' }}</div>
+                                                    <a href="{{ route('admin.stores.edit', $review->product->store->id ?? 0) }}" class="text-xs text-brand-blue hover:underline">عرض المتجر</a>
+                                                </div>
                                             </div>
+                                        </td>
+                                        <td class="px-5 py-4">
+                                             <div class="text-sm text-gray-500">{{ $review->product->name ?? 'منتج محذوف' }}</div>
                                         </td>
                                         <td class="px-5 py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $review->user->name ?? 'غير معروف' }}</div>

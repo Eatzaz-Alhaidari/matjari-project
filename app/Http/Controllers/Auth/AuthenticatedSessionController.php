@@ -22,33 +22,37 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-   public function store(LoginRequest $request): RedirectResponse
-{
-    $request->authenticate(); // <-- هذا يتحقق من الإيميل وكلمة المرور
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate(); // <-- هذا يتحقق من الإيميل وكلمة المرور
 
-    // ##### بداية الكود المضاف #####
-    $user = Auth::getProvider()->retrieveByCredentials($request->only('email'));
-    if ($user && $user->status !== 'active') {
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // ##### بداية الكود المضاف #####
+        $user = Auth::getProvider()->retrieveByCredentials($request->only('email'));
+        if ($user && $user->status !== 'active') {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return back()->withErrors([
-            'email' => 'هذا الحساب غير نشط أو تم حظره.',
-        ]);
+            return back()->withErrors([
+                'email' => 'هذا الحساب غير نشط أو تم حظره.',
+            ]);
+        }
+        // ##### نهاية الكود المضاف #####
+
+        $request->session()->regenerate();
+
+        // ... (باقي كود التوجيه لا يتغير)
+        // توجيه المستخدم حسب الصلاحية
+        if ($request->user()->hasRole('super-admin')) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        if ($request->user()->hasRole('vendor')) {
+            return redirect()->intended(route('vendor.dashboard'));
+        }
+
+        return redirect()->intended('/');
     }
-    // ##### نهاية الكود المضاف #####
-
-    $request->session()->regenerate();
-
-    // ... (باقي كود التوجيه لا يتغير)
-    $url = '';
-    if ($request->user()->hasRole('super-admin')) { /* ... */ }
-    elseif ($request->user()->hasRole('vendor')) { /* ... */ }
-    else { $url = '/'; }
-
-    return redirect()->intended($url);
-}
 
     /**
      * Destroy an authenticated session.

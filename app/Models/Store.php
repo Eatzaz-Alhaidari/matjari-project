@@ -21,10 +21,17 @@ class Store extends Model
         'description',
         'logo_path',
         'is_active',
-        
+
         // ##### الحقول الجديدة التي أضفناها #####
         'commercial_registration',
         'address',
+        'slogan',
+        'cover_image_path',
+        'support_phone',
+        'support_email',
+        'shipping_policy',
+        'return_policy',
+        'accounting_system',
     ];
 
 

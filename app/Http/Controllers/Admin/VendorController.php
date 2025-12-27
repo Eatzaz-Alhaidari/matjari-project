@@ -28,7 +28,7 @@ class VendorController extends Controller
             // أضف شرط البحث
             $vendorsQuery->where(function ($query) use ($searchTerm) {
                 $query->where('name', 'LIKE', "%{$searchTerm}%")
-                      ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
 
@@ -144,7 +144,7 @@ class VendorController extends Controller
 
         $vendor->store()->updateOrCreate(
             ['user_id' => $vendor->id],
-            [ 
+            [
                 'name' => $validated['store_name'],
                 'slug' => Str::slug($validated['store_name']),
                 'commercial_registration' => $validated['commercial_registration'],
@@ -160,25 +160,25 @@ class VendorController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(User $vendor): RedirectResponse
-{
-    // نتأكد أن المستخدم الذي نحاول حذفه هو بائع
-    if ($vendor->hasRole('vendor')) {
-        // ملاحظة: بفضل onDelete('cascade') في ملف الـ migration،
-        // عند حذف البائع، سيتم حذف متجره تلقائياً.
-        
-        // إذا كان لديه صورة، قم بحذفها من الـ storage
-        if ($vendor->profile_photo_path) {
-            Storage::disk('public')->delete($vendor->profile_photo_path);
+    {
+        // نتأكد أن المستخدم الذي نحاول حذفه هو بائع
+        if ($vendor->hasRole('vendor')) {
+            // ملاحظة: بفضل onDelete('cascade') في ملف الـ migration،
+            // عند حذف البائع، سيتم حذف متجره تلقائياً.
+
+            // إذا كان لديه صورة، قم بحذفها من الـ storage
+            if ($vendor->profile_photo_path) {
+                Storage::disk('public')->delete($vendor->profile_photo_path);
+            }
+
+            $vendor->delete(); // حذف المستخدم
+
+            return redirect()->route('admin.vendors.index')->with('success', 'تم حذف البائع بنجاح!');
         }
 
-        $vendor->delete(); // حذف المستخدم
-
-        return redirect()->route('admin.vendors.index')->with('success', 'تم حذف البائع بنجاح!');
+        return redirect()->route('admin.vendors.index')->with('error', 'حدث خطأ أثناء محاولة الحذف.');
     }
 
-    return redirect()->route('admin.vendors.index')->with('error', 'حدث خطأ أثناء محاولة الحذف.');
-}
-    
     /**
      * Toggle the active status of a vendor's store.
      */
@@ -192,5 +192,40 @@ class VendorController extends Controller
             session()->flash('error', 'هذا البائع ليس لديه متجر لتغيير حالته.');
         }
         return redirect()->route('admin.vendors.index');
+    }
+
+    /**
+     * Ban the specified vendor.
+     */
+    public function ban(Request $request, User $vendor): RedirectResponse
+    {
+        $request->validate([
+            'ban_reason' => 'required|string|max:500',
+        ]);
+
+        $vendor->update([
+            'status' => 'banned',
+            'ban_reason' => $request->ban_reason,
+        ]);
+
+        // اختيارياً: تعطيل المتجر عند الحظر
+        if ($vendor->store) {
+            $vendor->store->update(['is_active' => false]);
+        }
+
+        return redirect()->back()->with('success', 'تم حظر البائع بنجاح.');
+    }
+
+    /**
+     * Activate (Unban) the specified vendor.
+     */
+    public function activate(User $vendor): RedirectResponse
+    {
+        $vendor->update([
+            'status' => 'active',
+            'ban_reason' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'تم إعادة تفعيل البائع بنجاح.');
     }
 }

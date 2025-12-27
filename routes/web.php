@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\UserController;
@@ -26,8 +26,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// مسارات المصادقة (تسجيل دخول، تسجيل، ... الخ)
-// هذا الملف يحتوي على كل المسارات مثل /login, /register, /logout
+// مسارات المصادقة
 require __DIR__ . '/auth.php';
 
 // ==================== Admin Routes ====================
@@ -36,120 +35,120 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
 
+        // 1. Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('categories', CategoryController::class);
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
+        // 2. Vendors Management
         Route::post('vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggleStatus');
+        Route::post('vendors/{vendor}/ban', [VendorController::class, 'ban'])->name('vendors.ban');
+        Route::post('vendors/{vendor}/activate', [VendorController::class, 'activate'])->name('vendors.activate');
         Route::resource('vendors', VendorController::class);
 
-        // ##### الكود المضاف #####
-        Route::resource('stores', StoreController::class);
-        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
-        Route::patch('products/{product}/toggle-status', [\App\Http\Controllers\Admin\ProductController::class, 'toggleStatus'])->name('products.toggleStatus');
-        // ##### نهاية الكود المضاف #####
+        // 3. Stores Management
         Route::post('stores/{store}/toggle-status', [StoreController::class, 'toggleStatus'])->name('stores.toggleStatus');
         Route::resource('stores', StoreController::class);
-        Route::resource('users', UserController::class);
+
+        // 4. Products Management
+        // Use ['as' => 'admin'] to prefix resource route names with 'admin.' properly if needed,
+        // but since we are wrapped in name('admin.'), a simple resource usually suffices.
+        // However, let's correspond to previous fixes to ensure 'admin.products.index' exists.
+        Route::resource('products', ProductController::class);
+        Route::patch('/products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggleStatus');
+
+        // 5. Orders Management
+        Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+
+        // 6. Users (Customers) Management
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
         Route::resource('users', UserController::class);
 
-        // Wallets
+        // 7. Wallets
         Route::get('wallets', [\App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallets.index');
 
-        // Financial Reports
+        // 8. Financial Reports
         Route::get('reports/financial', [\App\Http\Controllers\Admin\FinancialReportController::class, 'index'])->name('reports.financial');
 
-        // Reviews
+        // 9. Reviews
         Route::get('reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+        Route::patch('reviews/{review}/update-status', [\App\Http\Controllers\Admin\ReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
 
-        // Notifications
+        // 10. Notifications
         Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
 
-        // Complaints
+        // 11. Complaints
         Route::get('complaints', [\App\Http\Controllers\Admin\ComplaintController::class, 'index'])->name('complaints.index');
 
-        // TEST NOTIFICATION ROUTE (Temporary)
+        // 12. Settings
+        Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+
+        // Coming Soon (Temporary for new features)
+        Route::get('coming-soon', function () {
+            return view('admin.coming-soon');
+        })->name('coming-soon');
+
+        // Test Route
         Route::get('/test-notification', function () {
             $user = \Illuminate\Support\Facades\Auth::user();
             if ($user) {
                 $user->notify(new \App\Notifications\TestNotification('تجربة إشعار جديد في ' . now()->toTimeString()));
-                return 'تم إرسال الإشعار بنجاح! اذهب الآن لصفحة الإشعارات لرؤيته.';
+                return 'تم إرسال الإشعار بنجاح!';
             }
             return 'يجب تسجيل الدخول أولاً.';
         });
     });
 
-// ==================== Protected Routes ====================
 
-// --- مجموعة مسارات الأدمن ---
-Route::prefix('admin')
-    ->middleware(['auth', 'role:super-admin'])
-    ->name('admin.')
-    ->group(function () {
-
-        // لوحة تحكم الأدمن الرئيسية
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-        // المسار الخاص بتغيير حالة المتجر
-        Route::post('vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggleStatus');
-
-        // المسارات الخاصة بإدارة البائعين (CRUD)
-        Route::resource('vendors', VendorController::class);
-
-        // (سنضيف باقي مسارات إدارة الأدمن هنا لاحقاً)
-    });
-
-
-// --- مجموعة مسارات البائع ---
+// ==================== Vendor Routes ====================
 Route::prefix('vendor')
     ->middleware(['auth', 'role:vendor'])
     ->name('vendor.')
     ->group(function () {
 
-        // لوحة تحكم البائع الرئيسية
-        Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
+        // Dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Vendor\DashboardController::class, 'index'])->name('dashboard');
 
-        // إدارة المنتجات
+        // Products
         Route::resource('products', \App\Http\Controllers\Vendor\ProductController::class);
         Route::patch('products/{product}/toggle-status', [\App\Http\Controllers\Vendor\ProductController::class, 'toggleStatus'])->name('products.toggleStatus');
 
-        // إدارة الطلبات
+        // Orders
         Route::resource('orders', \App\Http\Controllers\Vendor\OrderController::class)->except(['edit', 'destroy']);
-        // إضافة مسارات إنشاء الطلبات للبائع (إن لم تكن ضمن الـresource)
         Route::get('orders/create', [\App\Http\Controllers\Vendor\OrderController::class, 'create'])->name('orders.create');
         Route::post('orders', [\App\Http\Controllers\Vendor\OrderController::class, 'store'])->name('orders.store');
 
-        // إدارة المخازن
+        // Warehouse
         Route::get('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'import'])->name('warehouse.import');
         Route::post('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'processImport'])->name('warehouse.process-import');
         Route::get('warehouse', [\App\Http\Controllers\Vendor\WarehouseController::class, 'index'])->name('warehouse.index');
         Route::patch('warehouse/products/{product}/stock', [\App\Http\Controllers\Vendor\WarehouseController::class, 'updateStock'])->name('warehouse.updateStock');
 
-        // إدارة الإعلانات
+        // Advertisements
         Route::resource('advertisements', \App\Http\Controllers\Vendor\AdvertisementController::class);
         Route::patch('advertisements/{advertisement}/toggle-status', [\App\Http\Controllers\Vendor\AdvertisementController::class, 'toggleStatus'])->name('advertisements.toggleStatus');
 
-        // إدارة الخصومات
+        // Discounts
         Route::resource('discounts', \App\Http\Controllers\Vendor\DiscountController::class);
         Route::patch('discounts/{discount}/toggle-status', [\App\Http\Controllers\Vendor\DiscountController::class, 'toggleStatus'])->name('discounts.toggleStatus');
 
-        // إعدادات المتجر
+        // Store Settings
         Route::get('store/edit', [\App\Http\Controllers\Vendor\DashboardController::class, 'editStore'])->name('store.edit');
         Route::put('store/update', [\App\Http\Controllers\Vendor\DashboardController::class, 'updateStore'])->name('store.update');
 
-        // إدارة المبيعات
+        // Sales
         Route::get('sales', [\App\Http\Controllers\Vendor\SalesController::class, 'index'])->name('sales.index');
         Route::get('sales/export', [\App\Http\Controllers\Vendor\SalesController::class, 'export'])->name('sales.export');
 
-        // إدارة التقييمات
+        // Reviews
         Route::get('reviews', [\App\Http\Controllers\Vendor\ReviewController::class, 'index'])->name('reviews.index');
         Route::get('reviews/{review}', [\App\Http\Controllers\Vendor\ReviewController::class, 'show'])->name('reviews.show');
         Route::patch('reviews/{review}/update-status', [\App\Http\Controllers\Vendor\ReviewController::class, 'updateStatus'])->name('reviews.updateStatus');
 
-        // المنتجات الأكثر طلباً
+        // Top Products
         Route::get('top-products', [\App\Http\Controllers\Vendor\TopProductsController::class, 'index'])->name('top-products.index');
 
-        // التقارير المالية
+        // Financial Reports
         Route::get('financial-reports', [\App\Http\Controllers\Vendor\FinancialReportController::class, 'index'])->name('financial-reports.index');
-
-        // (سنضيف باقي مسارات إدارة البائع هنا لاحقاً)
     });

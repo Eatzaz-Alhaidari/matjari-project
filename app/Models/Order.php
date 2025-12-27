@@ -18,6 +18,7 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'notes',
+        'problem_reason',
         'shipped_at',
         'delivered_at',
     ];
@@ -47,7 +48,7 @@ class Order extends Model
     // Helper methods
     public function getStatusColorAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'yellow',
             'processing' => 'blue',
             'shipped' => 'purple',
@@ -59,7 +60,7 @@ class Order extends Model
 
     public function getStatusTextAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'في الانتظار',
             'processing' => 'قيد المعالجة',
             'shipped' => 'تم الشحن',

@@ -21,10 +21,7 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-brand-blue-800">قائمة المنتجات</h2>
-                        <a href="{{ route('admin.products.create') }}"
-                            class="px-4 py-2 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-brand-blue-700">
-                            + إضافة منتج جديد
-                        </a>
+
                     </div>
 
                     <!-- Search Form -->
@@ -149,9 +146,11 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $product->store->name ?? 'غير محدد' }}</div>
+                                            <div class="text-sm text-gray-900">{{ $product->store->name ?? 'غير محدد' }}
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 text-center text-sm font-medium" onclick="event.stopPropagation()">
+                                        <td class="px-6 py-4 text-center text-sm font-medium"
+                                            onclick="event.stopPropagation()">
                                             <div class="flex items-center justify-center space-x-2 space-x-reverse">
                                                 <a href="{{ route('admin.products.show', $product->id) }}"
                                                     class="px-2 py-1 text-xs rounded-full font-semibold bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -171,7 +170,7 @@
                                                     @method('PATCH')
                                                     <button type="submit"
                                                         class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                        {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                                                            {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
                                                         {{ $product->status === 'active' ? 'تعطيل' : 'تفعيل' }}
                                                     </button>
                                                 </form>

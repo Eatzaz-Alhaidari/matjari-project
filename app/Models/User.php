@@ -22,20 +22,21 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone', 
-        'profile_photo_path', 
+        'phone',
+        'profile_photo_path',
         'status',
+        'ban_reason',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      */
-    protected $hidden = [ /* ... */ ];
+    protected $hidden = [ /* ... */];
 
     /**
      * The attributes that should be cast.
      */
-    protected $casts = [ /* ... */ ];
+    protected $casts = [ /* ... */];
 
     /**
      * Get the store associated with the user.
