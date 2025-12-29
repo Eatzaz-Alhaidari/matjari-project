@@ -44,30 +44,30 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-brand-blue-50">
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         الصورة
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         اسم التصنيف
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الوصف
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الحالة
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         عدد المنتجات
                                     </th>
                                     <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        class="px-6 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الإجراءات
                                     </th>
                                 </tr>

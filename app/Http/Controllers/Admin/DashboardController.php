@@ -43,8 +43,8 @@ class DashboardController extends Controller
         // --- NEW STATISTICS ---
         // 10. Orders Count
         $ordersCount = \App\Models\Order::count();
-        // 11. Returns Count (Placeholder)
-        $returnsCount = 0;
+        // 11. Returns Count
+        $returnsCount = \App\Models\OrderReturn::count();
         // 12. Shipping Count (Orders shipped or delivered)
         $shippingCount = \App\Models\Order::whereIn('status', ['shipped', 'delivered'])->count();
         // 13. Advertisements Count
@@ -63,6 +63,49 @@ class DashboardController extends Controller
 
         // 19. Activity Log Count (New - Placeholder)
         $activityLogCount = 0; // Or \App\Models\Activity::count(); if added later
+
+        // --- NEW CHARTS DATA ---
+
+        // 1. Users Growth Chart (Line Chart)
+        $dates = collect();
+        for ($i = 29; $i >= 0; $i--) {
+            $dates->put(now()->subDays($i)->format('Y-m-d'), 0);
+        }
+
+        // Users Growth (All Users)
+        $usersGrowthQuery = User::select(\Illuminate\Support\Facades\DB::raw('DATE(created_at) as date'), \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'))
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        // Vendors Growth
+        $vendorsGrowthQuery = User::role('vendor')
+            ->select(\Illuminate\Support\Facades\DB::raw('DATE(created_at) as date'), \Illuminate\Support\Facades\DB::raw('COUNT(*) as count'))
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        $growthLabels = $dates->keys();
+        $userGrowthValues = $dates->map(fn($val, $date) => $usersGrowthQuery[$date] ?? 0)->values();
+        $vendorGrowthValues = $dates->map(fn($val, $date) => $vendorsGrowthQuery[$date] ?? 0)->values();
+
+        // 2. Vendors Status Chart (Pie Chart)
+        $activeVendors = User::role('vendor')->where('status', 'active')->whereHas('store', function ($q) {
+            $q->where('is_active', true);
+        })->count();
+
+        $bannedVendors = User::role('vendor')->where('status', 'banned')->count();
+
+        // Pending/Suspended: Active User but Inactive Store OR User with 'pending' status (if implemented)
+        $pendingVendors = User::role('vendor')->where(function ($q) {
+            $q->where('status', '!=', 'banned')->whereHas('store', function ($sq) {
+                $sq->where('is_active', false);
+            });
+        })->orWhere('status', 'pending')->count();
+
+        // Fallback calculation: Total Vendors - (Active + Banned) might be safer if statuses are messy, 
+        // but explicit query is better. Let's stick to explicit.
+
 
         // --- CHART DATA ---
 
@@ -119,6 +162,13 @@ class DashboardController extends Controller
             'salesValues' => $salesValues,
             'categoryLabels' => $categoryLabels,
             'categoryValues' => $categoryValues,
+            // New Charts Data
+            'growthLabels' => $growthLabels,
+            'userGrowthValues' => $userGrowthValues,
+            'vendorGrowthValues' => $vendorGrowthValues,
+            'activeVendors' => $activeVendors,
+            'bannedVendors' => $bannedVendors,
+            'pendingVendors' => $pendingVendors,
         ]);
     }
 }

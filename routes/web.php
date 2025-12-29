@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +61,16 @@ Route::prefix('admin')
         // 5. Orders Management
         Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
 
-        // 6. Users (Customers) Management
+        // 6. Returns Management (New)
+        Route::get('returns', [\App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
+        Route::patch('returns/{returnOrder}', [\App\Http\Controllers\Admin\OrderReturnController::class, 'updateStatus'])->name('returns.updateStatus');
+        Route::patch('returns/{returnOrder}/restock', [\App\Http\Controllers\Admin\OrderReturnController::class, 'restock'])->name('returns.restock');
+
+        // 6.2 Shipping Management (New Demo)
+        Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
+        Route::patch('shipping/{order}/update-status', [\App\Http\Controllers\Admin\ShippingController::class, 'updateStatus'])->name('shipping.updateStatus');
+
+        // 7. Users (Customers) Management
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
         Route::resource('users', UserController::class);
 
