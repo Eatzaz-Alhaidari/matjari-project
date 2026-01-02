@@ -222,17 +222,7 @@
                 </div>
             </div>
         </a>
-        <!-- تحليل العملاء -->
-        <a href="{{ route('admin.coming-soon') }}"
-            class="block p-6 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-sky-50 transition-all duration-300">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-4 bg-sky-100 rounded-xl"><span class="text-2xl">🔬</span></div>
-                <div class="mr-4">
-                    <h3 class="text-lg font-bold text-gray-800">تحليل العملاء</h3>
-                    <p class="text-sm text-sky-600">{{ $newCustomersCount }} عميل جديد</p>
-                </div>
-            </div>
-        </a>
+
     </div>
 
     <!-- 🎧 الدعم والمتابعة -->
@@ -286,7 +276,7 @@
             </div>
         </a>
         <!-- سجل الأنشطة -->
-        <a href="{{ route('admin.coming-soon') }}"
+        <a href="{{ route('admin.activity-logs.index') }}"
             class="block p-6 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-slate-50 transition-all duration-300">
             <div class="flex items-center">
                 <div class="flex-shrink-0 p-4 bg-slate-100 rounded-xl"><span class="text-2xl">📜</span></div>

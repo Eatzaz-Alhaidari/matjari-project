@@ -127,7 +127,24 @@
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 py-8 mx-auto">
-                    <h3 class="text-3xl font-bold text-brand-blue-800">@yield('title')</h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-3xl font-bold text-brand-blue-800">@yield('title')</h3>
+                        @if(!request()->routeIs('admin.dashboard'))
+                            <a href="{{ route('admin.dashboard') }}"
+                                class="group flex items-center px-4 py-2 bg-white text-gray-600 rounded-full shadow-md hover:shadow-lg hover:bg-brand-blue hover:text-white transition-all duration-300 transform hover:-translate-y-1 ring-1 ring-gray-100 hover:ring-brand-blue-300">
+                                <span
+                                    class="ml-2 font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">عودة
+                                    للرئيسية</span>
+                                <div class="bg-gray-100 p-1.5 rounded-full group-hover:bg-white/20 transition-colors">
+                                    <svg class="w-5 h-5 rtl:rotate-180 transition-transform duration-300 group-hover:-translate-x-1"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                </div>
+                            </a>
+                        @endif
+                    </div>
                     <div class="mt-4">
                         {{ $slot }}
                     </div>

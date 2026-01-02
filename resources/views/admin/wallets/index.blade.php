@@ -3,64 +3,23 @@
         إدارة المحافظ
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-full mx-auto sm:px-6 lg:px-8">
-
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <h2 class="text-2xl font-bold text-brand-blue-800 mb-6">قائمة المحافظ</h2>
-
-                    <div class="overflow-x-auto bg-white">
-                        <table class="min-w-full">
-                            <thead class="bg-brand-blue-50">
-                                <tr>
-                                    <th
-                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
-                                        اسم التاجر</th>
-                                    <th
-                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
-                                        الرصيد الحالي</th>
-                                    <th
-                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
-                                        إجمالي الأرباح</th>
-                                    <th
-                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
-                                        المبلغ المسحوب</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($wallets as $wallet)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-5 py-4">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ $wallet->vendor?->name ?? 'غير معروف' }}</div>
-                                            <div class="text-xs text-gray-500">{{ $wallet->vendor?->email }}</div>
-                                        </td>
-                                        <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->balance, 2) }} ر.ي
-                                        </td>
-                                        <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->total_earnings, 2) }} ر.ي
-                                        </td>
-                                        <td class="px-5 py-4 text-sm text-gray-900">
-                                            {{ number_format($wallet->withdrawn_amount, 2) }} ر.ي
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">لا توجد محافظ حالياً.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination Links -->
-                    <div class="mt-8">
-                        {{ $wallets->links() }}
-                    </div>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 text-center">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-10">
+                <div class="mb-6">
+                    <svg class="w-24 h-24 text-gray-300 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
                 </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">هذه الميزة قيد التطوير</h2>
+                <p class="text-gray-600 text-lg mb-8">
+                    نحن نعمل بجد لإطلاق هذه الميزة قريباً. شكراً لصبركم!
+                </p>
+                <a href="{{ route('admin.dashboard') }}"
+                    class="inline-flex items-center px-6 py-3 bg-brand-blue border border-transparent rounded-md font-semibold text-white hover:bg-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-500 transition ease-in-out duration-150">
+                    عودة للرئيسية
+                </a>
             </div>
         </div>
     </div>

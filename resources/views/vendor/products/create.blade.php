@@ -24,8 +24,15 @@
                             <!-- Brand -->
                             <div>
                                 <x-input-label for="brand" :value="__('الماركة')" />
-                                <x-text-input id="brand" class="block mt-1 w-full" type="text" name="brand"
-                                    :value="old('brand')" />
+                                <select id="brand" name="brand"
+                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">اختر الماركة</option>
+                                    @foreach(['Apple', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Microsoft (Surface)', 'MSI', 'Razer', 'Samsung'] as $brand)
+                                        <option value="{{ $brand }}" {{ old('brand') == $brand ? 'selected' : '' }}>
+                                            {{ $brand }}</option>
+                                    @endforeach
+                                    <option value="other" {{ old('brand') == 'other' ? 'selected' : '' }}>أخرى</option>
+                                </select>
                                 <x-input-error :messages="$errors->get('brand')" class="mt-2" />
                             </div>
 

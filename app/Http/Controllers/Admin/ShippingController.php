@@ -3,53 +3,74 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Shipment;
+use App\Models\Order;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 
 class ShippingController extends Controller
 {
-    public function index()
-    {
-        // جلب الطلبات الحقيقية التي في مدينة صنعاء وشركة الشحن "توصيل"
-        // ملاحظة: قمنا بإضافة شرط لجلب الطلبات التي حالتها 'shipped' أو 'processing' لإظهار بيانات حقيقية
-        $shippings = \App\Models\Order::where(function ($query) {
-            $query->where('shipping_city', 'صنعاء')
-                ->orWhere('shipping_address', 'like', '%صنعاء%');
-        })
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($order) {
-                return [
-                    'id' => 'SHP-' . $order->id,
-                    'order_id' => $order->order_number,
-                    'customer' => $order->user->name ?? 'عميل غير معروف',
-                    'carrier' => $order->carrier_name ?? 'توصيل',
-                    'tracking_number' => $order->tracking_number ?? ('TRK-' . strtoupper(bin2hex(random_bytes(4)))),
-                    'status' => $order->status_text, // استخدام الـ Accessor الموجود في الموديل
-                    'city' => 'صنعاء',
-                    'date' => $order->created_at->format('Y-m-d')
-                ];
-            });
+    protected $shippingService;
 
-        return view('admin.shipping.index', compact('shippings'));
+    public function __construct(ShippingService $shippingService)
+    {
+        $this->shippingService = $shippingService;
     }
 
-    public function updateStatus(Request $request, \App\Models\Order $order)
+    /**
+     * Display a listing of shippings.
+     */
+    public function index()
+    {
+        // Get all shipments with related order and customer info
+        $shippings = Shipment::with(['order.user', 'order.store'])->latest()->get();
+
+        // Also get orders that don't have a shipment yet and are in Sana'a
+        $pendingOrders = Order::whereDoesntHave('shipment')
+            ->where(function ($q) {
+                $q->where('shipping_city', 'صنعاء')
+                    ->orWhere('shipping_address', 'LIKE', '%صنعاء%');
+            })
+            ->whereIn('status', ['pending', 'processing'])
+            ->get();
+
+        return view('admin.shipping.index', compact('shippings', 'pendingOrders'));
+    }
+
+    /**
+     * Create a shipment for an order.
+     */
+    public function store(Request $request)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
-            'tracking_number' => 'nullable|string|max:255',
-            'carrier_name' => 'nullable|string|max:255',
+            'order_id' => 'required|exists:orders,id',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-            'tracking_number' => $request->tracking_number ?? $order->tracking_number,
-            'carrier_name' => $request->carrier_name ?? $order->carrier_name,
-            'shipped_at' => ($request->status === 'shipped' && !$order->shipped_at) ? now() : $order->shipped_at,
-            'delivered_at' => ($request->status === 'delivered' && !$order->delivered_at) ? now() : $order->delivered_at,
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->shipment) {
+            return back()->with('error', 'هذا الطلب لديه شحنة بالفعل!');
+        }
+
+        $this->shippingService->createShipment($order);
+
+        return back()->with('success', 'تم إنشاء الشحنة بنجاح وتوليد رقم التتبع.');
+    }
+
+    /**
+     * Update shipment status.
+     */
+    public function updateStatus(Request $request, Shipment $shipping)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,picked_up,in_transit,delivered,failed',
         ]);
 
-        return back()->with('success', 'تم تحديث حالة الشحن بنجاح!');
+        try {
+            $this->shippingService->updateStatus($shipping, $request->status);
+            return back()->with('success', 'تم تحديث حالة الشحنة بنجاح!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'حدث خطأ أثناء تحديث الحالة: ' . $e->getMessage());
+        }
     }
 }

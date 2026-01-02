@@ -13,6 +13,17 @@ class OrderController extends Controller
     {
         $query = Order::with(['user', 'store'])->latest();
 
+        // Search Logic
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
         // Tabs Logic
         $tab = $request->get('tab', 'all');
 
@@ -35,5 +46,11 @@ class OrderController extends Controller
         $problemCount = Order::whereNotNull('problem_reason')->where('problem_reason', '!=', '')->count();
 
         return view('admin.orders.index', compact('orders', 'pendingCount', 'delayedCount', 'problemCount', 'tab'));
+    }
+
+    public function show(Order $order)
+    {
+        $order->load(['user', 'store', 'items.product']);
+        return view('admin.orders.show', compact('order'));
     }
 }

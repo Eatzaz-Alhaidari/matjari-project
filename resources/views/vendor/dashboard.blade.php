@@ -60,6 +60,22 @@
             </div>
         </a>
 
+        <a href="{{ route('vendor.shipping.index') }}"
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-orange-50 transition-all duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-5 bg-orange-100 rounded-xl">
+                    <svg class="w-10 h-10 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+                <div class="mr-4">
+                    <h3 class="text-lg font-bold text-gray-800">معلومات الشحن</h3>
+                    <p class="mt-1 text-sm text-gray-500">إدارة معلومات الشحن والتوصيل للمتجر</p>
+                </div>
+            </div>
+        </a>
+
         <a href="{{ route('vendor.advertisements.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-purple-50 transition-all duration-300">
             <div class="flex items-center">
@@ -190,7 +206,7 @@
         </a>
 
         <a href="{{ route('vendor.store.edit') }}"
-            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-gray-100 transition-all duration-300 md:col-span-2 xl:col-span-3">
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-gray-100 transition-all duration-300">
             <div class="flex items-center">
                 <div class="flex-shrink-0 p-5 bg-gray-200 rounded-xl">
                     <svg class="w-10 h-10 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none"

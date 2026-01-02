@@ -61,8 +61,8 @@ class DashboardController extends Controller
         // 18. Categories Count (New)
         $categoriesCount = \App\Models\Category::count();
 
-        // 19. Activity Log Count (New - Placeholder)
-        $activityLogCount = 0; // Or \App\Models\Activity::count(); if added later
+        // 19. Activity Log Count (New)
+        $activityLogCount = \App\Models\ActivityLog::count();
 
         // --- NEW CHARTS DATA ---
 

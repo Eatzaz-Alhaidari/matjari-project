@@ -60,6 +60,14 @@
                         <span class="mx-3 font-semibold">إدارة الطلبات</span>
                     </a>
                     <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
+                        href="{{ route('vendor.shipping.index') }}">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                        </svg>
+                        <span class="mx-3 font-semibold">معلومات الشحن</span>
+                    </a>
+                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
                         href="{{ route('vendor.warehouse.index') }}">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -155,7 +163,24 @@
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 py-8 mx-auto">
-                    <h3 class="text-3xl font-bold text-gray-700">@yield('title')</h3>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-3xl font-bold text-gray-700">@yield('title')</h3>
+                        @if(!request()->routeIs('vendor.dashboard'))
+                            <a href="{{ route('vendor.dashboard') }}"
+                                class="group flex items-center px-4 py-2 bg-white text-gray-600 rounded-full shadow-md hover:shadow-lg hover:bg-brand-orange hover:text-white transition-all duration-300 transform hover:-translate-y-1 ring-1 ring-gray-100 hover:ring-brand-orange-300">
+                                <span
+                                    class="ml-2 font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">عودة
+                                    للرئيسية</span>
+                                <div class="bg-gray-100 p-1.5 rounded-full group-hover:bg-white/20 transition-colors">
+                                    <svg class="w-5 h-5 rtl:rotate-180 transition-transform duration-300 group-hover:-translate-x-1"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                </div>
+                            </a>
+                        @endif
+                    </div>
                     <div class="mt-4">
                         {{ $slot }}
                     </div>

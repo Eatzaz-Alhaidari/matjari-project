@@ -164,6 +164,34 @@
                                 </div>
                             </div>
 
+                            <!-- معلومات الشحن -->
+                            @if($order->shipment)
+                            <div>
+                                <h3 class="text-lg font-semibold text-brand-blue-800 mb-4">معلومات الشحن (توصيل)</h3>
+                                <div class="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-bold text-gray-700">رقم التتبع:</span>
+                                        <span class="text-sm font-mono font-bold text-brand-blue-800">{{ $order->shipment->tracking_number }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-bold text-gray-700">الحالة:</span>
+                                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-white text-brand-blue-800 border border-brand-blue-200">
+                                            @php
+                                                $shipmentStatuses = [
+                                                    'pending' => 'قيد التجهيز',
+                                                    'picked_up' => 'تم الاستلام من البائع',
+                                                    'in_transit' => 'في الطريق',
+                                                    'delivered' => 'تم التسليم',
+                                                    'failed' => 'فشل التسليم',
+                                                ];
+                                            @endphp
+                                            {{ $shipmentStatuses[$order->shipment->status] ?? $order->shipment->status }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <!-- تحديث حالة الطلب -->
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4">تحديث حالة الطلب</h3>

@@ -31,47 +31,62 @@
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-brand-blue-800">قائمة الطلبات</h2>
+                    </div>
 
-                    <div class="overflow-x-auto">
+                    <!-- Search Form -->
+                    <div class="mb-6">
+                        <form action="{{ route('admin.orders.index') }}" method="GET" class="flex items-center">
+                            <input type="hidden" name="tab" value="{{ $tab }}">
+                            <input type="text" name="search" placeholder="ابحث برقم الطلب أو اسم العميل..."
+                                class="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm"
+                                value="{{ request('search') }}">
+                            <button type="submit"
+                                class="mr-3 px-4 py-2 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-brand-blue-700">بحث</button>
+                        </form>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-brand-blue-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         رقم الطلب</th>
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         العميل / المتجر</th>
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         تاريخ الطلب</th>
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الحالة</th>
                                     @if($tab == 'problem')
-                                        <th
-                                            class="px-6 py-3 text-right text-xs font-bold text-red-500 uppercase tracking-wider">
+                                        <th scope="col"
+                                            class="px-6 py-3 text-right text-xs font-bold text-red-600 uppercase tracking-wider">
                                             سبب المشكلة</th>
                                     @endif
-                                    <th
-                                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الاجمالي</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse ($orders as $order)
-                                    <tr class="hover:bg-gray-50 transition">
+                                    <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
                                             #{{ $order->order_number }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="text-sm font-medium text-gray-900">
+                                            <div class="text-sm font-bold text-gray-900">
                                                 {{ $order->user->name ?? 'زائر' }}</div>
-                                            <div class="text-xs text-gray-500 flex items-center">
-                                                <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24"
+                                            <div class="text-xs text-gray-500 flex items-center mt-1">
+                                                <svg class="w-3.5 h-3.5 ml-1 text-brand-blue" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -79,30 +94,41 @@
                                                 {{ $order->store->name ?? '-' }}
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $order->created_at->format('Y-m-d') }}
-                                            <div class="text-xs">{{ $order->created_at->diffForHumans() }}</div>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900 font-medium">{{ $order->created_at->format('Y-m-d') }}</div>
+                                            <div class="text-xs text-gray-500">{{ $order->created_at->diffForHumans() }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($order->status == 'pending')
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">قيد
-                                                    الانتظار</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                                                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full ml-1.5"></span>
+                                                    قيد الانتظار
+                                                </span>
                                             @elseif($order->status == 'processing')
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">جاري
-                                                    التجهيز</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                                                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full ml-1.5"></span>
+                                                    جاري التجهيز
+                                                </span>
                                             @elseif($order->status == 'shipped')
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">تم
-                                                    الشحن</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                                                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full ml-1.5"></span>
+                                                    تم الشحن
+                                                </span>
                                             @elseif($order->status == 'delivered')
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">تم
-                                                    التوصيل</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full ml-1.5"></span>
+                                                    تم التوصيل
+                                                </span>
                                             @elseif($order->status == 'cancelled')
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">ملغي</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">
+                                                    <span class="w-1.5 h-1.5 bg-red-400 rounded-full ml-1.5"></span>
+                                                    ملغي
+                                                </span>
                                             @endif
                                         </td>
 
@@ -113,24 +139,35 @@
                                             </td>
                                         @endif
 
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                            {{ number_format($order->total_amount, 2) }} ر.ي
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-bold text-brand-blue-800">
+                                                {{ number_format($order->total_amount, 2) }} <span class="text-xs text-gray-500">ر.ي</span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                            <a href="#" class="text-brand-blue hover:text-brand-blue-700 font-bold ml-3">عرض
-                                                التفاصيل</a>
+                                            <div class="flex items-center justify-center">
+                                                <a href="{{ route('admin.orders.show', $order->id) }}"
+                                                    class="inline-flex items-center px-3 py-1 bg-brand-blue-50 text-brand-blue-800 text-xs font-bold rounded-full hover:bg-brand-blue-100 transition-colors">
+                                                    <svg class="w-3.5 h-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    عرض التفاصيل
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                                            <div class="flex flex-col items-center">
-                                                <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
+                                        <td colspan="{{ $tab == 'problem' ? 7 : 6 }}" class="px-6 py-12 text-center text-gray-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <svg class="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                                                    </path>
                                                 </svg>
-                                                لا توجد طلبات في هذه القائمة حالياً.
+                                                <p class="text-lg font-medium text-gray-900">لا توجد طلبات في هذه القائمة حالياً</p>
                                             </div>
                                         </td>
                                     </tr>

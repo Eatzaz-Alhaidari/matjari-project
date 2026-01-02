@@ -31,7 +31,7 @@ class OrderController extends Controller
                 $q->where('order_number', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
@@ -51,7 +51,7 @@ class OrderController extends Controller
             abort(403, 'غير مصرح لك بعرض هذا الطلب');
         }
 
-        $order->load(['user', 'orderItems.product']);
+        $order->load(['user', 'orderItems.product', 'shipment']);
 
         return view('vendor.orders.show', compact('order'));
     }

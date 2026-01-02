@@ -60,6 +60,7 @@ Route::prefix('admin')
 
         // 5. Orders Management
         Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
 
         // 6. Returns Management (New)
         Route::get('returns', [\App\Http\Controllers\Admin\OrderReturnController::class, 'index'])->name('returns.index');
@@ -68,7 +69,8 @@ Route::prefix('admin')
 
         // 6.2 Shipping Management (New Demo)
         Route::get('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
-        Route::patch('shipping/{order}/update-status', [\App\Http\Controllers\Admin\ShippingController::class, 'updateStatus'])->name('shipping.updateStatus');
+        Route::post('shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'store'])->name('shipping.store');
+        Route::patch('shipping/{shipping}/update-status', [\App\Http\Controllers\Admin\ShippingController::class, 'updateStatus'])->name('shipping.updateStatus');
 
         // 7. Users (Customers) Management
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
@@ -90,9 +92,11 @@ Route::prefix('admin')
         // 11. Complaints
         Route::get('complaints', [\App\Http\Controllers\Admin\ComplaintController::class, 'index'])->name('complaints.index');
 
-        // 12. Settings
-        Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
-        Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+        // Platform Settings
+        Route::resource('settings', \App\Http\Controllers\Admin\SettingController::class)->only(['index', 'store']);
+
+        // Activity Logs
+        Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
 
         // Coming Soon (Temporary for new features)
         Route::get('coming-soon', function () {
@@ -161,4 +165,7 @@ Route::prefix('vendor')
 
         // Financial Reports
         Route::get('financial-reports', [\App\Http\Controllers\Vendor\FinancialReportController::class, 'index'])->name('financial-reports.index');
+
+        // Shipping Info (New)
+        Route::get('shipping-info', [\App\Http\Controllers\Vendor\ShippingController::class, 'index'])->name('shipping.index');
     });
