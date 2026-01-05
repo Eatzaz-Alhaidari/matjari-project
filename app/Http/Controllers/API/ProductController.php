@@ -1,29 +1,66 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the products.
+     * Use query parameters for filtering: ?category_id=1&search=xyz
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(20);
-        return ProductResource::collection($products);
+        $query = Product::with(['category:id,name', 'store:id,name']) // Eager load category and store names
+            ->where('status', 'active'); // Only active products
+
+        // Filter by Category
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Search by Name
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Get paginated results
+        $products = $query->latest()->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified product.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(string $id)
+    public function show($id)
     {
-        $product = Product::findOrFail($id);
-        return new ProductResource($product);
+        $product = Product::with(['category', 'store', 'reviews.user:id,name'])
+            ->where('status', 'active')
+            ->find($id);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ]);
     }
 }
