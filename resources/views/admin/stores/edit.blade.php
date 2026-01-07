@@ -170,8 +170,14 @@
                             <a href="{{ route('admin.stores.index') }}"
                                 class="px-5 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-200">إلغاء</a>
                             <button type="submit"
-                                class="mr-4 px-6 py-2 bg-brand-orange text-white font-semibold rounded-lg shadow-md hover:bg-opacity-90">حفظ
-                                التغييرات</button>
+                                class="mr-4 inline-flex items-center px-6 py-2 bg-brand-blue text-white font-bold rounded-xl shadow-lg hover:bg-brand-blue-600 hover:-translate-y-0.5 transition-all duration-300 group">
+                                <svg class="w-5 h-5 ml-2 group-hover:scale-110 transition-transform duration-300"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                                حفظ التغييرات
+                            </button>
                         </div>
                     </form>
 

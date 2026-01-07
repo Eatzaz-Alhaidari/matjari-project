@@ -85,19 +85,33 @@
                                 <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                             </div>
 
-                            <!-- Image -->
-                            <div>
-                                <x-input-label for="image" :value="__('صورة المنتج')" />
-                                @if($product->image)
-                                    <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="Current Image"
-                                            class="w-20 h-20 object-cover rounded-md">
+                            <!-- Images -->
+                            <div class="col-span-2">
+                                <x-input-label for="images" :value="__('صور المنتج')" />
+
+                                <!-- عرض الصور الحالية -->
+                                @if($product->images->count() > 0)
+                                    <div class="flex flex-wrap gap-4 mb-4 mt-2">
+                                        @foreach($product->images as $img)
+                                            <div class="relative group">
+                                                <img src="{{ asset('storage/' . $img->image_path) }}"
+                                                    class="w-24 h-24 object-cover rounded-lg border shadow-sm">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif($product->image)
+                                    <div class="mb-4 mt-2">
+                                        <img src="{{ asset('storage/' . $product->image) }}"
+                                            class="w-24 h-24 object-cover rounded-lg border shadow-sm">
                                     </div>
                                 @endif
-                                <input type="file" id="image" name="image"
+
+                                <input type="file" id="images" name="images[]" multiple
                                     class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <p class="text-xs text-gray-500 mt-1">اتركه فارغاً إذا كنت لا تريد تغيير الصورة.</p>
-                                <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                <p class="text-xs text-gray-500 mt-1">يمكنك إضافة صور إضافية للمنتج. سيتم الاحتفاظ
+                                    بالصور القديمة.</p>
+                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
                             </div>
                         </div>
 

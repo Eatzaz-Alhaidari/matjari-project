@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\ReviewController;//ضمن لي هذه الملف اللي يحتوي على الشعل والدوال
 
 /*
 |--------------------------------------------------------------------------

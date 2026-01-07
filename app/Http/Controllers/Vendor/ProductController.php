@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -58,17 +59,29 @@ class ProductController extends Controller
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->except('image');
-        $data['store_id'] = auth()->user()->store->id; // ربط المنتج بمتجر البائع
+        $data = $request->except('images');
+        $data['store_id'] = auth()->user()->store->id;
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+        $product = Product::create($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('products', 'public');
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+
+                if ($index === 0) {
+                    $product->update(['image' => $path]);
+                }
+            }
         }
-
-        Product::create($data);
 
         return redirect()->route('vendor.products.index')
             ->with('success', 'تم إضافة المنتج بنجاح');
@@ -121,20 +134,27 @@ class ProductController extends Controller
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->except('image');
-
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
-
+        $data = $request->except('images');
         $product->update($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('products', 'public');
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+
+                if (!$product->image && $index === 0) {
+                    $product->update(['image' => $path]);
+                }
+            }
+        }
 
         return redirect()->route('vendor.products.index')
             ->with('success', 'تم تعديل المنتج بنجاح');
@@ -152,6 +172,11 @@ class ProductController extends Controller
 
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
+        }
+
+        // Delete all secondary images from storage
+        foreach ($product->images as $img) {
+            Storage::disk('public')->delete($img->image_path);
         }
 
         $product->delete();

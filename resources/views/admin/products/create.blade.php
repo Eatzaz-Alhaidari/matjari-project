@@ -50,8 +50,10 @@
                                 <x-input-label for="status" :value="__('الحالة')" />
                                 <select id="status" name="status"
                                     class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>نشط</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>معطل</option>
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>نشط
+                                    </option>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>معطل
+                                    </option>
                                 </select>
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
@@ -82,12 +84,13 @@
                                 <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                             </div>
 
-                            <!-- Image -->
+                            <!-- Images -->
                             <div>
-                                <x-input-label for="image" :value="__('صورة المنتج')" />
-                                <input type="file" id="image" name="image"
+                                <x-input-label for="images" :value="__('صور المنتج (يمكنك اختيار أكثر من صورة)')" />
+                                <input type="file" id="images" name="images[]" multiple
                                     class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
                             </div>
                         </div>
 

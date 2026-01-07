@@ -45,7 +45,7 @@ class ReviewController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request)//تستسلم البيانات 
     {
         // Validator
         $validator = Validator::make($request->all(), [

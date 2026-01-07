@@ -20,8 +20,12 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-brand-blue-800">قائمة البائعين</h2>
                         <a href="{{ route('admin.vendors.create') }}"
-                            class="px-4 py-2 bg-brand-orange text-white font-semibold rounded-lg shadow-md hover:bg-opacity-90">إضافة
-                            بائع جديد</a>
+                            class="inline-flex items-center px-4 py-2 bg-brand-blue text-white font-bold rounded-xl shadow-lg hover:bg-brand-blue-600 hover:-translate-y-0.5 transition-all duration-300 group">
+                            <svg class="w-5 h-5 ml-2 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            إضافة بائع جديد
+                        </a>
                     </div>
 
                     <!-- ##### بداية نموذج البحث ##### -->

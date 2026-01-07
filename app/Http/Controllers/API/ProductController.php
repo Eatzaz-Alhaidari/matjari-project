@@ -45,7 +45,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show($id)//
     {
         $product = Product::with(['category', 'store', 'reviews.user:id,name'])
             ->where('status', 'active')
@@ -55,7 +55,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Product not found'
-            ], 404);
+            ], 404);//غير موجودة
         }
 
         return response()->json([

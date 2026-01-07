@@ -9,7 +9,7 @@
                 <h2 class="text-xl font-bold text-gray-800">تعديل المنتج: {{ $product->name }}</h2>
             </div>
 
-            <form action="{{ route('vendor.products.update', $product->id) }}" method="POST"
+            <form id="edit-product-form" action="{{ route('vendor.products.update', $product->id) }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -139,47 +139,46 @@
                         <!-- Media Card -->
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                             <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                                <h3 class="text-lg font-medium text-gray-900">الوسائط</h3>
+                                <h3 class="text-lg font-medium text-gray-900">صور المنتج</h3>
                             </div>
                             <div class="p-6">
-                                <x-input-label for="image" :value="__('صورة المنتج')" class="mb-2" />
+                                <!-- عرض الصور الحالية -->
+                                @if($product->images->count() > 0)
+                                    <div class="grid grid-cols-2 gap-2 mb-4">
+                                        @foreach($product->images as $img)
+                                            <img src="{{ asset('storage/' . $img->image_path) }}"
+                                                class="w-full h-20 object-cover rounded border">
+                                        @endforeach
+                                    </div>
+                                @elseif($product->image)
+                                    <div class="mb-4">
+                                        <img src="{{ asset('storage/' . $product->image) }}"
+                                            class="w-full h-32 object-cover rounded border">
+                                    </div>
+                                @endif
 
                                 <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
                                     id="image-preview-container">
                                     <div class="text-center">
-                                        @if($product->image)
-                                            <img src="{{ asset('storage/' . $product->image) }}"
-                                                class="mx-auto h-32 object-cover rounded mb-4" alt="Current Image">
-                                            <div class="flex text-sm leading-6 text-gray-600 justify-center">
-                                                <label for="image"
-                                                    class="relative cursor-pointer rounded-md bg-white font-semibold text-brand-orange focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-orange focus-within:ring-offset-2 hover:text-brand-orange-700">
-                                                    <span>تغيير الصورة</span>
-                                                    <input id="image" name="image" type="file" class="sr-only"
-                                                        accept="image/*">
-                                                </label>
-                                            </div>
-                                        @else
-                                            <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24"
-                                                fill="currentColor" aria-hidden="true">
-                                                <path fill-rule="evenodd"
-                                                    d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                            <div class="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                                                <label for="image"
-                                                    class="relative cursor-pointer rounded-md bg-white font-semibold text-brand-orange focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-orange focus-within:ring-offset-2 hover:text-brand-orange-700">
-                                                    <span>رفع ملف</span>
-                                                    <input id="image" name="image" type="file" class="sr-only"
-                                                        accept="image/*">
-                                                </label>
-                                                <p class="pl-1">أو اسحب وأفلت</p>
-                                            </div>
-                                            <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 2MB</p>
-                                        @endif
+                                        <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24"
+                                            fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd"
+                                                d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        <div class="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
+                                            <label for="images"
+                                                class="relative cursor-pointer rounded-md bg-white font-semibold text-brand-orange focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-orange focus-within:ring-offset-2 hover:text-brand-orange-700">
+                                                <span>رفع صور إضافية</span>
+                                                <input id="images" name="images[]" type="file" class="sr-only"
+                                                    accept="image/*" multiple>
+                                            </label>
+                                        </div>
+                                        <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 2MB</p>
                                         <p id="file-name" class="mt-2 text-sm text-gray-500 hidden"></p>
                                     </div>
                                 </div>
-                                <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
                             </div>
                         </div>
 
@@ -199,13 +198,123 @@
     </div>
 
     <script>
-        document.getElementById('image').addEventListener('change', function (e) {
-            const fileName = e.target.files[0]?.name;
-            const fileNameElement = document.getElementById('file-name');
-            if (fileName) {
-                fileNameElement.textContent = 'تم اختيار: ' + fileName;
-                fileNameElement.classList.remove('hidden');
+        // Track initial values
+        const form = document.getElementById('edit-product-form');
+        const initialValues = {};
+        const fieldLabels = {
+            'name': 'اسم المنتج',
+            'brand': 'الماركة',
+            'description': 'الوصف المختصر',
+            'full_description': 'الوصف الكامل',
+            'price': 'السعر',
+            'stock': 'الكمية',
+            'warranty': 'الضمان',
+            'status': 'الحالة',
+            'category_id': 'التصنيف'
+        };
+
+        const statusLabels = {
+            'active': 'نشط',
+            'inactive': 'معطل'
+        };
+
+        const categoryNames = {
+            @foreach($categories as $category)
+                '{{ $category->id }}': '{{ $category->name }}',
+            @endforeach
+        };
+
+        // Initialize values
+        document.querySelectorAll('#edit-product-form input, #edit-product-form textarea, #edit-product-form select').forEach(input => {
+            if (input.name && input.name !== '_token' && input.name !== '_method') {
+                if (input.name === 'images[]') return;
+                initialValues[input.name] = input.value;
             }
         });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const currentValues = {};
+            const changes = [];
+
+            document.querySelectorAll('#edit-product-form input, #edit-product-form textarea, #edit-product-form select').forEach(input => {
+                if (input.name && input.name !== '_token' && input.name !== '_method') {
+                    if (input.name === 'images[]') {
+                        if (input.files.length > 0) {
+                            changes.push(`<li><strong>صور المنتج:</strong> تم اختيار ${input.files.length} صورة جديدة</li>`);
+                        }
+                        return;
+                    }
+
+                    if (input.value !== initialValues[input.name]) {
+                        let oldVal = initialValues[input.name];
+                        let newVal = input.value;
+
+                        // Handle status translation
+                        if (input.name === 'status') {
+                            oldVal = statusLabels[oldVal] || oldVal;
+                            newVal = statusLabels[newVal] || newVal;
+                        }
+
+                        // Handle category translation
+                        if (input.name === 'category_id') {
+                            oldVal = categoryNames[oldVal] || oldVal;
+                            newVal = categoryNames[newVal] || newVal;
+                        }
+
+                        changes.push(`<li><strong>${fieldLabels[input.name] || input.name}:</strong> من "${oldVal}" إلى "${newVal}"</li>`);
+                    }
+                }
+            });
+
+            if (changes.length === 0) {
+                Swal.fire({
+                    title: 'لا توجد تغييرات',
+                    text: 'لم تقم بإجراء أي تعديلات على المنتج.',
+                    icon: 'info',
+                    confirmButtonText: 'إغلاق',
+                    confirmButtonColor: '#f97316',
+                });
+                return;
+            }
+
+            let changesHtml = '<ul style="text-align: right; direction: rtl; list-style-type: disc; padding-right: 20px;">' + changes.join('') + '</ul>';
+
+            Swal.fire({
+                title: 'تأكيد التعديلات',
+                html: `
+                    <div class="text-right" dir="rtl">
+                        <p class="mb-3">لقد قمت بتعديل الحقول التالية:</p>
+                        ${changesHtml}
+                        <p class="mt-4 font-bold text-center">هل أنت متأكد من حفظ هذه التعديلات؟</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، حفظ',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#f97316', // brand-orange
+                cancelButtonColor: '#6b7280',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+
+        // Image preview logic fix
+        const imagesInput = document.getElementById('images');
+        if (imagesInput) {
+            imagesInput.addEventListener('change', function (e) {
+                const fileNameElement = document.getElementById('file-name');
+                if (this.files.length > 0) {
+                    fileNameElement.textContent = 'تم اختيار ' + this.files.length + ' صور';
+                    fileNameElement.classList.remove('hidden');
+                } else {
+                    fileNameElement.classList.add('hidden');
+                }
+            });
+        }
     </script>
 </x-vendor-layout>

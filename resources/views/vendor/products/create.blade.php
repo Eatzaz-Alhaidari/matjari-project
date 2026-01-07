@@ -29,7 +29,8 @@
                                     <option value="">اختر الماركة</option>
                                     @foreach(['Apple', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Microsoft (Surface)', 'MSI', 'Razer', 'Samsung'] as $brand)
                                         <option value="{{ $brand }}" {{ old('brand') == $brand ? 'selected' : '' }}>
-                                            {{ $brand }}</option>
+                                            {{ $brand }}
+                                        </option>
                                     @endforeach
                                     <option value="other" {{ old('brand') == 'other' ? 'selected' : '' }}>أخرى</option>
                                 </select>
@@ -85,12 +86,13 @@
                                 <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                             </div>
 
-                            <!-- Image -->
+                            <!-- Images -->
                             <div>
-                                <x-input-label for="image" :value="__('صورة المنتج')" />
-                                <input type="file" id="image" name="image"
+                                <x-input-label for="images" :value="__('صور المنتج (يمكنك اختيار أكثر من صورة)')" />
+                                <input type="file" id="images" name="images[]" multiple
                                     class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" />
-                                <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
                             </div>
                         </div>
 

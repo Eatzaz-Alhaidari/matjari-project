@@ -26,14 +26,16 @@
                                         <span class="text-gray-900">{{ $product->name }}</span>
                                     </div>
                                     @if($product->brand)
-                                    <div class="flex justify-between">
-                                        <span class="font-medium text-gray-700">الماركة:</span>
-                                        <span class="text-gray-900">{{ $product->brand }}</span>
-                                    </div>
+                                        <div class="flex justify-between">
+                                            <span class="font-medium text-gray-700">الماركة:</span>
+                                            <span class="text-gray-900">{{ $product->brand }}</span>
+                                        </div>
                                     @endif
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">السعر:</span>
-                                        <span class="text-green-600 font-semibold">{{ number_format($product->price, 2) }} ر.ي</span>
+                                        <span
+                                            class="text-green-600 font-semibold">{{ number_format($product->price, 2) }}
+                                            ر.ي</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">المخزون:</span>
@@ -41,7 +43,8 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">الحالة:</span>
-                                        <span class="px-2 py-1 text-xs rounded-full font-semibold
+                                        <span
+                                            class="px-2 py-1 text-xs rounded-full font-semibold
                                             {{ $product->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                             {{ $product->status === 'active' ? 'نشط' : 'معطل' }}
                                         </span>
@@ -56,60 +59,70 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">تاريخ الإضافة:</span>
-                                        <span class="text-gray-900">{{ $product->created_at->format('Y-m-d H:i') }}</span>
+                                        <span
+                                            class="text-gray-900">{{ $product->created_at->format('Y-m-d H:i') }}</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="font-medium text-gray-700">آخر تحديث:</span>
-                                        <span class="text-gray-900">{{ $product->updated_at->format('Y-m-d H:i') }}</span>
+                                        <span
+                                            class="text-gray-900">{{ $product->updated_at->format('Y-m-d H:i') }}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- الوصف المختصر -->
                             @if($product->description)
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">الوصف المختصر</h3>
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <p class="text-gray-700 leading-relaxed">{{ $product->description }}</p>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">الوصف المختصر</h3>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <p class="text-gray-700 leading-relaxed">{{ $product->description }}</p>
+                                    </div>
                                 </div>
-                            </div>
                             @endif
                         </div>
 
                         <!-- الصورة والوصف الكامل -->
                         <div class="space-y-6">
-                            <!-- صورة المنتج -->
-                            @if($product->image)
+                            <!-- صور المنتج -->
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">صورة المنتج</h3>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">صور المنتج</h3>
                                 <div class="bg-gray-50 rounded-lg p-4">
-                                    <img src="{{ asset('storage/' . $product->image) }}"
-                                         alt="{{ $product->name }}"
-                                         class="w-full h-64 object-cover rounded-lg shadow-md">
+                                    @if($product->images->count() > 0)
+                                        <div class="grid grid-cols-2 gap-4">
+                                            @foreach($product->images as $img)
+                                                <a href="{{ asset('storage/' . $img->image_path) }}" target="_blank">
+                                                    <img src="{{ asset('storage/' . $img->image_path) }}"
+                                                        class="w-full h-48 object-cover rounded-lg shadow-sm hover:opacity-75 transition-opacity">
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @elseif($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}"
+                                            class="w-full h-auto object-cover rounded-lg shadow-md">
+                                    @else
+                                        <div class="flex items-center justify-center h-64">
+                                            <div class="text-center">
+                                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p class="text-gray-500">لا توجد صور</p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
-                            @else
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">صورة المنتج</h3>
-                                <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-center h-64">
-                                    <div class="text-center">
-                                        <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <p class="text-gray-500">لا توجد صورة</p>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
+
 
                             <!-- الوصف الكامل -->
                             @if($product->full_description)
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">الوصف الكامل</h3>
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <p class="text-gray-700 leading-relaxed">{{ $product->full_description }}</p>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">الوصف الكامل</h3>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <p class="text-gray-700 leading-relaxed">{{ $product->full_description }}</p>
+                                    </div>
                                 </div>
-                            </div>
                             @endif
                         </div>
                     </div>
@@ -120,8 +133,7 @@
                             class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
                             تعديل المنتج
                         </a>
-                        <form action="{{ route('admin.products.toggleStatus', $product->id) }}"
-                            method="POST"
+                        <form action="{{ route('admin.products.toggleStatus', $product->id) }}" method="POST"
                             class="inline-block">
                             @csrf
                             @method('PATCH')
@@ -131,10 +143,8 @@
                                 {{ $product->status === 'active' ? 'تعطيل المنتج' : 'تفعيل المنتج' }}
                             </button>
                         </form>
-                        <form action="{{ route('admin.products.destroy', $product->id) }}"
-                            method="POST"
-                            onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');"
-                            class="inline-block">
+                        <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
+                            onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');" class="inline-block">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

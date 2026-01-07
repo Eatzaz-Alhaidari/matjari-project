@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\Category;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -64,16 +65,31 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except('images');
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+        // Create the product first
+        $product = Product::create($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('products', 'public');
+
+                // Save to product_images table
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+
+                // Set the first image as the main product image
+                if ($index === 0) {
+                    $product->update(['image' => $path]);
+                }
+            }
         }
-
-        Product::create($data);
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم إضافة المنتج بنجاح');
@@ -104,20 +120,31 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->except('image');
-
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
-
+        $data = $request->except('images');
         $product->update($data);
+
+        if ($request->hasFile('images')) {
+            // If new images are uploaded, it adds to existing or replaces?
+            // Usually, users expect to add more or replace. 
+            // For now, let's ADD them.
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('products', 'public');
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
+
+                // If product doesn't have a main image yet, set the first one
+                if (!$product->image && $index === 0) {
+                    $product->update(['image' => $path]);
+                }
+            }
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم تعديل المنتج بنجاح');
@@ -128,8 +155,14 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        // Delete main image
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
+        }
+
+        // Delete all secondary images from storage
+        foreach ($product->images as $img) {
+            Storage::disk('public')->delete($img->image_path);
         }
 
         $product->delete();
