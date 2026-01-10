@@ -111,8 +111,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="status" value="approved">
                                     <button type="submit"
-                                        class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700"
-                                        onclick="return confirm('هل أنت متأكد من قبول هذا التقييم؟')">
+                                        class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700">
                                         قبول التقييم
                                     </button>
                                 </form>
@@ -124,8 +123,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="status" value="rejected">
                                     <button type="submit"
-                                        class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700"
-                                        onclick="return confirm('هل أنت متأكد من رفض هذا التقييم؟')">
+                                        class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700">
                                         رفض التقييم
                                     </button>
                                 </form>

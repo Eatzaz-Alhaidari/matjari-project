@@ -169,13 +169,13 @@
                                 @method('PATCH')
                                 <button type="submit"
                                     class="px-6 py-2 font-semibold rounded-lg shadow-md transition-colors
-                                            {{ $advertisement->status === 'active' ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-green-500 text-white hover:bg-green-600' }}">
+                                                {{ $advertisement->status === 'active' ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-green-500 text-white hover:bg-green-600' }}">
                                     {{ $advertisement->status === 'active' ? 'تعطيل الإعلان' : 'تفعيل الإعلان' }}
                                 </button>
                             </form>
                         @endif
                         <form action="{{ route('vendor.advertisements.destroy', $advertisement->id) }}" method="POST"
-                            onsubmit="return confirm('هل أنت متأكد من حذف هذا الإعلان؟');" class="inline-block">
+                            class="inline-block">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

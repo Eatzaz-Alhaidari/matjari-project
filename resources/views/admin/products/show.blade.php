@@ -134,7 +134,10 @@
                             تعديل المنتج
                         </a>
                         <form action="{{ route('admin.products.toggleStatus', $product->id) }}" method="POST"
-                            class="inline-block">
+                            class="inline-block" data-confirm-title="هل أنت متأكد؟"
+                            data-confirm-text="{{ $product->status === 'active' ? 'سيتم تعطيل هذا المنتج وإخفاؤه من المتجر.' : 'سيتم تفعيل هذا المنتج وإظهاره للعملاء.' }}"
+                            data-confirm-button="{{ $product->status === 'active' ? 'نعم، قم بالتعطيل' : 'نعم، قم بالتفعيل' }}"
+                            data-confirm-icon="question">
                             @csrf
                             @method('PATCH')
                             <button type="submit"
@@ -144,7 +147,9 @@
                             </button>
                         </form>
                         <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                            onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');" class="inline-block">
+                            class="inline-block" data-confirm-title="حذف المنتج نهائياً"
+                            data-confirm-text="هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء."
+                            data-confirm-button="نعم، احذف المنتج" data-confirm-icon="warning">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

@@ -7,14 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Wallet extends Model
 {
     protected $fillable = [
-        'vendor_id',
+        'user_id', // Changed from vendor_id
         'balance',
         'total_earnings',
         'withdrawn_amount',
     ];
 
-    public function vendor()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 }

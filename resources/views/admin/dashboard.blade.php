@@ -119,7 +119,7 @@
             </div>
         </a>
         <!-- إدارة الدفع -->
-        <a href="{{ route('admin.coming-soon') }}"
+        <a href="{{ route('admin.payment-gateways.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-lime-50 transition-all duration-300 group">
             <div class="flex items-center">
                 <div class="flex-shrink-0 p-5 bg-lime-100 rounded-xl transition-colors group-hover:bg-lime-200">
@@ -129,28 +129,9 @@
                     </svg>
                 </div>
                 <div class="mr-4 text-right">
-                    <h3 class="text-lg font-bold text-gray-800">إدارة الدفع</h3>
+                    <h3 class="text-lg font-bold text-gray-800">إدارة طرق الدفع</h3>
                     <p class="mt-1 text-sm text-gray-600">
                         <span class="font-extrabold text-lime-600">{{ $paymentCount }}</span> عملية
-                    </p>
-                </div>
-            </div>
-        </a>
-        <!-- إدارة المحافظ -->
-        <a href="{{ route('admin.wallets.index') }}"
-            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-purple-50 transition-all duration-300 group">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-5 bg-purple-100 rounded-xl transition-colors group-hover:bg-purple-200">
-                    <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-                <div class="mr-4 text-right">
-                    <h3 class="text-lg font-bold text-gray-800">إدارة المحافظ</h3>
-                    <p class="mt-1 text-sm text-gray-600">
-                        <span class="font-extrabold text-purple-600">{{ number_format($walletTotalBalance, 2) }}</span>
-                        ر.ي
                     </p>
                 </div>
             </div>
@@ -353,7 +334,7 @@
             </div>
         </a>
         <!-- الدعم الفني -->
-        <a href="{{ route('admin.coming-soon') }}"
+        <a href="{{ route('admin.support.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-fuchsia-50 transition-all duration-300 group">
             <div class="flex items-center">
                 <div class="flex-shrink-0 p-5 bg-fuchsia-100 rounded-xl transition-colors group-hover:bg-fuchsia-200">

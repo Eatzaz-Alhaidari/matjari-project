@@ -124,8 +124,9 @@
                                                     </svg>
                                                 </button>
                                                 <form action="{{ route('admin.categories.destroy', $category) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا التصنيف؟\nسيتم حذف الارتباط بجميع المنتجات التابعة له.')">
+                                                    method="POST" data-confirm-title="حذف التصنيف"
+                                                    data-confirm-text="هل أنت متأكد؟ سيتم حذف التصنيف وقد تتأثر المنتجات المرتبطة به."
+                                                    data-confirm-button="نعم، احذف">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-500 hover:text-red-700 group"

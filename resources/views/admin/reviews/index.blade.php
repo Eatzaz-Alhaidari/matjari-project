@@ -27,7 +27,8 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-600">متوسط التقييم</p>
-                            <p class="text-2xl font-bold text-yellow-600">{{ number_format($stats['average_rating'], 1) }} ⭐</p>
+                            <p class="text-2xl font-bold text-yellow-600">
+                                {{ number_format($stats['average_rating'], 1) }} ⭐</p>
                         </div>
                         <div class="p-3 bg-yellow-50 rounded-full">
                             <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,7 +47,8 @@
                         </div>
                         <div class="p-3 bg-yellow-50 rounded-full">
                             <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
@@ -60,7 +62,8 @@
                         </div>
                         <div class="p-3 bg-green-50 rounded-full">
                             <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                     </div>
@@ -121,14 +124,30 @@
                         <table class="min-w-full">
                             <thead class="bg-brand-blue-50">
                                 <tr>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">المتجر</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">المنتج المقيم</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">اسم العميل</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التقييم</th>
-                                    <th class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التعليق</th>
-                                    <th class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">الحالة</th>
-                                    <th class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التاريخ</th>
-                                    <th class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">الإجراءات</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        المتجر</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        المنتج المقيم</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        اسم العميل</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        التقييم</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        التعليق</th>
+                                    <th
+                                        class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        الحالة</th>
+                                    <th
+                                        class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        التاريخ</th>
+                                    <th
+                                        class="px-5 py-3 text-center text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -138,34 +157,44 @@
                                             <div class="flex items-center">
                                                 @if($review->product && $review->product->store && $review->product->store->logo_path)
                                                     <div class="flex-shrink-0 w-10 h-10 ml-3">
-                                                        <img class="w-10 h-10 rounded-full object-cover" src="{{ asset('storage/' . $review->product->store->logo_path) }}" alt="{{ $review->product->store->name }}">
+                                                        <img class="w-10 h-10 rounded-full object-cover"
+                                                            src="{{ asset('storage/' . $review->product->store->logo_path) }}"
+                                                            alt="{{ $review->product->store->name }}">
                                                     </div>
                                                 @else
-                                                     <div class="flex-shrink-0 w-10 h-10 ml-3 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs">
+                                                    <div
+                                                        class="flex-shrink-0 w-10 h-10 ml-3 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs">
                                                         {{ substr($review->product->store->name ?? 'S', 0, 1) }}
-                                                     </div>
+                                                    </div>
                                                 @endif
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900">{{ $review->product->store->name ?? 'متجر غير معروف' }}</div>
-                                                    <a href="{{ route('admin.stores.edit', $review->product->store->id ?? 0) }}" class="text-xs text-brand-blue hover:underline">عرض المتجر</a>
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        {{ $review->product->store->name ?? 'متجر غير معروف' }}</div>
+                                                    <a href="{{ route('admin.stores.edit', $review->product->store->id ?? 0) }}"
+                                                        class="text-xs text-brand-blue hover:underline">عرض المتجر</a>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-5 py-4">
-                                             <div class="text-sm text-gray-500">{{ $review->product->name ?? 'منتج محذوف' }}</div>
+                                            <div class="text-sm text-gray-500">{{ $review->product->name ?? 'منتج محذوف' }}
+                                            </div>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $review->user->name ?? 'غير معروف' }}</div>
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $review->user->name ?? 'غير معروف' }}</div>
                                             <div class="text-xs text-gray-500">{{ $review->user->email ?? '' }}</div>
                                         </td>
                                         <td class="px-5 py-4">
-                                            <div class="text-yellow-500 font-bold text-lg">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</div>
+                                            <div class="text-yellow-500 font-bold text-lg">
+                                                {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                                            </div>
                                             <div class="text-xs text-gray-500">({{ $review->rating }}/5)</div>
                                         </td>
                                         <td class="px-5 py-4">
                                             <div class="text-sm text-gray-500 max-w-xs">
                                                 @if($review->comment)
-                                                    <p class="truncate" title="{{ $review->comment }}">{{ Str::limit($review->comment, 50) }}</p>
+                                                    <p class="truncate" title="{{ $review->comment }}">
+                                                        {{ Str::limit($review->comment, 50) }}</p>
                                                 @else
                                                     <span class="text-gray-400">لا يوجد تعليق</span>
                                                 @endif
@@ -173,39 +202,60 @@
                                         </td>
                                         <td class="px-5 py-4 text-center">
                                             @if ($review->status == 'approved')
-                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">مقبول</span>
+                                                <span
+                                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">مقبول</span>
                                             @elseif ($review->status == 'pending')
-                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">قيد المراجعة</span>
+                                                <span
+                                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">قيد
+                                                    المراجعة</span>
                                             @else
-                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">مرفوض</span>
+                                                <span
+                                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">مرفوض</span>
                                             @endif
                                         </td>
                                         <td class="px-5 py-4 text-center text-sm text-gray-500">
                                             {{ $review->created_at->format('Y-m-d') }}
-                                            <div class="text-xs text-gray-400">{{ $review->created_at->format('H:i') }}</div>
+                                            <div class="text-xs text-gray-400">{{ $review->created_at->format('H:i') }}
+                                            </div>
                                         </td>
                                         <td class="px-5 py-4 text-center text-sm font-medium">
                                             <div class="flex items-center justify-center space-x-2 space-x-reverse">
-                                                <a href="{{ route('admin.reviews.show', $review->id) }}" class="px-2 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200" title="عرض التفاصيل">
-                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                <a href="{{ route('admin.reviews.show', $review->id) }}"
+                                                    class="px-2 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                                    title="عرض التفاصيل">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
                                                 </a>
                                                 @if($review->status !== 'approved')
-                                                    <form action="{{ route('admin.reviews.updateStatus', $review->id) }}" method="POST" class="inline-block">
+                                                    <form action="{{ route('admin.reviews.updateStatus', $review->id) }}"
+                                                        method="POST" class="inline-block" data-confirm-title="قبول التقييم"
+                                                        data-confirm-text="هل تريد نشر هذا التقييم في صفحة المنتج؟"
+                                                        data-confirm-button="نعم، انشر التقييم" data-confirm-icon="question">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="approved">
-                                                        <button type="submit" class="px-2 py-1 text-xs rounded-full font-semibold bg-green-100 text-green-800 hover:bg-green-200" title="قبول التقييم" onclick="return confirm('هل أنت متأكد من قبول هذا التقييم؟')">✓</button>
+                                                        <button type="submit"
+                                                            class="px-2 py-1 text-xs rounded-full font-semibold bg-green-100 text-green-800 hover:bg-green-200"
+                                                            title="قبول التقييم">✓</button>
                                                     </form>
                                                 @endif
                                                 @if($review->status !== 'rejected')
-                                                    <form action="{{ route('admin.reviews.updateStatus', $review->id) }}" method="POST" class="inline-block">
+                                                    <form action="{{ route('admin.reviews.updateStatus', $review->id) }}"
+                                                        method="POST" class="inline-block" data-confirm-title="رفض التقييم"
+                                                        data-confirm-text="هل تريد رفض هذا التقييم؟ لن يظهر للعملاء."
+                                                        data-confirm-button="نعم، ارفض التقييم" data-confirm-icon="warning">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="rejected">
-                                                        <button type="submit" class="px-2 py-1 text-xs rounded-full font-semibold bg-red-100 text-red-800 hover:bg-red-200" title="رفض التقييم" onclick="return confirm('هل أنت متأكد من رفض هذا التقييم؟')">✗</button>
+                                                        <button type="submit"
+                                                            class="px-2 py-1 text-xs rounded-full font-semibold bg-red-100 text-red-800 hover:bg-red-200"
+                                                            title="رفض التقييم">✗</button>
                                                     </form>
                                                 @endif
                                             </div>
@@ -213,7 +263,8 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">لا توجد تقييمات حالياً.</td>
+                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">لا توجد تقييمات حالياً.
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>

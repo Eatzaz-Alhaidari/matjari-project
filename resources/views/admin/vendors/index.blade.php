@@ -8,7 +8,8 @@
 
             @if (session('success'))
                 <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
-                    {{ session('success') }}</div>
+                    {{ session('success') }}
+                </div>
             @endif
             @if (session('error'))
                 <div class="mb-4 px-4 py-2 bg-red-100 border border-red-200 text-red-700 rounded-md">{{ session('error') }}
@@ -21,8 +22,10 @@
                         <h2 class="text-2xl font-bold text-brand-blue-800">قائمة البائعين</h2>
                         <a href="{{ route('admin.vendors.create') }}"
                             class="inline-flex items-center px-4 py-2 bg-brand-blue text-white font-bold rounded-xl shadow-lg hover:bg-brand-blue-600 hover:-translate-y-0.5 transition-all duration-300 group">
-                            <svg class="w-5 h-5 ml-2 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            <svg class="w-5 h-5 ml-2 group-hover:rotate-90 transition-transform duration-300"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
                             </svg>
                             إضافة بائع جديد
                         </a>
@@ -80,7 +83,8 @@
                                                     <div class="text-sm font-medium text-gray-900">{{ $vendor->name }}</div>
                                                     <div class="text-xs text-gray-500">{{ $vendor->email }}</div>
                                                     <div class="text-xs text-gray-500">
-                                                        {{ $vendor->phone ?? 'لا يوجد هاتف' }}</div>
+                                                        {{ $vendor->phone ?? 'لا يوجد هاتف' }}
+                                                    </div>
                                                     @if($vendor->status === 'banned')
                                                         <div
                                                             class="mt-1 text-xs text-red-600 bg-red-50 p-1 rounded border border-red-100 max-w-xs whitespace-normal">
@@ -94,7 +98,8 @@
                                             <div class="text-sm text-gray-900">{{ $vendor->store?->name ?? 'لا يوجد' }}
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                {{ $vendor->store?->address ?? 'لا يوجد عنوان' }}</div>
+                                                {{ $vendor->store?->address ?? 'لا يوجد عنوان' }}
+                                            </div>
                                         </td>
                                         <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ $vendor->store?->commercial_registration ?? 'لا يوجد' }}
@@ -128,7 +133,10 @@
                                                 @if($vendor->status === 'banned')
                                                     <form action="{{ route('admin.vendors.activate', $vendor->id) }}"
                                                         method="POST" class="inline-block"
-                                                        onsubmit="return confirm('هل أنت متأكد من إلغاء حظر هذا البائع؟');">
+                                                        data-confirm-title="إلغاء الحظر"
+                                                        data-confirm-text="هل أنت متأكد من إلغاء حظر هذا البائع؟ سيتمكن من الدخول للمنصة مجدداً."
+                                                        data-confirm-button="نعم، إلغاء الحظر"
+                                                        data-confirm-icon="question">
                                                         @csrf
                                                         <button type="submit"
                                                             class="p-2 text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200 rounded-full transition-colors duration-200"
@@ -158,7 +166,10 @@
                                                 {{-- أزرار تحكم المتجر --}}
                                                 @if($vendor->store)
                                                     <form action="{{ route('admin.vendors.toggleStatus', $vendor->id) }}"
-                                                        method="POST" class="inline-block">
+                                                        method="POST" class="inline-block"
+                                                        data-confirm-title="{{ $vendor->store->is_active ? 'تعطيل المتجر' : 'تفعيل المتجر' }}"
+                                                        data-confirm-text="{{ $vendor->store->is_active ? 'سيتم تعطيل متجر هذا البائع ولن تظهر منتجاته للعملاء.' : 'سيتم تفعيل المتجر وعرض منتجاته.' }}"
+                                                        data-confirm-button="نعم، نفذ الإجراء">
                                                         @csrf
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold {{ $vendor->store->is_active ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-blue-100 text-blue-800 hover:bg-blue-200' }}"
@@ -180,9 +191,11 @@
                                                 </a>
 
                                                 <form action="{{ route('admin.vendors.destroy', $vendor->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا البائع؟ لا يمكن التراجع عن هذا الإجراء.');"
-                                                    class="inline-block">
+                                                    method="POST" class="inline-block"
+                                                    data-confirm-title="حذف البائع نهائياً"
+                                                    data-confirm-text="تحذير: سيتم حذف البائع وكافة بيانات متجره ومنتجاته. هذا الإجراء لا يمكن التراجع عنه!"
+                                                    data-confirm-button="نعم، احذف البائع"
+                                                    data-confirm-icon="warning">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"

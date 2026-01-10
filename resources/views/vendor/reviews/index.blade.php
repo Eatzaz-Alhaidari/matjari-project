@@ -39,7 +39,8 @@
                         <div>
                             <p class="text-sm text-gray-600">متوسط التقييم</p>
                             <p class="text-2xl font-bold text-yellow-600">
-                                {{ number_format($stats['average_rating'], 1) }} ⭐</p>
+                                {{ number_format($stats['average_rating'], 1) }} ⭐
+                            </p>
                         </div>
                         <div class="p-3 bg-yellow-100 rounded-full">
                             <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,28 +246,30 @@
                                                 </a>
                                                 @if($review->status !== 'approved')
                                                     <form action="{{ route('vendor.reviews.updateStatus', $review->id) }}"
-                                                        method="POST" class="inline-block">
+                                                        method="POST" class="inline-block" data-confirm-title="قبول التقييم"
+                                                        data-confirm-text="هل أنت موافق على نشر هذا التقييم؟"
+                                                        data-confirm-button="نعم، قبول" data-confirm-icon="question">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="approved">
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold bg-green-100 text-green-800 hover:bg-green-200"
-                                                            title="قبول التقييم"
-                                                            onclick="return confirm('هل أنت متأكد من قبول هذا التقييم؟')">
+                                                            title="قبول التقييم">
                                                             ✓
                                                         </button>
                                                     </form>
                                                 @endif
                                                 @if($review->status !== 'rejected')
                                                     <form action="{{ route('vendor.reviews.updateStatus', $review->id) }}"
-                                                        method="POST" class="inline-block">
+                                                        method="POST" class="inline-block" data-confirm-title="رفض التقييم"
+                                                        data-confirm-text="هل تريد رفض هذا التقييم وإخفائه؟"
+                                                        data-confirm-button="نعم، رفض" data-confirm-icon="warning">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="rejected">
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold bg-red-100 text-red-800 hover:bg-red-200"
-                                                            title="رفض التقييم"
-                                                            onclick="return confirm('هل أنت متأكد من رفض هذا التقييم؟')">
+                                                            title="رفض التقييم">
                                                             ✗
                                                         </button>
                                                     </form>

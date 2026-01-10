@@ -165,21 +165,24 @@
                                                     </svg>
                                                 </a>
                                                 <form action="{{ route('admin.products.toggleStatus', $product->id) }}"
-                                                    method="POST" class="inline-block">
+                                                    method="POST" class="inline-block"
+                                                    data-confirm-title="تغيير حالة المنتج"
+                                                    data-confirm-text="{{ $product->status === 'active' ? 'سيتم تعطيل المنتج.' : 'سيتم تفعيل المنتج.' }}"
+                                                    data-confirm-button="نعم، غير الحالة">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit"
                                                         class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                            {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                                                                        {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
                                                         {{ $product->status === 'active' ? 'تعطيل' : 'تفعيل' }}
                                                     </button>
                                                 </form>
                                                 <a href="{{ route('admin.products.edit', $product->id) }}"
                                                     class="px-2 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200">تعديل</a>
                                                 <form action="{{ route('admin.products.destroy', $product->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');"
-                                                    class="inline-block">
+                                                    method="POST" class="inline-block" data-confirm-title="حذف المنتج"
+                                                    data-confirm-text="هل أنت متأكد من حذف هذا المنتج؟"
+                                                    data-confirm-button="حذف">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"

@@ -46,3 +46,11 @@ Route::get('/products/{id}', [\App\Http\Controllers\API\ProductController::class
 Route::get('/orders', [\App\Http\Controllers\API\OrderController::class, 'index']);
 Route::get('/orders/{id}', [\App\Http\Controllers\API\OrderController::class, 'show']);
 Route::post('/orders', [\App\Http\Controllers\API\OrderController::class, 'store']);
+
+// Payment & Wallet API
+Route::get('/payment-methods', [\App\Http\Controllers\Api\PaymentController::class, 'getPaymentMethods']);
+
+// Wallet Routes (Protected)
+Route::get('/wallet', [\App\Http\Controllers\Api\WalletController::class, 'show']);
+// Hint: Order creation with wallet payment logic should be inside OrderController::store or a specific checkpoint in checkout
+

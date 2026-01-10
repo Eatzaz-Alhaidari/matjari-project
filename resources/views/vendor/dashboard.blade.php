@@ -3,6 +3,126 @@
         لوحة تحكم متجري
     </x-slot>
 
+    {{-- Charts & Stats Section --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {{-- Sales Chart --}}
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-orange-500 pr-3">مبيعات آخر 7 أيام</h3>
+            <div class="relative h-80 w-full">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        {{-- Ratings --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-yellow-500 pr-3">تقييمات المنتجات</h3>
+            <div class="flex flex-col items-center justify-center p-4">
+                <div class="text-5xl font-bold text-gray-800 mb-2">{{ number_format($ratingStats['average'], 1) }}</div>
+                <div class="text-yellow-400 text-2xl mb-2 tracking-widest">
+                    @for($i=1; $i<=5; $i++)
+                        <span>{{ $i <= round($ratingStats['average']) ? '★' : '☆' }}</span>
+                    @endfor
+                </div>
+                <p class="text-sm text-gray-500 mb-6">بناءً على {{ $ratingStats['count'] }} تقييم</p>
+                
+                <div class="w-full space-y-3">
+                    @foreach([5,4,3,2,1] as $star)
+                        <div class="flex items-center text-xs">
+                            <span class="w-8 font-medium text-gray-600">{{ $star }} ★</span>
+                            <div class="flex-1 mx-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                @php
+                                    $percentage = $ratingStats['count'] > 0 ? ($ratingStats['stars'][$star] / $ratingStats['count']) * 100 : 0;
+                                @endphp
+                                <div class="h-full bg-yellow-400 rounded-full" style="width: {{ $percentage }}%"></div>
+                            </div>
+                            <span class="w-6 text-left text-gray-500">{{ $ratingStats['stars'][$star] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Lists Section --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {{-- Top Selling Products --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-indigo-500 pr-3">الأكثر مبيعاً</h3>
+            <div class="space-y-4">
+                @forelse($top5Products as $product)
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 p-2 rounded transition-colors">
+                        <div class="flex items-center flex-1 min-w-0">
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" class="w-10 h-10 rounded-lg object-cover ml-3 bg-gray-100 flex-shrink-0">
+                            @else
+                                <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center ml-3 text-indigo-500 flex-shrink-0">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                            @endif
+                            <div class="truncate">
+                                <p class="text-sm font-bold text-gray-800 truncate" title="{{ $product->name }}">{{ $product->name }}</p>
+                                <p class="text-xs text-indigo-600 font-semibold">{{ $product->total_quantity_sold }} قطعة مباعة</p>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-6 text-gray-400">
+                        لا توجد مبيعات كافية لعرضها
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Low Stock Products --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-red-500 pr-3">تنبيهات المخزون</h3>
+            <div class="space-y-4">
+                @forelse($lowStockProducts as $product)
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 p-2 rounded transition-colors">
+                        <div class="flex-1 min-w-0 ml-2">
+                            <p class="text-sm font-medium text-gray-800 truncate" title="{{ $product->name }}">{{ $product->name }}</p>
+                            <p class="text-xs text-gray-500">الكمية الحالية</p>
+                        </div>
+                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold {{ $product->stock == 0 ? 'bg-red-100 text-red-800' : 'bg-red-50 text-red-600' }}">
+                            {{ $product->stock }}
+                        </span>
+                    </div>
+                @empty
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 text-green-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-sm text-gray-500">جميع المنتجات متوفرة</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Pending Orders --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-green-500 pr-3">طلبات جديدة</h3>
+            <div class="space-y-4">
+                @forelse($latestPendingOrders as $order)
+                    <a href="{{ route('vendor.orders.show', $order->id) }}" class="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0 hover:bg-green-50 p-2 rounded transition-colors group">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-sm font-bold text-gray-800 group-hover:text-green-700">#{{ $order->id }}</span>
+                                <span class="text-xs text-gray-400 mr-2">{{ $order->created_at->diffForHumans() }}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">{{ $order->user->name ?? 'عميل زائر' }}</p>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-sm font-bold text-green-600">{{ number_format($order->total_amount, 0) }}</span>
+                            <span class="text-xs text-gray-400">ريال</span>
+                        </div>
+                    </a>
+                @empty
+                    <div class="text-center py-8 text-gray-400">
+                        لا توجد طلبات جديدة
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
 
         <a href="{{ route('vendor.products.index') }}"
@@ -225,4 +345,67 @@
         </a>
 
     </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @json($salesChartLabels),
+                    datasets: [{
+                        label: 'المبيعات (ريال)',
+                        data: @json($salesChartData),
+                        borderColor: '#ea580c',
+                        backgroundColor: 'rgba(234, 88, 12, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ea580c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#1f2937',
+                            bodyColor: '#ea580c',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function (context) {
+                                    return context.parsed.y.toLocaleString() + ' ريال';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 2], color: '#f3f4f6' },
+                            ticks: { font: { family: 'Tajawal' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Tajawal' } }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                }
+            });
+        });
+    </script>
 </x-vendor-layout>

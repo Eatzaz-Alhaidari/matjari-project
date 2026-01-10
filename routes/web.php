@@ -76,8 +76,7 @@ Route::prefix('admin')
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
         Route::resource('users', UserController::class);
 
-        // 7. Wallets
-        Route::get('wallets', [\App\Http\Controllers\Admin\WalletController::class, 'index'])->name('wallets.index');
+
 
         // 8. Financial Reports
         Route::get('reports/financial', [\App\Http\Controllers\Admin\FinancialReportController::class, 'index'])->name('reports.financial');
@@ -92,8 +91,16 @@ Route::prefix('admin')
         // 11. Complaints
         Route::get('complaints', [\App\Http\Controllers\Admin\ComplaintController::class, 'index'])->name('complaints.index');
 
+        // 12. Technical Support
+        Route::get('support', [\App\Http\Controllers\Admin\SupportController::class, 'index'])->name('support.index');
+        Route::post('support', [\App\Http\Controllers\Admin\SupportController::class, 'store'])->name('support.store');
+
         // Platform Settings
         Route::resource('settings', \App\Http\Controllers\Admin\SettingController::class)->only(['index', 'store']);
+
+        // 13. Payment Gateways Management (New)
+        Route::get('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+        Route::post('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'store'])->name('payment-gateways.store');
 
         // Activity Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
@@ -169,3 +176,5 @@ Route::prefix('vendor')
         // Shipping Info (New)
         Route::get('shipping-info', [\App\Http\Controllers\Vendor\ShippingController::class, 'index'])->name('shipping.index');
     });
+
+require __DIR__ . '/db_fix.php';

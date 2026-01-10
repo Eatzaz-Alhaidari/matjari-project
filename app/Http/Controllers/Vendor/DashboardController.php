@@ -84,11 +84,71 @@ class DashboardController extends Controller
         $stats['top_products_total_sold'] = $top5Products->sum('total_quantity_sold');
 
         // إضافة معلومات المحفظة
-        $wallet = Wallet::where('vendor_id', auth()->user()->id)->first();
+        $wallet = Wallet::where('user_id', auth()->user()->id)->first();
         $stats['wallet_balance'] = $wallet ? $wallet->balance : 0;
         $stats['total_earnings'] = $wallet ? $wallet->total_earnings : 0;
 
-        return view('vendor.dashboard', compact('stats', 'top5Products'));
+        // 1. مبيعات آخر 7 أيام
+        $salesLast7Days = Order::where('store_id', $storeId)
+            ->where('status', 'delivered')
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_amount) as total_sales')
+            )
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date');
+
+        $salesChartData = [];
+        $salesChartLabels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $salesChartLabels[] = now()->subDays($i)->locale('ar')->dayName; // أسماء الأيام بالعربي
+            $salesChartData[] = $salesLast7Days->has($date) ? $salesLast7Days[$date]->total_sales : 0;
+        }
+
+        // 2. تقييمات المنتجات (تفاصيل)
+        $ratingStats = [
+            'average' => $stats['average_rating'],
+            'count' => $stats['total_reviews'],
+            'stars' => [
+                5 => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('rating', 5)->count(),
+                4 => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('rating', 4)->count(),
+                3 => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('rating', 3)->count(),
+                2 => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('rating', 2)->count(),
+                1 => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('rating', 1)->count(),
+            ]
+        ];
+
+        // 3. أكثر المنتجات مبيعاً (تم جلبها سابقاً في top5Products)
+        // سنستخدم المتغير $top5Products
+
+        // 4. المنتجات قليلة المخزون (القائمة)
+        $lowStockProducts = Product::where('store_id', $storeId)
+            ->where('stock', '<', 10)
+            ->orderBy('stock', 'asc')
+            ->limit(5)
+            ->get();
+
+        // 5. الطلبات في الانتظار (القائمة)
+        $latestPendingOrders = Order::where('store_id', $storeId)
+            ->where('status', 'pending')
+            ->with('user')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('vendor.dashboard', compact(
+            'stats',
+            'top5Products',
+            'salesChartLabels',
+            'salesChartData',
+            'ratingStats',
+            'lowStockProducts',
+            'latestPendingOrders'
+        ));
     }
 
     public function editStore(): View

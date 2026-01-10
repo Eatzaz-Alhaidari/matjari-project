@@ -43,7 +43,8 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:cash_on_delivery,credit_card,bank_transfer',
+            'payment_method' => 'required|in:cash_on_delivery,wallet,bank_transfer',
+            'payment_proof' => 'nullable|required_if:payment_method,bank_transfer|image|max:2048', // Image required for transfer
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -56,15 +57,17 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $userId = Auth::id() ?? $request->user_id ?? 1; // Fallback
+        $user = Auth::user() ?? \App\Models\User::find($request->user_id ?? 1); // Use authenticated user
         $items = $request->items;
 
         // Group items by store_id
         $itemsByStore = [];
+        $grandTotal = 0; // Total of ALL orders for wallet check
+
+        // 1. Validate Stock & Calculate Totals
         foreach ($items as $itemData) {
             $product = Product::find($itemData['product_id']);
 
-            // Check stock
             if ($product->stock < $itemData['quantity']) {
                 return response()->json([
                     'success' => false,
@@ -76,29 +79,48 @@ class OrderController extends Controller
                 'product' => $product,
                 'quantity' => $itemData['quantity']
             ];
+            $grandTotal += $product->price * $itemData['quantity'];
+        }
+
+        // 2. Wallet Balance Check
+        if ($request->payment_method === 'wallet') {
+            $wallet = $user->wallet; // Assuming relationship is setup
+            if (!$wallet || $wallet->balance < $grandTotal) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "رصيد المحفظة غير كافي لإتمام هذه العملية.",
+                ], 400);
+            }
         }
 
         DB::beginTransaction();
         try {
             $createdOrders = [];
 
+            // Payment Proof Upload
+            $paymentProofPath = null;
+            if ($request->hasFile('payment_proof')) {
+                $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            }
+
             foreach ($itemsByStore as $storeId => $storeItems) {
                 // Calculate total for this store's order
-                $totalAmount = 0;
+                $orderTotal = 0;
                 foreach ($storeItems as $item) {
-                    $totalAmount += $item['product']->price * $item['quantity'];
+                    $orderTotal += $item['product']->price * $item['quantity'];
                 }
 
                 // Create Order
                 $order = Order::create([
                     'order_number' => 'ORD-' . strtoupper(Str::random(10)),
-                    'user_id' => $userId,
+                    'user_id' => $user->id,
                     'store_id' => $storeId,
-                    'total_amount' => $totalAmount,
+                    'total_amount' => $orderTotal,
                     'status' => 'pending',
                     'shipping_address' => $request->shipping_address,
                     'payment_method' => $request->payment_method,
-                    'payment_status' => 'pending',
+                    'payment_status' => 'pending', // Default pending
+                    'payment_proof' => $paymentProofPath,
                     'notes' => $request->notes,
                 ]);
 
@@ -117,8 +139,12 @@ class OrderController extends Controller
                         'total' => $lineTotal,
                     ]);
 
-                    // Decrement stock
                     $product->decrement('stock', $quantity);
+                }
+
+                // Process Wallet Payment Per Order
+                if ($request->payment_method === 'wallet') {
+                    app(\App\Services\PaymentService::class)->payWithWallet($user, $orderTotal, $order);
                 }
 
                 $createdOrders[] = $order->load('items');

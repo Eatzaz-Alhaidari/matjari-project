@@ -17,7 +17,7 @@ class FinancialReportController extends Controller
     /**
      * عرض التقارير المالية
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $user = auth()->user();
         $store = $user->store;
@@ -42,7 +42,8 @@ class FinancialReportController extends Controller
         }
 
         // الحصول على محفظة البائع
-        $wallet = Wallet::where('vendor_id', $user->id)->first();
+        // الحصول على محفظة البائع
+        $wallet = Wallet::where('user_id', $user->id)->first();
 
         // إجمالي المبيعات (الطلبات المسلمة)
         $totalSales = Order::where('store_id', $storeId)

@@ -89,10 +89,14 @@
                             <!-- Images -->
                             <div>
                                 <x-input-label for="images" :value="__('صور المنتج (يمكنك اختيار أكثر من صورة)')" />
-                                <input type="file" id="images" name="images[]" multiple
-                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" />
+                                <input type="file" id="images" name="images[]" multiple accept="image/*"
+                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                                    onchange="document.getElementById('image-preview-container').innerHTML = ''; Array.from(this.files).forEach(file => { if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; img.className = 'h-20 w-20 object-cover rounded-md border border-gray-200'; document.getElementById('image-preview-container').appendChild(img); }; reader.readAsDataURL(file); } });" />
                                 <x-input-error :messages="$errors->get('images')" class="mt-2" />
                                 <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
+
+                                <!-- Image Preview Container -->
+                                <div id="image-preview-container" class="mt-4 flex flex-wrap gap-4"></div>
                             </div>
                         </div>
 

@@ -26,7 +26,7 @@
                                     @method('PATCH')
                                     <button type="submit"
                                         class="px-4 py-2 text-sm font-semibold rounded-lg shadow-md
-                                                    {{ $discount->status === 'active' ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-green-500 text-white hover:bg-green-600' }}">
+                                                        {{ $discount->status === 'active' ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-green-500 text-white hover:bg-green-600' }}">
                                         {{ $discount->status === 'active' ? 'تعطيل الخصم' : 'تفعيل الخصم' }}
                                     </button>
                                 </form>
@@ -36,7 +36,7 @@
                                 تعديل
                             </a>
                             <form action="{{ route('vendor.discounts.destroy', $discount->id) }}" method="POST"
-                                onsubmit="return confirm('هل أنت متأكد من حذف هذا الخصم؟');" class="inline-block">
+                                class="inline-block">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"

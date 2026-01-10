@@ -189,6 +189,69 @@
             </main>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.addEventListener('submit', function (e) {
+                const form = e.target;
+                if (!form.tagName || form.tagName.toLowerCase() !== 'form') return;
+
+                // Check for explicit bypass
+                if (form.classList.contains('no-confirm')) return;
+
+                // Logic to determine if confirmation is needed
+                const methodInput = form.querySelector('input[name="_method"]');
+                const method = methodInput ? methodInput.value.toUpperCase() : (form.method ? form.method.toUpperCase() : 'GET');
+                const action = form.action.toLowerCase();
+                const isExplicitConfirm = form.classList.contains('confirm-action') || form.classList.contains('confirm-delete');
+
+                let shouldConfirm = false;
+                let isDestructive = false;
+
+                // 1. DELETE actions (Destructive)
+                if (method === 'DELETE' || form.classList.contains('confirm-delete')) {
+                    shouldConfirm = true;
+                    isDestructive = true;
+                }
+                // 2. PUT/PATCH actions (Updates)
+                else if (method === 'PUT' || method === 'PATCH') {
+                    shouldConfirm = true;
+                }
+                // 3. Sensitive Keywords
+                else if (action.includes('toggle') || action.includes('ban') || action.includes('activate') || action.includes('confirm') || action.includes('reject') || action.includes('restock') || action.includes('pay')) {
+                    shouldConfirm = true;
+                }
+                // 4. Explicit class
+                else if (isExplicitConfirm) {
+                    shouldConfirm = true;
+                }
+
+                if (shouldConfirm) {
+                    e.preventDefault();
+
+                    let title = form.dataset.confirmTitle || 'هل أنت متأكد؟';
+                    let text = form.dataset.confirmText || (isDestructive ? 'لا يمكن التراجع عن هذا الإجراء!' : 'سيتم تنفيذ العملية فوراً.');
+                    let icon = form.dataset.confirmIcon || (isDestructive ? 'error' : 'warning');
+                    let confirmButtonText = form.dataset.confirmButton || 'نعم، نفذ';
+                    let confirmButtonColor = isDestructive ? '#ef4444' : '#ea580c'; // Red or Vendor Orange
+
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: icon,
+                        showCancelButton: true,
+                        confirmButtonColor: confirmButtonColor,
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: confirmButtonText,
+                        cancelButtonText: 'إلغاء'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

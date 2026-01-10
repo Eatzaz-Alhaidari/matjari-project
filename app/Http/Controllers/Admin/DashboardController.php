@@ -25,8 +25,7 @@ class DashboardController extends Controller
         // 4. Products Count
         $productCount = \App\Models\Product::count();
 
-        // 5. Wallet Total Balance
-        $walletTotalBalance = \App\Models\Wallet::sum('balance');
+
 
         // 6. Reviews Count
         $reviewCount = \App\Models\Review::count();
@@ -140,7 +139,7 @@ class DashboardController extends Controller
             'activeStoresCount' => $activeStoresCount,
             'customerCount' => $customerCount,
             'productCount' => $productCount,
-            'walletTotalBalance' => $walletTotalBalance,
+
             'reviewCount' => $reviewCount,
             'complaintOpenCount' => $complaintOpenCount,
             'notificationCount' => $notificationCount,

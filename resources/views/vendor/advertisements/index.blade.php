@@ -108,13 +108,13 @@
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
                                             <span class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                @if($advertisement->status === 'active')
-                                                                    bg-green-100 text-green-800
-                                                                @elseif($advertisement->status === 'inactive')
-                                                                    bg-red-100 text-red-800
-                                                                @else
-                                                                    bg-yellow-100 text-yellow-800
-                                                                @endif">
+                                                                            @if($advertisement->status === 'active')
+                                                                                bg-green-100 text-green-800
+                                                                            @elseif($advertisement->status === 'inactive')
+                                                                                bg-red-100 text-red-800
+                                                                            @else
+                                                                                bg-yellow-100 text-yellow-800
+                                                                            @endif">
                                                 {{ $advertisement->status_text }}
                                             </span>
                                         </td>
@@ -162,12 +162,15 @@
                                                 @if($advertisement->status !== 'pending')
                                                     <form
                                                         action="{{ route('vendor.advertisements.toggleStatus', $advertisement->id) }}"
-                                                        method="POST" class="inline-block">
+                                                        method="POST" class="inline-block"
+                                                        data-confirm-title="{{ $advertisement->status === 'active' ? 'تعطيل الإعلان' : 'تفعيل الإعلان' }}"
+                                                        data-confirm-text="{{ $advertisement->status === 'active' ? 'سيتم إيقاف عرض الإعلان.' : 'سيتم تنشيط الإعلان وبدء حملته.' }}"
+                                                        data-confirm-button="نعم، نفذ">
                                                         @csrf
                                                         @method('PATCH')
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                            {{ $advertisement->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                                                                                    {{ $advertisement->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
                                                             {{ $advertisement->status === 'active' ? 'تعطيل' : 'تفعيل' }}
                                                         </button>
                                                     </form>
@@ -176,9 +179,9 @@
                                                     class="px-2 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200">تعديل</a>
                                                 <form
                                                     action="{{ route('vendor.advertisements.destroy', $advertisement->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('هل أنت متأكد من حذف هذا الإعلان؟');"
-                                                    class="inline-block">
+                                                    method="POST" class="inline-block" data-confirm-title="حذف الإعلان"
+                                                    data-confirm-text="هل أنت متأكد من حذف هذا الإعلان؟"
+                                                    data-confirm-button="حذف">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
