@@ -105,13 +105,34 @@
                                             class="w-24 h-24 object-cover rounded-lg border shadow-sm">
                                     </div>
                                 @endif
+                            </div>
 
-                                <input type="file" id="images" name="images[]" multiple
-                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <p class="text-xs text-gray-500 mt-1">يمكنك إضافة صور إضافية للمنتج. سيتم الاحتفاظ
-                                    بالصور القديمة.</p>
-                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
-                                <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
+                            <!-- 3D Model -->
+                            <div class="col-span-1">
+                                <x-input-label for="three_d_model" :value="__('ملف 3D')" />
+                                @if($product->three_d_model)
+                                    <div class="mb-2 mt-1 text-xs text-indigo-600">
+                                        يوجد ملف حالي: <a href="{{ asset('storage/' . $product->three_d_model) }}"
+                                            target="_blank" class="underline font-bold">عرض</a>
+                                    </div>
+                                @else
+                                    <p class="text-xs text-gray-500 mt-1">لا يوجد ملف 3D مرفوع</p>
+                                @endif
+                            </div>
+
+                            <!-- 360 Images -->
+                            <div class="col-span-1">
+                                <x-input-label for="three_sixty_images" :value="__('صور 360 درجة')" />
+                                @if($product->three_sixty_images)
+                                    <div class="flex flex-wrap gap-1 mb-2 mt-1">
+                                        @foreach($product->three_sixty_images as $path)
+                                            <img src="{{ asset('storage/' . $path) }}"
+                                                class="w-8 h-8 object-cover rounded border">
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-xs text-gray-500 mt-1">لا توجد صور 360 مرفوعة</p>
+                                @endif
                             </div>
                         </div>
 

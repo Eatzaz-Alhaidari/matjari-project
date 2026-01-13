@@ -40,6 +40,28 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="mb-6 bg-red-100 border-r-4 border-red-500 text-red-700 p-4 rounded shadow-sm" role="alert">
+                    <div class="flex">
+                        <div class="py-1">
+                            <svg class="fill-current h-6 w-6 text-red-500 ml-4" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20">
+                                <path
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold">حدث خطأ أثناء المعالجة:</p>
+                            <ul class="list-disc list-inside text-sm">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="overflow-x-auto">
@@ -124,7 +146,7 @@
                                                     </svg>
                                                 </button>
                                                 <form action="{{ route('admin.categories.destroy', $category) }}"
-                                                    method="POST" data-confirm-title="حذف التصنيف"
+                                                    method="POST" class="no-confirm" data-confirm-title="حذف التصنيف"
                                                     data-confirm-text="هل أنت متأكد؟ سيتم حذف التصنيف وقد تتأثر المنتجات المرتبطة به."
                                                     data-confirm-button="نعم، احذف">
                                                     @csrf
@@ -148,7 +170,7 @@
                                                     <h3 class="font-bold text-lg mb-4 text-brand-blue border-b pb-2">تعديل
                                                         التصنيف: {{ $category->name }}</h3>
                                                     <form action="{{ route('admin.categories.update', $category) }}"
-                                                        method="POST" enctype="multipart/form-data">
+                                                        method="POST" enctype="multipart/form-data" class="no-confirm">
                                                         @csrf
                                                         @method('PUT')
 

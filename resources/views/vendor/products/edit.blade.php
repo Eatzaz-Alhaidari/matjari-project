@@ -179,6 +179,40 @@
                                     </div>
                                 </div>
                                 <x-input-error :messages="$errors->get('images')" class="mt-2" />
+
+                                <div class="mt-8 pt-6 border-t border-gray-100">
+                                    <h4 class="text-md font-medium text-gray-800 mb-4">عرض 3D</h4>
+                                    @if($product->three_d_model)
+                                        <div
+                                            class="mb-3 p-2 bg-blue-50 rounded text-xs text-blue-700 flex justify-between items-center">
+                                            <span>ملف 3D الحالي موجود</span>
+                                            <a href="{{ asset('storage/' . $product->three_d_model) }}" target="_blank"
+                                                class="underline">تحميل/عرض</a>
+                                        </div>
+                                    @endif
+                                    <x-input-label for="three_d_model" :value="__('تحديث ملف 3D (.glb, .gltf, .obj, .stl)')" />
+                                    <input type="file" id="three_d_model" name="three_d_model"
+                                        accept=".glb,.gltf,.obj,.stl"
+                                        class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                    <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-gray-100">
+                                    <h4 class="text-md font-medium text-gray-800 mb-4">عرض 360 درجة</h4>
+                                    @if($product->three_sixty_images)
+                                        <div class="grid grid-cols-4 gap-2 mb-4">
+                                            @foreach($product->three_sixty_images as $path)
+                                                <img src="{{ asset('storage/' . $path) }}"
+                                                    class="w-full h-10 object-cover rounded border">
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <x-input-label for="three_sixty_images" :value="__('تحديث صور 360 (ارفع المجموعة بالكامل)')" />
+                                    <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple
+                                        accept="image/*"
+                                        class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                    <x-input-error :messages="$errors->get('three_sixty_images')" class="mt-2" />
+                                </div>
                             </div>
                         </div>
 

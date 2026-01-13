@@ -98,6 +98,27 @@
                                 <!-- Image Preview Container -->
                                 <div id="image-preview-container" class="mt-4 flex flex-wrap gap-4"></div>
                             </div>
+
+                            <!-- 3D Model -->
+                            <div>
+                                <x-input-label for="three_d_model" :value="__('ملف 3D (glb, gltf, obj, stl)')" />
+                                <input type="file" id="three_d_model" name="three_d_model" accept=".glb,.gltf,.obj,.stl"
+                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                <p class="text-xs text-gray-500 mt-1">يُدعم ملفات glb, gltf, obj, stl بحد أقصى 20 ميجا
+                                    بايت</p>
+                                <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
+                            </div>
+
+                            <!-- 360 Images -->
+                            <div>
+                                <x-input-label for="three_sixty_images" :value="__('صور 360 (ارفع مجموعة من الصور للعرض الدوار)')" />
+                                <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple
+                                    accept="image/*"
+                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+                                <p class="text-xs text-gray-500 mt-1">يُشترط رفع صور متتالية لتكوين العرض 360 درجة</p>
+                                <x-input-error :messages="$errors->get('three_sixty_images')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('three_sixty_images.*')" class="mt-2" />
+                            </div>
                         </div>
 
                         <!-- Description -->

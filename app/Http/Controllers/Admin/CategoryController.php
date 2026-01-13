@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->paginate(10);
+        $categories = Category::latest()->withCount('products')->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -22,10 +22,18 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'nullable|string|in:active,inactive',
         ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($request->name);
+        $data = $request->except('image');
+
+        // Support Arabic slugs or fallback to name if slug is empty
+        $data['slug'] = Str::slug($request->name, '-', null);
+        if (empty($data['slug'])) {
+            $data['slug'] = str_replace(' ', '-', $request->name);
+        }
+
+        $data['status'] = $request->status ?? 'active';
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categories', 'public');
@@ -42,10 +50,16 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'nullable|string|in:active,inactive',
         ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($request->name);
+        $data = $request->except(['image', '_token', '_method']);
+
+        // Support Arabic slugs or fallback to name if slug is empty
+        $data['slug'] = Str::slug($request->name, '-', null);
+        if (empty($data['slug'])) {
+            $data['slug'] = str_replace(' ', '-', $request->name);
+        }
 
         if ($request->hasFile('image')) {
             if ($category->image) {

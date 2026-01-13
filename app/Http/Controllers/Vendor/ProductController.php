@@ -61,10 +61,25 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'three_d_model' => 'nullable|file|mimes:glb,gltf,obj,stl|max:20480', // 20MB max
+            'three_sixty_images' => 'nullable|array',
+            'three_sixty_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->except('images');
+        $data = $request->except(['images', 'three_d_model', 'three_sixty_images']);
         $data['store_id'] = auth()->user()->store->id;
+
+        if ($request->hasFile('three_d_model')) {
+            $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
+        }
+
+        if ($request->hasFile('three_sixty_images')) {
+            $threeSixtyPaths = [];
+            foreach ($request->file('three_sixty_images') as $image) {
+                $threeSixtyPaths[] = $image->store('products/360', 'public');
+            }
+            $data['three_sixty_images'] = $threeSixtyPaths;
+        }
 
         $product = Product::create($data);
 
@@ -136,9 +151,33 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'three_d_model' => 'nullable|file|mimes:glb,gltf,obj,stl|max:20480',
+            'three_sixty_images' => 'nullable|array',
+            'three_sixty_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->except('images');
+        $data = $request->except(['images', 'three_d_model', 'three_sixty_images']);
+
+        if ($request->hasFile('three_d_model')) {
+            if ($product->three_d_model) {
+                Storage::disk('public')->delete($product->three_d_model);
+            }
+            $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
+        }
+
+        if ($request->hasFile('three_sixty_images')) {
+            if ($product->three_sixty_images) {
+                foreach ($product->three_sixty_images as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+            $threeSixtyPaths = [];
+            foreach ($request->file('three_sixty_images') as $image) {
+                $threeSixtyPaths[] = $image->store('products/360', 'public');
+            }
+            $data['three_sixty_images'] = $threeSixtyPaths;
+        }
+
         $product->update($data);
 
         if ($request->hasFile('images')) {

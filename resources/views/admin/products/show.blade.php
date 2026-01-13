@@ -111,8 +111,40 @@
                                             </div>
                                         </div>
                                     @endif
+                                    @endif
                                 </div>
                             </div>
+
+                            <!-- عرض 3D و 360 درجة -->
+                            @if($product->three_d_model || $product->three_sixty_images)
+                                <div class="mt-6 space-y-6">
+                                    @if($product->three_d_model)
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900 mb-4">عرض 3D</h3>
+                                            <div class="bg-indigo-50 rounded-lg p-4 flex items-center justify-between">
+                                                <span class="text-indigo-700 font-medium">ملف 3D متاح</span>
+                                                <a href="{{ asset('storage/' . $product->three_d_model) }}" target="_blank" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700">
+                                                    تحميل الملف
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if($product->three_sixty_images)
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-900 mb-4">عرض 360 درجة</h3>
+                                            <div class="bg-cyan-50 rounded-lg p-4">
+                                                <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                                    @foreach($product->three_sixty_images as $path)
+                                                        <img src="{{ asset('storage/' . $path) }}" class="w-full h-12 object-cover rounded shadow-sm">
+                                                    @endforeach
+                                                </div>
+                                                <p class="text-xs text-cyan-700 mt-2 font-medium">مكون من {{ count($product->three_sixty_images) }} صورة</p>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
 
 
                             <!-- الوصف الكامل -->
