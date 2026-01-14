@@ -23,6 +23,7 @@ class ProductController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('product_code', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhereHas('category', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
@@ -50,12 +51,17 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'name' => 'required|string|max:255',
             'brand' => 'nullable|string|max:255',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
+            'price_before' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'min_stock' => 'nullable|integer|min:0',
+            'notes' => 'nullable|string',
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
             'category_id' => 'required|exists:categories,id',
@@ -140,12 +146,17 @@ class ProductController extends Controller
         }
 
         $request->validate([
+            'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
             'brand' => 'nullable|string|max:255',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
+            'price_before' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'min_stock' => 'nullable|integer|min:0',
+            'notes' => 'nullable|string',
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
             'category_id' => 'required|exists:categories,id',

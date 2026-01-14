@@ -24,6 +24,15 @@
                                 <h3 class="text-lg font-medium text-gray-900">المعلومات الأساسية</h3>
                             </div>
                             <div class="p-6 space-y-6">
+                                <!-- Product Code -->
+                                <div>
+                                    <x-input-label for="product_code" :value="__('رمز المنتج (SKU)')" />
+                                    <x-text-input id="product_code" class="block mt-1 w-full" type="text"
+                                        name="product_code" :value="old('product_code', $product->product_code)"
+                                        placeholder="مثال: PRD-001" />
+                                    <x-input-error :messages="$errors->get('product_code')" class="mt-2" />
+                                </div>
+
                                 <!-- Name -->
                                 <div>
                                     <x-input-label for="name" :value="__('اسم المنتج')" />
@@ -56,6 +65,15 @@
                                         class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">{{ old('full_description', $product->full_description) }}</textarea>
                                     <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
                                 </div>
+
+                                <!-- Notes -->
+                                <div>
+                                    <x-input-label for="notes" :value="__('ملاحظات المرفق (خاصة بك)')" />
+                                    <textarea id="notes" name="notes" rows="2"
+                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm"
+                                        placeholder="ملاحظات تظهر لك فقط">{{ old('notes', $product->notes) }}</textarea>
+                                    <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+                                </div>
                             </div>
                         </div>
 
@@ -67,7 +85,7 @@
                             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Price -->
                                 <div>
-                                    <x-input-label for="price" :value="__('السعر')" />
+                                    <x-input-label for="price" :value="__('سعر البيع الحالي')" />
                                     <div class="relative mt-1 rounded-md shadow-sm">
                                         <div
                                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -79,12 +97,48 @@
                                     <x-input-error :messages="$errors->get('price')" class="mt-2" />
                                 </div>
 
+                                <!-- Price Before -->
+                                <div>
+                                    <x-input-label for="price_before" :value="__('السعر قبل الخصم')" />
+                                    <div class="relative mt-1 rounded-md shadow-sm">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <span class="text-gray-500 sm:text-sm">ر.ي</span>
+                                        </div>
+                                        <x-text-input id="price_before" class="block w-full pr-12" type="number"
+                                            step="0.01" name="price_before" :value="old('price_before', $product->price_before)" />
+                                    </div>
+                                    <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
+                                </div>
+
+                                <!-- Cost Price -->
+                                <div>
+                                    <x-input-label for="cost_price" :value="__('تكلفة الشراء')" />
+                                    <div class="relative mt-1 rounded-md shadow-sm">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <span class="text-gray-500 sm:text-sm">ر.ي</span>
+                                        </div>
+                                        <x-text-input id="cost_price" class="block w-full pr-12" type="number"
+                                            step="0.01" name="cost_price" :value="old('cost_price', $product->cost_price)" />
+                                    </div>
+                                    <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
+                                </div>
+
                                 <!-- Stock -->
                                 <div>
-                                    <x-input-label for="stock" :value="__('الكمية (المخزون)')" />
+                                    <x-input-label for="stock" :value="__('الكمية المتوفرة')" />
                                     <x-text-input id="stock" class="block mt-1 w-full" type="number" name="stock"
                                         :value="old('stock', $product->stock)" required />
                                     <x-input-error :messages="$errors->get('stock')" class="mt-2" />
+                                </div>
+
+                                <!-- Min Stock -->
+                                <div>
+                                    <x-input-label for="min_stock" :value="__('الحد الأدنى للتنبيه')" />
+                                    <x-text-input id="min_stock" class="block mt-1 w-full" type="number"
+                                        name="min_stock" :value="old('min_stock', $product->min_stock)" required />
+                                    <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
                                 </div>
 
                                 <!-- Warranty -->
@@ -236,12 +290,17 @@
         const form = document.getElementById('edit-product-form');
         const initialValues = {};
         const fieldLabels = {
+            'product_code': 'رمز المنتج',
             'name': 'اسم المنتج',
             'brand': 'الماركة',
             'description': 'الوصف المختصر',
             'full_description': 'الوصف الكامل',
-            'price': 'السعر',
+            'price': 'سعر البيع',
+            'price_before': 'السعر قبل الخصم',
+            'cost_price': 'تكلفة الشراء',
             'stock': 'الكمية',
+            'min_stock': 'الحد الأدنى',
+            'notes': 'الملاحظات',
             'warranty': 'الضمان',
             'status': 'الحالة',
             'category_id': 'التصنيف'

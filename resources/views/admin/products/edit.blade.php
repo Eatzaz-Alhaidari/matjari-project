@@ -15,6 +15,15 @@
                         @method('PUT')
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Product Code -->
+                            <div>
+                                <x-input-label for="product_code" :value="__('رمز المنتج (SKU)')" />
+                                <x-text-input id="product_code" class="block mt-1 w-full" type="text"
+                                    name="product_code" :value="old('product_code', $product->product_code)"
+                                    placeholder="مثال: PRD-001" />
+                                <x-input-error :messages="$errors->get('product_code')" class="mt-2" />
+                            </div>
+
                             <!-- Name -->
                             <div>
                                 <x-input-label for="name" :value="__('اسم المنتج')" />
@@ -33,10 +42,26 @@
 
                             <!-- Price -->
                             <div>
-                                <x-input-label for="price" :value="__('السعر')" />
+                                <x-input-label for="price" :value="__('سعر البيع الحالي')" />
                                 <x-text-input id="price" class="block mt-1 w-full" type="number" step="0.01"
                                     name="price" :value="old('price', $product->price)" required />
                                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                            </div>
+
+                            <!-- Price Before Discount -->
+                            <div>
+                                <x-input-label for="price_before" :value="__('السعر قبل الخصم')" />
+                                <x-text-input id="price_before" class="block mt-1 w-full" type="number" step="0.01"
+                                    name="price_before" :value="old('price_before', $product->price_before)" />
+                                <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
+                            </div>
+
+                            <!-- Cost Price -->
+                            <div>
+                                <x-input-label for="cost_price" :value="__('تكلفة الشراء')" />
+                                <x-text-input id="cost_price" class="block mt-1 w-full" type="number" step="0.01"
+                                    name="cost_price" :value="old('cost_price', $product->cost_price)" />
+                                <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
                             </div>
 
                             <!-- Stock -->
@@ -45,6 +70,14 @@
                                 <x-text-input id="stock" class="block mt-1 w-full" type="number" name="stock"
                                     :value="old('stock', $product->stock)" required />
                                 <x-input-error :messages="$errors->get('stock')" class="mt-2" />
+                            </div>
+
+                            <!-- Min Stock -->
+                            <div>
+                                <x-input-label for="min_stock" :value="__('الحد الأدنى للمخزون')" />
+                                <x-text-input id="min_stock" class="block mt-1 w-full" type="number" name="min_stock"
+                                    :value="old('min_stock', $product->min_stock)" required />
+                                <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
                             </div>
 
                             <!-- Status -->
@@ -151,6 +184,14 @@
                             <textarea id="full_description" name="full_description" rows="5"
                                 class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('full_description', $product->full_description) }}</textarea>
                             <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mt-6">
+                            <x-input-label for="notes" :value="__('ملاحظات إقليمية (خاصة بالنظام)')" />
+                            <textarea id="notes" name="notes" rows="3"
+                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('notes', $product->notes) }}</textarea>
+                            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end mt-6">

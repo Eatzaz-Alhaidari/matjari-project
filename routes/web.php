@@ -141,9 +141,11 @@ Route::prefix('vendor')
         Route::post('orders', [\App\Http\Controllers\Vendor\OrderController::class, 'store'])->name('orders.store');
 
         // Warehouse
-        Route::get('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'import'])->name('warehouse.import');
-        Route::post('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'processImport'])->name('warehouse.process-import');
         Route::get('warehouse', [\App\Http\Controllers\Vendor\WarehouseController::class, 'index'])->name('warehouse.index');
+        Route::get('warehouse/import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'import'])->name('warehouse.import');
+        Route::post('warehouse/upload-csv', [\App\Http\Controllers\Vendor\WarehouseController::class, 'uploadCsv'])->name('warehouse.upload-csv');
+        Route::post('warehouse/process-import', [\App\Http\Controllers\Vendor\WarehouseController::class, 'processImport'])->name('warehouse.process-import');
+        Route::get('warehouse/download-template', [\App\Http\Controllers\Vendor\WarehouseController::class, 'downloadTemplate'])->name('warehouse.download-template');
         Route::patch('warehouse/products/{product}/stock', [\App\Http\Controllers\Vendor\WarehouseController::class, 'updateStock'])->name('warehouse.updateStock');
 
         // Advertisements

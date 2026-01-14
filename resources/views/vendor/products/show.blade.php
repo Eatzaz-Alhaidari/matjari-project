@@ -107,7 +107,6 @@
                                             </div>
                                         </div>
                                     @endif
-                                    @endif
                                 </div>
                             </div>
 
@@ -119,7 +118,8 @@
                                             <h3 class="text-lg font-semibold text-gray-900 mb-4">عرض 3D</h3>
                                             <div class="bg-blue-50 rounded-lg p-4 flex items-center justify-between">
                                                 <span class="text-blue-700 font-medium">ملف 3D متاح للعرض في التطبيق</span>
-                                                <a href="{{ asset('storage/' . $product->three_d_model) }}" target="_blank" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                                <a href="{{ asset('storage/' . $product->three_d_model) }}" target="_blank"
+                                                    class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
                                                     تحميل الملف
                                                 </a>
                                             </div>
@@ -132,10 +132,12 @@
                                             <div class="bg-green-50 rounded-lg p-4">
                                                 <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
                                                     @foreach($product->three_sixty_images as $path)
-                                                        <img src="{{ asset('storage/' . $path) }}" class="w-full h-12 object-cover rounded shadow-sm">
+                                                        <img src="{{ asset('storage/' . $path) }}"
+                                                            class="w-full h-12 object-cover rounded shadow-sm">
                                                     @endforeach
                                                 </div>
-                                                <p class="text-xs text-green-700 mt-2 font-medium">مجموعة مكونة من {{ count($product->three_sixty_images) }} صورة للعرض الدوار</p>
+                                                <p class="text-xs text-green-700 mt-2 font-medium">مجموعة مكونة من
+                                                    {{ count($product->three_sixty_images) }} صورة للعرض الدوار</p>
                                             </div>
                                         </div>
                                     @endif
