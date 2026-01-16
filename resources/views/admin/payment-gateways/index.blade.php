@@ -63,15 +63,18 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <h3 class="text-lg font-bold text-gray-800">المحفظة الإلكترونية (جـيب)</h3>
-                                            <p class="text-sm text-gray-500">يتيح للعميل الدفع باستخدام رصيده الحالي في التطبيق.</p>
+                                            <h3 class="text-lg font-bold text-gray-800">المحافظ الإلكترونية</h3>
+                                            <p class="text-sm text-gray-500">إدارة محافظ الدفع الإلكتروني (إضافة/تعديل/تفعيل).</p>
                                         </div>
                                     </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" name="payment_jeeb_enabled" value="1" class="sr-only peer"
-                                            {{ ($settings['payment_jeeb_enabled'] ?? '0') == '1' ? 'checked' : '' }}>
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                                    </label>
+                                    <a href="{{ route('admin.electronic-wallets.index') }}" 
+                                       title="عرض المحافظ"
+                                       class="p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
                                 </div>
                             </div>
 

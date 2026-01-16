@@ -101,6 +101,7 @@ Route::prefix('admin')
         // 13. Payment Gateways Management (New)
         Route::get('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
         Route::post('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'store'])->name('payment-gateways.store');
+        Route::resource('electronic-wallets', \App\Http\Controllers\Admin\ElectronicWalletController::class);
 
         // Activity Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');

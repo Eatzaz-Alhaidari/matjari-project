@@ -4,16 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;//ضمن لي هذه الملف اللي يحتوي على الشعل والدوال
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 // Auth API
 Route::post('/register', [\App\Http\Controllers\API\AuthController::class, 'register']);
@@ -28,12 +18,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/complaints', [\App\Http\Controllers\API\ComplaintController::class, 'store']);
     Route::get('/complaints/{id}', [\App\Http\Controllers\API\ComplaintController::class, 'show']);
 
-    // Protected User Routes can be added here
+
 });
 
 // Reviews API
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
-Route::post('/reviews', [ReviewController::class, 'store']); // Submit a review
+Route::post('/reviews', [ReviewController::class, 'store']);
 
 // Categories API
 Route::get('/categories', [\App\Http\Controllers\API\CategoryController::class, 'index']);
@@ -52,5 +42,5 @@ Route::get('/payment-methods', [\App\Http\Controllers\Api\PaymentController::cla
 
 // Wallet Routes (Protected)
 Route::get('/wallet', [\App\Http\Controllers\Api\WalletController::class, 'show']);
-// Hint: Order creation with wallet payment logic should be inside OrderController::store or a specific checkpoint in checkout
+
 
