@@ -19,6 +19,12 @@ class CategoryController extends Controller
             ->select('id', 'name', 'slug', 'image', 'description')
             ->get();
 
+        $categories->each(function ($category) {
+            $category->image_url = $category->image
+                ? url('api/image/' . $category->image)
+                : null;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $categories

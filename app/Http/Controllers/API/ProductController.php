@@ -9,29 +9,55 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the products.
-     * Use query parameters for filtering: ?category_id=1&search=xyz
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * عرض المنتجات
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category:id,name', 'store:id,name']) // Eager load category and store names
-            ->where('status', 'active'); // Only active products
+        $query = Product::with([
+            'category:id,name',
+            'store:id,name',
+            'images'
+        ])
+            ->where('status', 'active');
 
-        // Filter by Category
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Search by Name
+        // Support for Flutter app 'category' parameter (slug)
+        if ($request->has('category') && $request->category !== 'all') {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        }
+
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Get paginated results
         $products = $query->latest()->paginate(10);
+
+        // ✅ إضافة رابط الصورة + دعم صور متعددة
+        foreach ($products as $product) {
+
+            // صورة رئيسية
+            $product->image_url = $product->image
+                ? url('api/image/' . $product->image)
+                : null;
+
+            // صور إضافية لو موجودة
+            if ($product->images) {
+                $images = [];
+
+                foreach ($product->images as $img) {
+                    $images[] = url('api/image/' . $img->image_path);
+                }
+
+                $product->images_url = $images;
+            } else {
+                $product->images_url = [];
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -40,14 +66,16 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified product.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * عرض منتج واحد
      */
-    public function show($id)//
+    public function show($id)
     {
-        $product = Product::with(['category', 'store', 'reviews.user:id,name'])
+        $product = Product::with([
+            'category',
+            'store',
+            'images',
+            'reviews.user:id,name'
+        ])
             ->where('status', 'active')
             ->find($id);
 
@@ -55,7 +83,25 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Product not found'
-            ], 404);//غير موجودة
+            ], 404);
+        }
+
+        // ✅ الصورة الرئيسية
+        $product->image_url = $product->image
+            ? url('api/image/' . $product->image)
+            : null;
+
+        // ✅ صور متعددة
+        if ($product->images) {
+            $images = [];
+
+            foreach ($product->images as $img) {
+                $images[] = url('api/image/' . $img->image_path);
+            }
+
+            $product->images_url = $images;
+        } else {
+            $product->images_url = [];
         }
 
         return response()->json([

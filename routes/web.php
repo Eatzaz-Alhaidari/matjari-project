@@ -103,6 +103,11 @@ Route::prefix('admin')
         Route::post('payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'store'])->name('payment-gateways.store');
         Route::resource('electronic-wallets', \App\Http\Controllers\Admin\ElectronicWalletController::class);
 
+        // 14. Advertisements Management (New)
+        Route::get('advertisements', [\App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
+        Route::patch('advertisements/{advertisement}/approve', [\App\Http\Controllers\Admin\AdvertisementController::class, 'approve'])->name('advertisements.approve');
+        Route::delete('advertisements/{advertisement}', [\App\Http\Controllers\Admin\AdvertisementController::class, 'destroy'])->name('advertisements.destroy');
+
         // Activity Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
 

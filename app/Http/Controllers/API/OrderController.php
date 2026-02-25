@@ -142,9 +142,57 @@ class OrderController extends Controller
                     $product->decrement('stock', $quantity);
                 }
 
-                // Process Wallet Payment Per Order
-                if ($request->payment_method === 'wallet') {
+                try {
+                    $service = new \App\Services\OnyxService();
+                    $result = $service->createOrder([
+                        'type' => 'SO',
+                        'storeOrderId' => $order->order_number,
+                        'mobile' => $user->phone ?? '967777777777', // Use user phone or fallback
+                        'OrderDetailsList' => array_map(function ($item) {
+                            return [
+                                'product_id' => $item['product']->id,
+                                'quantity' => $item['quantity'],
+                                'price' => $item['product']->price
+                            ];
+                        }, $storeItems)
+                    ]);
+
+                    if (isset($result['success']) && $result['success'] && isset($result['onyx_ref'])) {
+                        $order->update(['onyx_ref' => $result['onyx_ref']]);
+                    }
+
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('OnyxService Error: ' . $e->getMessage());
+                    // Continue order creation even if Onyx fails? Assuming yes.
+                }
+
+                // 5. Handle Payment
+                if ($request->payment_method == 'wallet') {
                     app(\App\Services\PaymentService::class)->payWithWallet($user, $orderTotal, $order);
+                } elseif ($request->payment_method == 'credit_card') {
+                    if (!$request->has('payment_token')) {
+                        throw new \Exception('يرجى إدخال بيانات البطاقة بشكل صحيح.');
+                    }
+
+                    // Charge Stripe
+                    $stripeService = app(\App\Services\StripeService::class);
+                    $charge = $stripeService->charge($orderTotal, $request->payment_token, 'USD'); // Assuming USD for now
+
+                    // Log Transaction
+                    \Illuminate\Support\Facades\DB::table('transactions')->insert([
+                        'user_id' => $user->id,
+                        'order_id' => $order->id,
+                        'transaction_id' => $charge->id,
+                        'provider' => 'stripe',
+                        'amount' => $orderTotal,
+                        'currency' => 'USD',
+                        'status' => 'success',
+                        'payload' => json_encode($charge),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $order->update(['payment_status' => 'paid', 'status' => 'processing']);
                 }
 
                 $createdOrders[] = $order->load('items');
@@ -194,3 +242,4 @@ class OrderController extends Controller
         ]);
     }
 }
+

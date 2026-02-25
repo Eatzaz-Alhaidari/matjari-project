@@ -177,7 +177,7 @@
             </div>
         </a>
         <!-- إدارة العروض والإعلانات -->
-        <a href="{{ route('admin.coming-soon') }}"
+        <a href="{{ route('admin.advertisements.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-amber-50 transition-all duration-300 group">
             <div class="flex items-center">
                 <div class="flex-shrink-0 p-5 bg-amber-100 rounded-xl transition-colors group-hover:bg-amber-200">

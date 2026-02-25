@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.url')) {
+            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+        }
+
         // Model Observers
         \App\Models\Product::observe(\App\Observers\GeneralObserver::class);
         \App\Models\Order::observe(\App\Observers\GeneralObserver::class);

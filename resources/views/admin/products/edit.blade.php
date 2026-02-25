@@ -41,26 +41,47 @@
                             </div>
 
                             <!-- Price -->
-                            <div>
-                                <x-input-label for="price" :value="__('سعر البيع الحالي')" />
-                                <x-text-input id="price" class="block mt-1 w-full" type="number" step="0.01"
-                                    name="price" :value="old('price', $product->price)" required />
-                                <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <x-input-label for="price" :value="__('سعر البيع الحالي')" />
+                                    <x-text-input id="price" class="block mt-1 w-full" type="number" step="0.01"
+                                        name="price" :value="old('price', $product->price)" required />
+                                    <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                                </div>
+                                <div class="w-1/3">
+                                    <x-input-label for="currency" :value="__('العملة')" />
+                                    <select id="currency" name="currency"
+                                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="YER" {{ old('currency', $product->currency) == 'YER' ? 'selected' : '' }}>ريال يمني (YER)</option>
+                                        <option value="SAR" {{ old('currency', $product->currency) == 'SAR' ? 'selected' : '' }}>ريال سعودي (SAR)</option>
+                                        <option value="USD" {{ old('currency', $product->currency) == 'USD' ? 'selected' : '' }}>دولار أمريكي (USD)</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('currency')" class="mt-2" />
+                                </div>
                             </div>
 
                             <!-- Price Before Discount -->
                             <div>
                                 <x-input-label for="price_before" :value="__('السعر قبل الخصم')" />
-                                <x-text-input id="price_before" class="block mt-1 w-full" type="number" step="0.01"
-                                    name="price_before" :value="old('price_before', $product->price_before)" />
+                                <div class="relative mt-1">
+                                    <x-text-input id="price_before" class="block w-full pr-12" type="number" step="0.01"
+                                        name="price_before" :value="old('price_before', $product->price_before)" />
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+                                    </div>
+                                </div>
                                 <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
                             </div>
 
                             <!-- Cost Price -->
                             <div>
-                                <x-input-label for="cost_price" :value="__('تكلفة الشراء')" />
-                                <x-text-input id="cost_price" class="block mt-1 w-full" type="number" step="0.01"
-                                    name="cost_price" :value="old('cost_price', $product->cost_price)" />
+                                <div class="relative mt-1">
+                                    <x-text-input id="cost_price" class="block w-full pr-12" type="number" step="0.01"
+                                        name="cost_price" :value="old('cost_price', $product->cost_price)" />
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+                                    </div>
+                                </div>
                                 <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
                             </div>
 
@@ -78,6 +99,14 @@
                                 <x-text-input id="min_stock" class="block mt-1 w-full" type="number" name="min_stock"
                                     :value="old('min_stock', $product->min_stock)" required />
                                 <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
+                            </div>
+
+                            <!-- Warranty -->
+                            <div>
+                                <x-input-label for="warranty" :value="__('الضمان')" />
+                                <x-text-input id="warranty" class="block mt-1 w-full" type="text" name="warranty"
+                                    :value="old('warranty', $product->warranty)" placeholder="مثال: سنتين" />
+                                <x-input-error :messages="$errors->get('warranty')" class="mt-2" />
                             </div>
 
                             <!-- Status -->
@@ -206,4 +235,29 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const currencySelect = document.getElementById('currency');
+            const currencyLabels = document.querySelectorAll('.currency-label');
+
+            function updateCurrencyLabels() {
+                if (!currencySelect) return;
+
+                const selectedCurrency = currencySelect.value;
+                let symbol = 'ر.ي';
+
+                if (selectedCurrency === 'SAR') symbol = 'ر.س';
+                else if (selectedCurrency === 'USD') symbol = '$';
+
+                currencyLabels.forEach(label => {
+                    label.textContent = symbol;
+                });
+            }
+
+            if (currencySelect) {
+                currencySelect.addEventListener('change', updateCurrencyLabels);
+                updateCurrencyLabels();
+            }
+        });
+    </script>
 </x-admin-layout>

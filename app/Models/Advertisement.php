@@ -9,10 +9,12 @@ class Advertisement extends Model
 {
     protected $fillable = [
         'store_id',
+        'vendor_id', // New
+        'is_admin', // New
         'title',
         'description',
         'image',
-        'status',
+        'status', // Now Integer: 0 or 1
         'start_date',
         'end_date',
         'budget',
@@ -27,6 +29,8 @@ class Advertisement extends Model
         'budget' => 'decimal:2',
         'clicks' => 'integer',
         'views' => 'integer',
+        'is_admin' => 'boolean',
+        'status' => 'integer',
     ];
 
     // العلاقات
@@ -35,32 +39,43 @@ class Advertisement extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1)
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now());
+    }
+
     // Helper methods
     public function getStatusColorAttribute()
     {
-        return match($this->status) {
-            'active' => 'green',
-            'inactive' => 'red',
-            'pending' => 'yellow',
+        return match ($this->status) {
+            1 => 'green',
+            0 => 'yellow',
             default => 'gray',
         };
     }
 
     public function getStatusTextAttribute()
     {
-        return match($this->status) {
-            'active' => 'نشط',
-            'inactive' => 'معطل',
-            'pending' => 'في الانتظار',
+        return match ($this->status) {
+            1 => 'نشط',
+            0 => 'في الانتظار',
             default => 'غير محدد',
         };
     }
 
     public function isActive()
     {
-        return $this->status === 'active' &&
-               $this->start_date <= now() &&
-               $this->end_date >= now();
+        return $this->status === 1 &&
+            $this->start_date <= now() &&
+            $this->end_date >= now();
     }
 
     public function getDaysRemainingAttribute()

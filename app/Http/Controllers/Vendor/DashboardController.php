@@ -81,7 +81,10 @@ class DashboardController extends Controller
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
-                'products.warranty'
+                'products.updated_at',
+                'products.warranty',
+                'products.sku',
+                'products.currency'
             )
             ->orderByDesc('total_quantity_sold')
             ->limit(5)

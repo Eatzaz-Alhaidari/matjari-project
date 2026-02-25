@@ -64,6 +64,7 @@ class ProductController extends Controller
             'notes' => 'nullable|string',
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
+            'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -145,6 +146,8 @@ class ProductController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا المنتج');
         }
 
+        \Illuminate\Support\Facades\Log::info('Product Update Request Data:', $request->all());
+
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
@@ -159,6 +162,7 @@ class ProductController extends Controller
             'notes' => 'nullable|string',
             'warranty' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
+            'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -168,6 +172,12 @@ class ProductController extends Controller
         ]);
 
         $data = $request->except(['images', 'three_d_model', 'three_sixty_images']);
+        $data['currency'] = $request->currency; // Force update currency
+
+        \Illuminate\Support\Facades\Log::info('Vendor Product Update - Final Data:', $data);
+
+        $updated = $product->update($data);
+        \Illuminate\Support\Facades\Log::info('Vendor Product Update - Result:', ['updated' => $updated, 'new_currency' => $product->fresh()->currency]);
 
         if ($request->hasFile('three_d_model')) {
             if ($product->three_d_model) {

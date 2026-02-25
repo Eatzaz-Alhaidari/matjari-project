@@ -24,6 +24,7 @@ class Order extends Model
         'tracking_number',
         'carrier_name',
         'shipping_city',
+        'onyx_ref',
     ];
 
     protected $casts = [

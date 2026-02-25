@@ -55,7 +55,7 @@ class AdvertisementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:active,inactive,pending',
+            // 'status' => 'required|in:active,inactive,pending', // Disabled, always 0
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'budget' => 'required|numeric|min:0',
@@ -64,15 +64,24 @@ class AdvertisementController extends Controller
 
         $data = $request->except('image');
         $data['store_id'] = auth()->user()->store->id;
+        $data['vendor_id'] = auth()->id();
+        $data['status'] = 0; // Pending by default
+        $data['is_admin'] = false;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('advertisements', 'public');
         }
 
-        Advertisement::create($data);
+        $advertisement = Advertisement::create($data);
+
+        // Notify Admins
+        $admins = \App\Models\User::where('role', 'super-admin')->get(); // Assuming 'super-admin' role based on routes
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\NewAdvertisementNotification($advertisement));
+        }
 
         return redirect()->route('vendor.advertisements.index')
-            ->with('success', 'تم إضافة الإعلان بنجاح');
+            ->with('success', 'تم إضافة الإعلان بنجاح، وهو الآن قيد المراجعة من قبل الإدارة.');
     }
 
     /**
@@ -115,7 +124,7 @@ class AdvertisementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:active,inactive,pending',
+            // 'status' => 'required|in:active,inactive,pending',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'budget' => 'required|numeric|min:0',

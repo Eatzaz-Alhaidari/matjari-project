@@ -45,4 +45,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Store::class, 'user_id', 'id');
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 }

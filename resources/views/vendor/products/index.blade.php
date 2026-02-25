@@ -131,8 +131,10 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-semibold text-gray-900">
-                                                {{ number_format($product->price, 2) }} <span
-                                                    class="text-xs text-gray-500">ر.ي</span>
+                                                {{ number_format($product->price, 2) }}
+                                                <span class="text-xs text-gray-500">
+                                                    {{ $product->currency == 'USD' ? '$' : ($product->currency == 'SAR' ? 'ر.س' : 'ر.ي') }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -176,7 +178,7 @@
                                                     @method('PATCH')
                                                     <button type="submit"
                                                         class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                                    {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                                                                        {{ $product->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
                                                         {{ $product->status === 'active' ? 'تعطيل' : 'تفعيل' }}
                                                     </button>
                                                 </form>

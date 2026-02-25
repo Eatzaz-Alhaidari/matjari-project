@@ -71,6 +71,8 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
+            'warranty' => 'nullable|string|max:255',
+            'currency' => 'required|in:YER,SAR,USD',
         ]);
 
         $data = $request->except('images');
@@ -112,9 +114,12 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
+            'warranty' => 'nullable|string|max:255',
+            'currency' => 'required|in:YER,SAR,USD',
         ]);
 
         $data = $request->except('images');
+        $data['currency'] = $request->currency; // Force update currency
         $product->update($data);
 
         return redirect()->route('admin.products.index')

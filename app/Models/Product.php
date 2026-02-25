@@ -11,6 +11,7 @@ class Product extends Model
 
     protected $fillable = [
         'product_code',
+        'sku',
         'name',
         'brand',
         'description',
@@ -27,12 +28,14 @@ class Product extends Model
         'three_sixty_images',
         'store_id',
         'category_id',
+        'warranty',
+        'currency',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'cost_price' => 'decimal:2',
-        'price_before' => 'decimal:2',
+        'price' => 'double',
+        'cost_price' => 'double',
+        'price_before' => 'double',
         'stock' => 'integer',
         'min_stock' => 'integer',
         'status' => 'string',
@@ -43,12 +46,12 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image ? url('api/image/' . $this->image) : null;
     }
 
     public function getThreeDModelUrlAttribute()
     {
-        return $this->three_d_model ? asset('storage/' . $this->three_d_model) : null;
+        return $this->three_d_model ? url('api/image/' . $this->three_d_model) : null;
     }
 
     public function getThreeSixtyImagesUrlsAttribute()
@@ -57,7 +60,7 @@ class Product extends Model
             return [];
         }
         return array_map(function ($path) {
-            return asset('storage/' . $path);
+            return url('api/image/' . $path);
         }, $this->three_sixty_images);
     }
 

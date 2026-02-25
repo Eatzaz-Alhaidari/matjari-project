@@ -46,11 +46,26 @@
                             </div>
 
                             <!-- Price -->
-                            <div>
-                                <x-input-label for="price" :value="__('سعر البيع')" />
-                                <x-text-input id="price" class="block mt-1 w-full" type="number" step="0.01"
-                                    name="price" :value="old('price')" required />
-                                <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <x-input-label for="price" :value="__('سعر البيع')" />
+                                    <x-text-input id="price" class="block mt-1 w-full" type="number" step="0.01"
+                                        name="price" :value="old('price')" required />
+                                    <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                                </div>
+                                <div class="w-1/3">
+                                    <x-input-label for="currency" :value="__('العملة')" />
+                                    <select id="currency" name="currency"
+                                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="YER" {{ old('currency') == 'YER' ? 'selected' : '' }}>ريال يمني
+                                        </option>
+                                        <option value="SAR" {{ old('currency') == 'SAR' ? 'selected' : '' }}>ريال سعودي
+                                        </option>
+                                        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>دولار أمريكي
+                                        </option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('currency')" class="mt-2" />
+                                </div>
                             </div>
 
                             <!-- Price Before Discount -->

@@ -86,15 +86,26 @@
                                 <!-- Price -->
                                 <div>
                                     <x-input-label for="price" :value="__('سعر البيع الحالي')" />
-                                    <div class="relative mt-1 rounded-md shadow-sm">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-gray-500 sm:text-sm">ر.ي</span>
+                                    <div class="flex gap-2">
+                                        <div class="relative mt-1 rounded-md shadow-sm flex-1">
+                                            <div
+                                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+                                            </div>
+                                            <x-text-input id="price" class="block w-full" type="number" step="0.01"
+                                                name="price" :value="old('price', $product->price)" required />
                                         </div>
-                                        <x-text-input id="price" class="block w-full pr-12" type="number" step="0.01"
-                                            name="price" :value="old('price', $product->price)" required />
+                                        <div class="w-1/3 mt-1">
+                                            <select id="currency" name="currency"
+                                                class="block w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                                <option value="YER" {{ old('currency', $product->currency) == 'YER' ? 'selected' : '' }}>ريال يمني</option>
+                                                <option value="SAR" {{ old('currency', $product->currency) == 'SAR' ? 'selected' : '' }}>ريال سعودي</option>
+                                                <option value="USD" {{ old('currency', $product->currency) == 'USD' ? 'selected' : '' }}>دولار أمريكي</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                                    <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                                 </div>
 
                                 <!-- Price Before -->
@@ -103,7 +114,7 @@
                                     <div class="relative mt-1 rounded-md shadow-sm">
                                         <div
                                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-gray-500 sm:text-sm">ر.ي</span>
+                                            <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
                                         </div>
                                         <x-text-input id="price_before" class="block w-full pr-12" type="number"
                                             step="0.01" name="price_before" :value="old('price_before', $product->price_before)" />
@@ -117,7 +128,7 @@
                                     <div class="relative mt-1 rounded-md shadow-sm">
                                         <div
                                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-gray-500 sm:text-sm">ر.ي</span>
+                                            <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
                                         </div>
                                         <x-text-input id="cost_price" class="block w-full pr-12" type="number"
                                             step="0.01" name="cost_price" :value="old('cost_price', $product->cost_price)" />
@@ -303,7 +314,8 @@
             'notes': 'الملاحظات',
             'warranty': 'الضمان',
             'status': 'الحالة',
-            'category_id': 'التصنيف'
+            'category_id': 'التصنيف',
+            'currency': 'العملة'
         };
 
         const statusLabels = {
@@ -394,6 +406,34 @@
                     form.submit();
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Currency update logic
+            const currencySelect = document.getElementById('currency');
+            const currencyLabels = document.querySelectorAll('.currency-label');
+
+            function updateCurrencyLabels() {
+                if (!currencySelect) return;
+
+                const selectedCurrency = currencySelect.value;
+                let symbol = 'ر.ي';
+
+                if (selectedCurrency === 'SAR') symbol = 'ر.س';
+                else if (selectedCurrency === 'USD') symbol = '$';
+
+                console.log('Updating currency labels to:', symbol); // Debug
+
+                currencyLabels.forEach(label => {
+                    label.textContent = symbol;
+                });
+            }
+
+            if (currencySelect) {
+                currencySelect.addEventListener('change', updateCurrencyLabels);
+                // Initialize on load
+                updateCurrencyLabels();
+            }
         });
 
         // Image preview logic fix

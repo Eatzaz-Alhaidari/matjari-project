@@ -15,6 +15,9 @@ class PaymentGatewayController extends Controller
             'payment_cod_enabled',
             'payment_jeeb_enabled',
             'payment_transfer_enabled',
+            'payment_credit_card_enabled',
+            'stripe_publishable_key',
+            'stripe_secret_key',
             'bank_name',
             'bank_account_name',
             'bank_account_number',
@@ -32,7 +35,7 @@ class PaymentGatewayController extends Controller
         $inputs = $request->except('_token');
 
         // Explicitly handle checkboxes to save '0' if unchecked
-        $checkboxes = ['payment_cod_enabled', 'payment_jeeb_enabled', 'payment_transfer_enabled'];
+        $checkboxes = ['payment_cod_enabled', 'payment_jeeb_enabled', 'payment_transfer_enabled', 'payment_credit_card_enabled'];
         foreach ($checkboxes as $chk) {
             $inputs[$chk] = $request->has($chk) ? '1' : '0';
         }

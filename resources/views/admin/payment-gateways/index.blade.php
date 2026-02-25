@@ -129,6 +129,46 @@
                                 </div>
                             </div>
 
+                            <!-- 4. الدفع بالبطاقة (Stripe) -->
+                            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="p-3 bg-indigo-100 rounded-lg text-indigo-600">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-bold text-gray-800">الدفع بالبطاقة (مدعوم بواسطة Stripe)</h3>
+                                            <p class="text-sm text-gray-500">قبول مدفوعات Visa / MasterCard عالمياً.</p>
+                                        </div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="payment_credit_card_enabled" value="1" class="sr-only peer"
+                                            id="toggle-stripe"
+                                            {{ ($settings['payment_credit_card_enabled'] ?? '0') == '1' ? 'checked' : '' }}
+                                            onchange="document.getElementById('stripe-details').style.display = this.checked ? 'block' : 'none'">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                </div>
+
+                                <!-- Stripe Details Form -->
+                                <div id="stripe-details" class="border-t border-gray-200 mt-6 pt-6" style="{{ ($settings['payment_credit_card_enabled'] ?? '0') == '1' ? '' : 'display: none;' }}">
+                                    <h4 class="font-bold text-gray-700 mb-4">إعدادات Stripe API keys:</h4>
+                                    <div class="grid grid-cols-1 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Publishable Key</label>
+                                            <input type="text" name="stripe_publishable_key" value="{{ $settings['stripe_publishable_key'] ?? '' }}" placeholder="pk_test_..."
+                                                class="w-full rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm" dir="ltr">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Secret Key</label>
+                                            <input type="password" name="stripe_secret_key" value="{{ $settings['stripe_secret_key'] ?? '' }}" placeholder="sk_test_..."
+                                                class="w-full rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm" dir="ltr">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-8 flex justify-end">
