@@ -29,8 +29,8 @@ class FinancialReportController extends Controller
 
         $storeId = $store->id;
 
-        // تحديد الفترة الزمنية (افتراضياً الشهر الحالي)
-        $period = $request->get('period', 'month'); // month, week, year, custom
+        // تحديد الفترة الزمنية
+        $period = $request->get('period', 'month');
         $customStart = $request->get('start_date');
         $customEnd = $request->get('end_date');
 
@@ -41,17 +41,16 @@ class FinancialReportController extends Controller
             [$startDate, $endDate] = $this->getPeriodDates($period);
         }
 
-        // الحصول على محفظة البائع
-        // الحصول على محفظة البائع
+        // المحفظة
         $wallet = Wallet::where('user_id', $user->id)->first();
 
-        // إجمالي المبيعات (الطلبات المسلمة)
+        // إجمالي المبيعات
         $totalSales = Order::where('store_id', $storeId)
             ->where('status', 'delivered')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('total_amount');
 
-        // إجمالي عدد الطلبات
+        // إجمالي الطلبات
         $totalOrders = Order::where('store_id', $storeId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
@@ -62,7 +61,6 @@ class FinancialReportController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
-        // متوسط قيمة الطلب
         $averageOrderValue = $deliveredOrders > 0
             ? $totalSales / $deliveredOrders
             : 0;
@@ -74,7 +72,7 @@ class FinancialReportController extends Controller
                 ->whereBetween('created_at', [$startDate, $endDate]);
         })->sum('quantity');
 
-        // المبيعات اليومية (للرسم البياني)
+        // المبيعات اليومية
         $dailySales = Order::where('store_id', $storeId)
             ->where('status', 'delivered')
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -83,7 +81,7 @@ class FinancialReportController extends Controller
             ->orderBy('date')
             ->get();
 
-        // المبيعات حسب حالة الطلب
+        // حسب الحالة
         $salesByStatus = Order::where('store_id', $storeId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('status, COUNT(*) as count, SUM(total_amount) as total')
@@ -91,7 +89,7 @@ class FinancialReportController extends Controller
             ->get()
             ->keyBy('status');
 
-        // المبيعات حسب طريقة الدفع
+        // حسب طريقة الدفع
         $salesByPayment = Order::where('store_id', $storeId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('payment_method, COUNT(*) as count, SUM(total_amount) as total')
@@ -99,7 +97,12 @@ class FinancialReportController extends Controller
             ->get()
             ->keyBy('payment_method');
 
-        // أفضل 10 منتجات حسب الإيرادات
+        /*
+        |--------------------------------------------------------------------------
+        | أفضل 10 منتجات حسب الإيرادات (تم إصلاح المشكلة هنا)
+        |--------------------------------------------------------------------------
+        */
+
         $topProductsByRevenue = Product::where('products.store_id', $storeId)
             ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
             ->leftJoin('orders', function ($join) use ($storeId, $startDate, $endDate) {
@@ -109,39 +112,28 @@ class FinancialReportController extends Controller
                     ->whereBetween('orders.created_at', [$startDate, $endDate]);
             })
             ->select(
-                'products.*',
+                'products.id',
+                'products.name',
+                'products.product_code',
+                'products.price',
+                'products.image',
                 DB::raw('COALESCE(SUM(order_items.total), 0) as revenue'),
                 DB::raw('COALESCE(SUM(order_items.quantity), 0) as quantity_sold')
             )
             ->groupBy(
                 'products.id',
-                'products.product_code',
                 'products.name',
-                'products.brand',
-                'products.description',
-                'products.notes',
-                'products.full_description',
+                'products.product_code',
                 'products.price',
-                'products.cost_price',
-                'products.price_before',
-                'products.stock',
-                'products.min_stock',
-                'products.status',
-                'products.image',
-                'products.three_d_model',
-                'products.three_sixty_images',
-                'products.store_id',
-                'products.category_id',
-                'products.created_at',
-                'products.updated_at',
-                'products.warranty'
+                'products.image'
             )
             ->orderByDesc('revenue')
             ->limit(10)
             ->get();
 
-        // مقارنة مع الفترة السابقة
+        // مقارنة بالفترة السابقة
         $previousPeriod = $this->getPreviousPeriod($period, $startDate, $endDate);
+
         $previousSales = Order::where('store_id', $storeId)
             ->where('status', 'delivered')
             ->whereBetween('created_at', [$previousPeriod['start'], $previousPeriod['end']])
@@ -151,14 +143,12 @@ class FinancialReportController extends Controller
             ? (($totalSales - $previousSales) / $previousSales) * 100
             : 0;
 
-        // إحصائيات المحفظة
         $walletStats = [
             'balance' => $wallet ? $wallet->balance : 0,
             'total_earnings' => $wallet ? $wallet->total_earnings : 0,
             'withdrawn_amount' => $wallet ? $wallet->withdrawn_amount : 0,
         ];
 
-        // ملخص شامل
         $summary = [
             'total_sales' => $totalSales,
             'total_orders' => $totalOrders,
@@ -184,24 +174,12 @@ class FinancialReportController extends Controller
         ));
     }
 
-    /**
-     * الحصول على تواريخ الفترة المحددة
-     */
     private function getPeriodDates(string $period): array
     {
         return match ($period) {
-            'week' => [
-                Carbon::now()->startOfWeek(),
-                Carbon::now()->endOfWeek(),
-            ],
-            'month' => [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
-            ],
-            'year' => [
-                Carbon::now()->startOfYear(),
-                Carbon::now()->endOfYear(),
-            ],
+            'week' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+            'month' => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            'year' => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
             'last_month' => [
                 Carbon::now()->subMonth()->startOfMonth(),
                 Carbon::now()->subMonth()->endOfMonth(),
@@ -210,16 +188,10 @@ class FinancialReportController extends Controller
                 Carbon::now()->subYear()->startOfYear(),
                 Carbon::now()->subYear()->endOfYear(),
             ],
-            default => [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
-            ],
+            default => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
         };
     }
 
-    /**
-     * الحصول على الفترة السابقة للمقارنة
-     */
     private function getPreviousPeriod(string $period, Carbon $startDate, Carbon $endDate): array
     {
         $days = $startDate->diffInDays($endDate);
