@@ -30,6 +30,10 @@ Route::get('/', function () {
 // مسارات المصادقة
 require __DIR__ . '/auth.php';
 
+// Google Authentication
+Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
+
 // ==================== Admin Routes ====================
 Route::prefix('admin')
     ->middleware(['auth', 'role:super-admin'])

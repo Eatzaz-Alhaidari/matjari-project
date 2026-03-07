@@ -103,13 +103,9 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}"
-                            class="text-gray-600 hover:text-brand-blue-600 font-bold transition">تسجيل الدخول</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                                class="px-5 py-2.5 rounded-full bg-brand-orange-500 text-white hover:bg-brand-orange-600 transition shadow-lg shadow-brand-orange-500/30 font-bold text-sm">
-                                حساب جديد
-                            </a>
-                        @endif
+                            class="px-5 py-2.5 rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition shadow-lg shadow-brand-blue-500/30 font-bold text-sm">تسجيل
+                            الدخول</a>
+
                     @endauth
                 </div>
 
@@ -149,7 +145,7 @@
             </p>
 
             <div class="mt-10 flex justify-center gap-4">
-                <a href="{{ route('register') }}"
+                <a href="{{ route('login') }}"
                     class="px-8 py-4 bg-brand-blue-600 text-white rounded-full font-bold text-lg shadow-xl hover:bg-brand-blue-700 hover:scale-105 transition transform duration-200 flex items-center">
                     <span>ابدأ التسوق</span>
                     <svg class="w-5 h-5 mr-2 -ml-1 rtl:ml-2 rtl:-mr-1" fill="none" stroke="currentColor"
@@ -232,9 +228,9 @@
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
             <h2 class="text-3xl font-bold text-white mb-6">جاهز لتجربة التسوق الأفضل؟</h2>
             <p class="text-brand-blue-100 mb-8 text-lg">انضم إلى آلاف العملاء السعداء واستمتع بمنتجات عالية الجودة.</p>
-            <a href="{{ route('register') }}"
+            <a href="{{ route('login') }}"
                 class="inline-block px-10 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-full shadow-lg transform hover:-translate-y-1 transition duration-200">
-                سجل الآن مجاناً
+                تسجيل الدخول الآن
             </a>
         </div>
     </div>

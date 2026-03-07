@@ -26,6 +26,8 @@ class User extends Authenticatable
         'profile_photo_path',
         'status',
         'ban_reason',
+        'google_id',
+        'role',
     ];
 
     /**

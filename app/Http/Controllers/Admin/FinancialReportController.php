@@ -87,6 +87,7 @@ class FinancialReportController extends Controller
             ->groupBy(
                 'products.id',
                 'products.product_code',
+                'products.sku',
                 'products.name',
                 'products.brand',
                 'products.description',
@@ -105,7 +106,8 @@ class FinancialReportController extends Controller
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
-                'products.warranty'
+                'products.warranty',
+                'products.currency'
             )
             ->orderByDesc('revenue')
             ->limit(10)
