@@ -109,4 +109,26 @@ class ProductController extends Controller
             'data' => $product
         ]);
     }
+
+    public function syncFromDesktop(Request $request)
+    {
+        // استلام البيانات المرسلة من برنامج الـ C#
+        $items = $request->all(); 
+
+        $updatedCount = 0;
+        foreach ($items as $item) {
+            // البحث باستخدام product_code وتحديث حقل stock
+            $result = \App\Models\Product::where('product_code', $item['code']) 
+                ->update(['stock' => $item['qty']]);
+            
+            if ($result) {
+                $updatedCount++;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "تمت المزامنة بنجاح. تم تحديث $updatedCount صنف."
+        ]);
+    }
 }

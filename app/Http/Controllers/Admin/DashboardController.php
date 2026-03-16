@@ -48,8 +48,7 @@ class DashboardController extends Controller
         $shippingCount = \App\Models\Order::whereIn('status', ['shipped', 'delivered'])->count();
         // 13. Advertisements Count
         $advertisementCount = \App\Models\Advertisement::count();
-        // 14. Discounts Count
-        $discountCount = \App\Models\Discount::count();
+
         // 16. Payment Management (Count of paid orders)
         $paymentCount = \App\Models\Order::where('payment_status', 'paid')->count();
         // 17. Customer Analysis (New Customers this month)
@@ -148,7 +147,7 @@ class DashboardController extends Controller
             'returnsCount' => $returnsCount,
             'shippingCount' => $shippingCount,
             'advertisementCount' => $advertisementCount,
-            'discountCount' => $discountCount,
+
             'paymentCount' => $paymentCount,
             'newCustomersCount' => $newCustomersCount,
             'categoriesCount' => $categoriesCount,

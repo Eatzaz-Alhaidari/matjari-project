@@ -87,4 +87,37 @@ class ProductApiTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.name', 'Prod Detail');
     }
+
+    public function test_can_sync_inventory_from_desktop()
+    {
+        $user = User::create(['name' => 'U', 'email' => 'u@e.com', 'password' => 'p', 'phone' => '1']);
+        $store = Store::create(['name' => 'S', 'slug' => 's', 'user_id' => $user->id]);
+        $cat = Category::create(['name' => 'C', 'slug' => 'c']);
+
+        $prod = Product::create([
+            'sku' => 'SKU123',
+            'name' => 'Prod Sync',
+            'brand' => 'B',
+            'description' => 'D',
+            'full_description' => 'FD',
+            'price' => 30,
+            'stock' => 10, // Initial stock
+            'status' => 'active',
+            'store_id' => $store->id,
+            'category_id' => $cat->id
+        ]);
+
+        $syncData = [
+            ['code' => 'SKU123', 'qty' => 50]
+        ];
+
+        $response = $this->postJson('/api/sync-inventory', $syncData);
+
+        $response->assertStatus(200)
+            ->assertJson(['status' => 'success', 'message' => 'تم تحديث المخزون بنجاح']);
+
+        // Verify stock updated
+        $prod->refresh();
+        $this->assertEquals(50, $prod->stock);
+    }
 }

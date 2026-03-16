@@ -38,7 +38,7 @@ class AdvertisementSeeder extends Seeder
             [
                 'title' => 'أحدث لابتوبات الألعاب - خصم 15%',
                 'description' => 'احصل على أداء فائق مع أحدث لابتوبات الألعاب من ASUS و MSI. خصومات تصل إلى 15% لفترة محدودة.',
-                'status' => 'active',
+                'status' => 1, // active
                 'start_date' => now(),
                 'end_date' => now()->addDays(30),
                 'budget' => 500.00,
@@ -49,7 +49,7 @@ class AdvertisementSeeder extends Seeder
             [
                 'title' => 'شحن مجاني لجميع قطع التجميع',
                 'description' => 'قم بتجميع جهاز أحلامك الآن واحصل على شحن مجاني لكامل الصندوق عند شراء كرت شاشة ومعالج.',
-                'status' => 'active',
+                'status' => 1, // active
                 'start_date' => now()->addDays(1),
                 'end_date' => now()->addDays(15),
                 'budget' => 300.00,
@@ -60,7 +60,7 @@ class AdvertisementSeeder extends Seeder
             [
                 'title' => 'كروت الشاشة RTX 40 Series',
                 'description' => 'الجيل الجديد من كروت الشاشة NVIDIA GeForce RTX 40 متوفر الآن. ارتقِ بتجربة اللعب.',
-                'status' => 'pending',
+                'status' => 0, // pending
                 'start_date' => now()->addDays(5),
                 'end_date' => now()->addDays(25),
                 'budget' => 250.00,
@@ -71,7 +71,7 @@ class AdvertisementSeeder extends Seeder
             [
                 'title' => 'عرض خاص على الشاشات المنحنية',
                 'description' => 'شاشات سامسونج المنحنية للألعاب، دقة 4K ومعدل تحديث 144Hz، الآن بسعر التكلفة.',
-                'status' => 'inactive',
+                'status' => 0, // inactive -> pending
                 'start_date' => now()->subDays(10),
                 'end_date' => now()->subDays(1),
                 'budget' => 400.00,
@@ -82,7 +82,7 @@ class AdvertisementSeeder extends Seeder
             [
                 'title' => 'اكسسوارات الجيمينج الاحترافية',
                 'description' => 'لوحات مفاتيح ميكانيكية، سماعات محيطية، وماوسات احترافية. اكمل السيت اب الخاص بك.',
-                'status' => 'active',
+                'status' => 1, // active
                 'start_date' => now(),
                 'end_date' => now()->addDays(20),
                 'budget' => 350.00,
