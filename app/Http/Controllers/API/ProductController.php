@@ -112,23 +112,53 @@ class ProductController extends Controller
 
     public function syncFromDesktop(Request $request)
     {
-        // استلام البيانات المرسلة من برنامج الـ C#
-        $items = $request->all(); 
+        // 1. التحقق من صحة البيانات (Validation)
+        // نتوقع أن يكون الطلب عبارة عن مصفوفة (Array) تحتوي على كائنات
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            '*' => 'required|array',
+            '*.code' => 'required',
+            '*.qty' => 'required|numeric|min:0',
+        ]);
 
-        $updatedCount = 0;
-        foreach ($items as $item) {
-            // البحث باستخدام product_code وتحديث حقل stock
-            $result = \App\Models\Product::where('product_code', $item['code']) 
-                ->update(['stock' => $item['qty']]);
-            
-            if ($result) {
-                $updatedCount++;
-            }
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في البيانات المرسلة من برنامج التزامن.',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => "تمت المزامنة بنجاح. تم تحديث $updatedCount صنف."
-        ]);
+        $items = $request->all(); 
+        $updatedCount = 0;
+
+        // 2. استخدام DB Transaction لضمان سلامة قاعدة البيانات وتسريع الأداء
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            foreach ($items as $item) {
+                // البحث باستخدام كود الصنف وتحديث حقلي الكمية
+                $result = \App\Models\Product::where('product_code', $item['code']) 
+                    ->update(['stock' => $item['qty']]);
+                
+                if ($result) {
+                    $updatedCount++;
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "تمت المزامنة بنجاح. تم مسح وتحديث $updatedCount صنف من المخزون."
+            ], 200);
+
+        } catch (\Exception $e) {
+            // في حال حدث أي خطأ برمجي، نلغي التعديلات لحماية الداتا베이스
+            \Illuminate\Support\Facades\DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ داخلي في الخادم المحتضن للمتجر: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

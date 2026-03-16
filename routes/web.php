@@ -188,5 +188,11 @@ Route::prefix('vendor')
         // Shipping Info (New)
         Route::get('shipping-info', [\App\Http\Controllers\Vendor\ShippingController::class, 'index'])->name('shipping.index');
     });
+    Route::get('/fix-api', function() {
+    \Artisan::call('route:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('cache:clear');
+    return "تم تنظيف الكاش وتحديث المسارات بنجاح!";
+});
 
 require __DIR__ . '/db_fix.php';
