@@ -57,7 +57,7 @@ Route::get('/payment-methods', [\App\Http\Controllers\Api\PaymentController::cla
 // Wallet Routes (Protected)
 Route::get('/wallet', [\App\Http\Controllers\Api\WalletController::class, 'show']);
 
-//تبع يمن سوفت
+// تبع يمن سوفت
 
 // مسار تجريبي (Endpoint) لمحاكاة عملية إرسال طلب إلى نظام أونكس ERP التابع ليمن سوفت
 Route::post('/test-onyx-order', function () {
@@ -74,10 +74,13 @@ Route::post('/test-onyx-order', function () {
 
         // نموذج للبيانات (Sample Body) التي تطلبها أونكس في أوراقها الرسمية:
         'sample_body' => [
-            'type' => 'SO',           // اختصار لـ Sales Order (أمر مبيعات) كما هو معرف في أونكس
-            'year' => 2026,           // تحديد السنة المالية الحالية لإدراج الفاتورة في السجل الصحيح
-            'storeOrderId' => 'WEB-1001',     // الرقم المرجعي للطلب القادم من المتجر لربطه داخل أونكس
-            'recipientName' => 'Mohammed Ali' // اسم العميل الذي سيظهر في حسابات العملاء لدى نظام يمن سوفت
+            'type' => 'SO',
+            'year' => 2026,
+            'storeOrderId' => 'WEB-1001',
+            'recipientName' => 'Mohammed Ali'
         ]
     ]);
 });
+
+// مسار استقبال تحديث المخزون من برنامج C#
+Route::post('/sync-inventory', [\App\Http\Controllers\API\ProductController::class, 'syncFromDesktop']);
