@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -112,52 +114,133 @@ class ProductController extends Controller
 
     public function syncFromDesktop(Request $request)
     {
-        // 1. التحقق من صحة البيانات (Validation)
-        // نتوقع أن يكون الطلب عبارة عن مصفوفة (Array) تحتوي على كائنات
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            '*' => 'required|array',
-            '*.code' => 'required',
-            '*.qty' => 'required|numeric|min:0',
-        ]);
+        $payload = $request->all();
+        $defaultStoreId = null;
+        $items = [];
 
-        if ($validator->fails()) {
+        // يدعم شكلين:
+        // 1) [ { code/sku/product_id, qty/quantity, store_id? }, ... ]
+        // 2) { store_id: 1, items: [ ... ] }
+        if (isset($payload['items']) && is_array($payload['items'])) {
+            $items = $payload['items'];
+            $defaultStoreId = $payload['store_id'] ?? null;
+        } elseif (is_array($payload) && array_is_list($payload)) {
+            $items = $payload;
+            $defaultStoreId = $request->input('store_id');
+        } else {
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ في البيانات المرسلة من برنامج التزامن.',
-                'errors' => $validator->errors()
+                'status' => 'error',
+                'message' => 'صيغة البيانات غير صحيحة. أرسل items كمصفوفة.',
             ], 422);
         }
 
-        $items = $request->all(); 
+        if (empty($items)) {
+            return response()->json([
+                'success' => false,
+                'status' => 'error',
+                'message' => 'لا توجد بيانات مزامنة.',
+            ], 422);
+        }
+
         $updatedCount = 0;
+        $notFound = [];
+        $invalidRows = [];
 
-        // 2. استخدام DB Transaction لضمان سلامة قاعدة البيانات وتسريع الأداء
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
 
-            foreach ($items as $item) {
-                // البحث باستخدام كود الصنف وتحديث حقلي الكمية
-                $result = \App\Models\Product::where('product_code', $item['code']) 
-                    ->update(['stock' => $item['qty']]);
-                
-                if ($result) {
-                    $updatedCount++;
+            foreach ($items as $index => $item) {
+                $rowNumber = $index + 1;
+
+                if (!is_array($item)) {
+                    $invalidRows[] = [
+                        'row' => $rowNumber,
+                        'reason' => 'row is not an object',
+                    ];
+                    continue;
+                }
+
+                $identifier = $item['product_id']
+                    ?? $item['id']
+                    ?? $item['code']
+                    ?? $item['product_code']
+                    ?? $item['sku']
+                    ?? null;
+
+                $qty = $item['qty']
+                    ?? $item['quantity']
+                    ?? $item['stock']
+                    ?? null;
+
+                $storeId = $item['store_id'] ?? $defaultStoreId;
+
+                $validator = Validator::make([
+                    'identifier' => $identifier,
+                    'qty' => $qty,
+                    'store_id' => $storeId,
+                ], [
+                    'identifier' => 'required',
+                    'qty' => 'required|numeric|min:0',
+                    'store_id' => 'nullable|integer|exists:stores,id',
+                ]);
+
+                if ($validator->fails()) {
+                    $invalidRows[] = [
+                        'row' => $rowNumber,
+                        'identifier' => $identifier,
+                        'errors' => $validator->errors()->all(),
+                    ];
+                    continue;
+                }
+
+                $query = Product::query();
+
+                if (is_numeric($identifier)) {
+                    $query->where('id', (int) $identifier);
+                } else {
+                    $query->where(function ($q) use ($identifier) {
+                        $q->where('product_code', $identifier)
+                            ->orWhere('sku', $identifier);
+                    });
+                }
+
+                if (!empty($storeId)) {
+                    $query->where('store_id', (int) $storeId);
+                }
+
+                $updated = $query->update(['stock' => (int) round((float) $qty)]);
+
+                if ($updated > 0) {
+                    $updatedCount += $updated;
+                } else {
+                    $notFound[] = [
+                        'row' => $rowNumber,
+                        'identifier' => $identifier,
+                        'store_id' => $storeId,
+                    ];
                 }
             }
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => "تمت المزامنة بنجاح. تم مسح وتحديث $updatedCount صنف من المخزون."
+                'status' => 'success',
+                'message' => 'تم تحديث المخزون بنجاح',
+                'updated_products' => $updatedCount,
+                'not_found_count' => count($notFound),
+                'invalid_rows_count' => count($invalidRows),
+                'not_found' => $notFound,
+                'invalid_rows' => $invalidRows,
             ], 200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
 
-        } catch (\Exception $e) {
-            // في حال حدث أي خطأ برمجي، نلغي التعديلات لحماية الداتا베이스
-            \Illuminate\Support\Facades\DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ داخلي في الخادم المحتضن للمتجر: ' . $e->getMessage()
+                'status' => 'error',
+                'message' => 'حدث خطأ داخلي في الخادم: ' . $e->getMessage(),
             ], 500);
         }
     }

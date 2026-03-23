@@ -95,7 +95,7 @@ class ProductApiTest extends TestCase
         $cat = Category::create(['name' => 'C', 'slug' => 'c']);
 
         $prod = Product::create([
-            'sku' => 'SKU123',
+            'product_code' => 'SKU123',
             'name' => 'Prod Sync',
             'brand' => 'B',
             'description' => 'D',
@@ -108,7 +108,7 @@ class ProductApiTest extends TestCase
         ]);
 
         $syncData = [
-            ['code' => 'SKU123', 'qty' => 50]
+            ['product_code' => 'SKU123', 'quantity' => 50, 'store_id' => $store->id]
         ];
 
         $response = $this->postJson('/api/sync-inventory', $syncData);

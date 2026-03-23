@@ -22,21 +22,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('addresses', \App\Http\Controllers\API\AddressController::class);
     Route::post('/addresses/{address}/default', [\App\Http\Controllers\API\AddressController::class, 'setDefault']);
 
-    //
+    //المفضلة 
     Route::get('/wishlist', [\App\Http\Controllers\API\WishlistController::class, 'index']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\API\WishlistController::class, 'toggle']);
 
 
 });
 
-// 
+// التقييمات 
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
 Route::post('/reviews', [ReviewController::class, 'store']);
 
-// 
+// الفئات
 Route::get('/categories', [\App\Http\Controllers\API\CategoryController::class, 'index']);
 
-// 
+// المنتجات
 Route::get('/products', [\App\Http\Controllers\API\ProductController::class, 'index']);
 Route::get('/products/{id}', [\App\Http\Controllers\API\ProductController::class, 'show']);
 
@@ -46,12 +46,12 @@ Route::get('/image/{path}', [\App\Http\Controllers\API\ImageController::class, '
 // Advertisements
 Route::get('/advertisements', [\App\Http\Controllers\API\AdvertisementController::class, 'index']);
 
-// 
+// الطلبات
 Route::get('/orders', [\App\Http\Controllers\API\OrderController::class, 'index']);
 Route::get('/orders/{id}', [\App\Http\Controllers\API\OrderController::class, 'show']);
 Route::post('/orders', [\App\Http\Controllers\API\OrderController::class, 'store']);
 
-// 
+// طرق الدفع
 Route::get('/payment-methods', [\App\Http\Controllers\Api\PaymentController::class, 'getPaymentMethods']);
 
 // Wallet Routes (Protected)
