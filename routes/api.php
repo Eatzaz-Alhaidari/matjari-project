@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ReviewController;//ضمن لي هذه الملف اللي يحتوي على الشعل والدوال
 
+use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\AdvertisementController;
+use App\Http\Controllers\Api\NotificationController;
 
 // المصادقة
 Route::post('/register', [\App\Http\Controllers\API\AuthController::class, 'register']);
@@ -26,8 +29,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wishlist', [\App\Http\Controllers\API\WishlistController::class, 'index']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\API\WishlistController::class, 'toggle']);
 
+    // Stores & Advertisements (Protected)
+    Route::post('/stores', [StoreController::class, 'store']);
+    Route::put('/stores/{id}', [StoreController::class, 'update']);
+    Route::delete('/stores/{id}', [StoreController::class, 'destroy']);
+    Route::post('/stores/{store}/advertisements', [AdvertisementController::class, 'store']);
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
 });
+
+// Stores & Advertisements (Public)
+Route::get('/stores', [StoreController::class, 'index']);
+Route::get('/stores/{id}', [StoreController::class, 'show']);
+Route::get('/stores/{store}/advertisements', [AdvertisementController::class, 'index']);
 
 // التقييمات 
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);

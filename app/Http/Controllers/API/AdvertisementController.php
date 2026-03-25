@@ -1,30 +1,35 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
+use App\Models\Store;
+use App\Http\Requests\AdvertisementRequest;
+use App\Http\Resources\AdvertisementResource;
 use Illuminate\Http\Request;
 
 class AdvertisementController extends Controller
 {
-    /**
-     * Get list of active advertisements.
-     */
-    public function index()
+    public function index($storeId)
     {
-        $advertisements = Advertisement::active()
-            ->select(['id', 'title', 'description', 'image', 'start_date', 'end_date', 'target_url', 'view_count']) // Select public fields
-            ->latest()
-            ->get();
+        $store = Store::findOrFail($storeId);
+        return AdvertisementResource::collection($store->advertisements);
+    }
 
-        // Increment views for these ads? 
-        // Typically views are incremented when actually seen, better done via a separate 'track-view' endpoint or just assume fetch = view for list.
-        // For now, simple fetch.
+    public function store(AdvertisementRequest $request, $storeId)
+    {
+        $store = Store::findOrFail($storeId);
+        
+        if ($store->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
-        return response()->json([
-            'success' => true,
-            'data' => $advertisements
-        ]);
+        $validated = $request->validated();
+        $validated['store_id'] = $store->id;
+        
+        $advertisement = Advertisement::create($validated);
+        
+        return new AdvertisementResource($advertisement);
     }
 }

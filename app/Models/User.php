@@ -41,11 +41,19 @@ class User extends Authenticatable
     protected $casts = [ /* ... */];
 
     /**
-     * Get the store associated with the user.
+     * Get the stores associated with the user.
      */
-    public function store()
+    public function stores()
     {
-        return $this->hasOne(Store::class, 'user_id', 'id');
+        return $this->hasMany(Store::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 
     public function addresses()
