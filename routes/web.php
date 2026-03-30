@@ -169,6 +169,7 @@ Route::prefix('vendor')
         // Store Settings
         Route::get('store/edit', [\App\Http\Controllers\Vendor\DashboardController::class, 'editStore'])->name('store.edit');
         Route::put('store/update', [\App\Http\Controllers\Vendor\DashboardController::class, 'updateStore'])->name('store.update');
+        Route::post('store/generate-token', [\App\Http\Controllers\Vendor\DashboardController::class, 'generateToken'])->name('store.generate-token');
 
         // Sales
         Route::get('sales', [\App\Http\Controllers\Vendor\SalesController::class, 'index'])->name('sales.index');

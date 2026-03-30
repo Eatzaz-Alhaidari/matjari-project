@@ -40,11 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications', [NotificationController::class, 'store']);
 });
 
-// Stores & Advertisements (Public)
-Route::get('/stores', [StoreController::class, 'index']);
-Route::get('/stores/{id}', [StoreController::class, 'show']);
-Route::get('/stores/{store}/advertisements', [AdvertisementController::class, 'index']);
-
 // التقييمات 
 Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
 Route::post('/reviews', [ReviewController::class, 'store']);
@@ -98,5 +93,5 @@ Route::post('/test-onyx-order', function () {
     ]);
 });
 
-// مسار استقبال تحديث المخزون من برنامج C#
-Route::post('/sync-inventory', [\App\Http\Controllers\API\ProductController::class, 'syncFromDesktop']);
+// مسار استقبال تحديث المخزون من برنامج C# (مرتبط بحساب التاجر)
+Route::post('/sync-inventory', [\App\Http\Controllers\API\ProductController::class, 'syncFromDesktop'])->middleware('auth:sanctum');

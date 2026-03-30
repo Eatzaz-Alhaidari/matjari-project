@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -114,19 +115,27 @@ class ProductController extends Controller
 
     public function syncFromDesktop(Request $request)
     {
+        // استخراج التاجر من الـ Token
+        $user = auth('sanctum')->user();
+        if (!$user || !$user->store) {
+            return response()->json([
+                'success' => false,
+                'status' => 'error',
+                'message' => 'بيانات التاجر غير صالحة، أو لا يمتلك متجراً مرتبطاً بحسابه.',
+            ], 403);
+        }
+        $authenticatedStoreId = $user->store->id;
+
         $payload = $request->all();
-        $defaultStoreId = null;
         $items = [];
 
         // يدعم شكلين:
-        // 1) [ { code/sku/product_id, qty/quantity, store_id? }, ... ]
-        // 2) { store_id: 1, items: [ ... ] }
+        // 1) [ { code/sku/product_id, qty/quantity }, ... ]
+        // 2) { items: [ ... ] }
         if (isset($payload['items']) && is_array($payload['items'])) {
             $items = $payload['items'];
-            $defaultStoreId = $payload['store_id'] ?? null;
         } elseif (is_array($payload) && array_is_list($payload)) {
             $items = $payload;
-            $defaultStoreId = $request->input('store_id');
         } else {
             return response()->json([
                 'success' => false,
@@ -173,16 +182,15 @@ class ProductController extends Controller
                     ?? $item['stock']
                     ?? null;
 
-                $storeId = $item['store_id'] ?? $defaultStoreId;
+                // نستخدم رقم المتجر الخاص بالتاجر الحالي (ملغي أي قيمة يتم إرسالها من الديسكتوب كنوع من الأمان)
+                $storeId = $authenticatedStoreId;
 
                 $validator = Validator::make([
                     'identifier' => $identifier,
                     'qty' => $qty,
-                    'store_id' => $storeId,
                 ], [
                     'identifier' => 'required',
                     'qty' => 'required|numeric|min:0',
-                    'store_id' => 'nullable|integer|exists:stores,id',
                 ]);
 
                 if ($validator->fails()) {
@@ -194,32 +202,74 @@ class ProductController extends Controller
                     continue;
                 }
 
-                $query = Product::query();
+                $product = null;
 
-                if (is_numeric($identifier)) {
-                    $query->where('id', (int) $identifier);
-                } else {
-                    $query->where(function ($q) use ($identifier) {
-                        $q->where('product_code', $identifier)
-                            ->orWhere('sku', $identifier);
-                    });
+                // 1) إذا تم إرسال ID صريح.
+                if (!empty($item['product_id'])) {
+                    $product = Product::where('id', (int) $item['product_id'])
+                        ->when($storeId, fn($q) => $q->where('store_id', (int) $storeId))
+                        ->first();
+                } elseif (!empty($item['id'])) {
+                    $product = Product::where('id', (int) $item['id'])
+                        ->when($storeId, fn($q) => $q->where('store_id', (int) $storeId))
+                        ->first();
                 }
 
-                if (!empty($storeId)) {
-                    $query->where('store_id', (int) $storeId);
+                // 2) البحث بالكود/الرقم المرسل، مع دعم product_code و sku
+                if (!$product && !empty($identifier)) {
+                    $query = Product::query();
+
+                    if (is_numeric($identifier)) {
+                        // يمكن أن يكون SKU أو product_code رقمي
+                        $query->where(function ($q) use ($identifier) {
+                            $q->where('id', (int) $identifier)
+                                ->orWhere('product_code', $identifier)
+                                ->orWhere('sku', $identifier);
+                        });
+                    } else {
+                        $query->where(function ($q) use ($identifier) {
+                            $q->where('product_code', $identifier)
+                                ->orWhere('sku', $identifier);
+                        });
+                    }
+
+                    if (!empty($storeId)) {
+                        $query->where('store_id', (int) $storeId);
+                    }
+
+                    $product = $query->first();
                 }
 
-                $updated = $query->update(['stock' => (int) round((float) $qty)]);
+                if (!$product) {
+                    // إنشاء المنتج كمسودة (غير نشط) ليتوافق مع قاعدة البيانات حتى لو لم يكن موجوداً
+                    $categoryId = \App\Models\Category::first()->id ?? 1;
 
-                if ($updated > 0) {
-                    $updatedCount += $updated;
-                } else {
-                    $notFound[] = [
-                        'row' => $rowNumber,
-                        'identifier' => $identifier,
-                        'store_id' => $storeId,
-                    ];
+                    $product = new Product();
+                    $product->product_code = $identifier;
+                    // استخدام الاسم المرسل أو وضع اسم افتراضي لتمييزه وتسهيل تعديله لاحقاً من لوحة التحكم
+                    $product->name = !empty($item['name']) ? $item['name'] : ('منتج تلقائي - ' . $identifier); 
+                    $product->description = 'تمت إضافته آلياً عبر المزامنة من نظام الديسكتوب';
+                    $product->price = isset($item['price']) ? (float) $item['price'] : 0;
+                    $product->stock = (int) round((float) $qty);
+                    $product->store_id = $storeId ?? 1;
+                    $product->category_id = $categoryId;
+                    $product->status = 'inactive'; // منتج غير نشط حتى يقوم المدير بتسعيره
+                    $product->save();
+                    
+                    $updatedCount++;
+                    continue; // تم إنشاء المنتج وحفظه
                 }
+
+                $product->stock = (int) round((float) $qty);
+                // تحديث الاسم والسعر في حال تم إرسالهم ولم يكونوا فارغين
+                if (!empty($item['name'])) {
+                    $product->name = $item['name'];
+                }
+                if (isset($item['price'])) {
+                    $product->price = (float) $item['price'];
+                }
+                $product->save();
+                $updatedCount++;
             }
 
             DB::commit();
