@@ -20,11 +20,16 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(): View|string
     {
+        $store = auth()->user()->store;
+        if (!$store) {
+            abort(403, 'عذراً، حسابك كبائع لا يمتلك متجراً مرتبطاً به حالياً. يرجى التواصل مع الإدارة لإنشاء وربط متجرك.');
+        }
+
         // حساب الإحصائيات
         $stats = [
-            'total_products' => Product::where('store_id', auth()->user()->store->id)->count(),
+            'total_products' => Product::where('store_id', $store->id)->count(),
             'active_products' => Product::where('store_id', auth()->user()->store->id)->where('status', 'active')->count(),
             'inactive_products' => Product::where('store_id', auth()->user()->store->id)->where('status', 'inactive')->count(),
             'total_orders' => Order::where('store_id', auth()->user()->store->id)->count(),
@@ -180,9 +185,12 @@ class DashboardController extends Controller
         ));
     }
 
-    public function editStore(): View
+    public function editStore(): View|string
     {
         $store = auth()->user()->store;
+        if (!$store) {
+            abort(403, 'عذراً، حسابك لا يمتلك متجراً مرتبطاً به حالياً.');
+        }
         return view('vendor.store.edit', compact('store'));
     }
 
@@ -211,5 +219,20 @@ class DashboardController extends Controller
         $store->update($data);
 
         return redirect()->route('vendor.dashboard')->with('success', 'تم تحديث بيانات المتجر بنجاح');
+    }
+
+    public function generateToken()
+    {
+        $user = auth()->user();
+        
+        // إزالة المفاتيح السابقة (اختياري لضمان وجود مفتاح واحد فقط للتزامن)
+        $user->tokens()->where('name', 'desktop-sync-token')->delete();
+
+        // إنشاء مفتاح جديد
+        $token = $user->createToken('desktop-sync-token');
+
+        return redirect()->route('vendor.store.edit')
+            ->with('api_token', $token->plainTextToken)
+            ->with('success', 'تم إصدار مفتاح المزامنة بنجاح. يرجى نسخه من الأسفل قبل مغادرة الصفحة.');
     }
 }

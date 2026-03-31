@@ -57,6 +57,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the single primary store for the vendor.
+     */
+    public function store()
+    {
+        return $this->hasOne(Store::class, 'user_id', 'id');
+    }
+
+    /**
      * Get the notifications for the user.
      */
     public function notifications()
