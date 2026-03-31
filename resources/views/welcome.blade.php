@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>متجرنا الإلكتروني | تجربة تسوق فريدة</title>
+    <title>متجر صخر الإلكتروني</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/brand/favicon.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,13 +72,11 @@
     @scroll.window="scrolled = (window.pageYOffset > 20)">
 
     <!-- Navigation -->
-    <nav :class="{ 'glass-nav shadow-sm': scrolled, 'bg-transparent': !scrolled }"
-        class="fixed w-full z-50 transition-all duration-300 top-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="fixed w-full z-50 transition-all duration-300 top-0 bg-white shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
-                    <x-application-logo class="h-10 w-auto text-brand-blue-600" />
-                    <span class="mr-3 text-2xl font-bold text-brand-blue-800 tracking-tight">متجرنا</span>
+                    <x-application-logo class="h-20 w-52 object-contain drop-shadow-md" />
                 </div>
 
                 <div class="hidden md:flex items-center space-x-6 space-x-reverse">
@@ -103,7 +102,7 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}"
-                            class="px-5 py-2.5 rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition shadow-lg shadow-brand-blue-500/30 font-bold text-sm">تسجيل
+                            class="flex items-center py-4 px-12 rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition shadow-xl shadow-brand-blue-500/30 font-bold text-xl tracking-wide">تسجيل
                             الدخول</a>
 
                     @endauth
@@ -122,7 +121,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <div class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden hero-gradient">
+    <div class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden hero-gradient flex flex-col items-center justify-center min-h-[60vh] text-center">
         <!-- Floating Shapes for Aesthetics -->
         <div
             class="absolute top-20 left-10 w-72 h-72 bg-brand-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob">
@@ -134,31 +133,17 @@
             class="absolute -bottom-8 left-1/2 w-72 h-72 bg-brand-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000">
         </div>
 
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-            <h1 class="text-5xl md:text-7xl font-black text-brand-blue-900 mb-6 leading-tight">
-                اكتشف متعة <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-green-600">التسوق
-                    الذكي</span>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-brand-blue-900 mb-8 leading-tight whitespace-nowrap">
+                اكتشف أحدث <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-green-600">الأجهزة الإلكترونية</span>
+                بأفضل الأسعار
             </h1>
             <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 أحدث المنتجات، أفضل الماركات، وتجربة شراء لا تُنسى. ابدأ رحلتك معنا اليوم واستمتع بالعروض الحصرية.
             </p>
 
-            <div class="mt-10 flex justify-center gap-4">
-                <a href="{{ route('login') }}"
-                    class="px-8 py-4 bg-brand-blue-600 text-white rounded-full font-bold text-lg shadow-xl hover:bg-brand-blue-700 hover:scale-105 transition transform duration-200 flex items-center">
-                    <span>ابدأ التسوق</span>
-                    <svg class="w-5 h-5 mr-2 -ml-1 rtl:ml-2 rtl:-mr-1" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                </a>
-                <a href="#features"
-                    class="px-8 py-4 bg-white text-brand-blue-700 border border-gray-200 rounded-full font-bold text-lg shadow-md hover:bg-gray-50 hover:text-brand-blue-800 transition transform duration-200">
-                    المزيد عنا
-                </a>
-            </div>
+            <div class="mb-10"></div>
         </div>
     </div>
 
@@ -166,7 +151,7 @@
     <div id="features" class="py-20 bg-white relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-extrabold text-brand-blue-900 sm:text-4xl">لماذا تختار متجرنا؟</h2>
+                <h2 class="text-3xl font-extrabold text-brand-blue-900 sm:text-4xl">لماذا تختار متجر صخر؟</h2>
                 <p class="mt-4 text-gray-500 text-lg">نقدم لك تجربة متكاملة تجمع بين الجودة والراحة.</p>
             </div>
 
@@ -226,11 +211,11 @@
         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
         </div>
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <h2 class="text-3xl font-bold text-white mb-6">جاهز لتجربة التسوق الأفضل؟</h2>
-            <p class="text-brand-blue-100 mb-8 text-lg">انضم إلى آلاف العملاء السعداء واستمتع بمنتجات عالية الجودة.</p>
-            <a href="{{ route('login') }}"
+            <h2 class="text-3xl font-bold text-white mb-6">عزيزي التاجر، هل أنت جاهز لتنمية عملك؟</h2>
+            <p class="text-brand-blue-100 mb-8 text-lg">انضم إلى منصة قوية تساعدك على إدارة متجرك وزيادة مبيعاتك بسهولة.</p>
+            <a href="{{ route('register') }}"
                 class="inline-block px-10 py-4 bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold rounded-full shadow-lg transform hover:-translate-y-1 transition duration-200">
-                تسجيل الدخول الآن
+                ابدأ متجرك الآن
             </a>
         </div>
     </div>

@@ -28,8 +28,13 @@ class Product extends Model
         'three_sixty_images',
         'store_id',
         'category_id',
-        'warranty',
+        'brand_id',
+        'warranty_duration',
+        'warranty_unit',
         'currency',
+        'size',
+        'color',
+        'region',
     ];
 
     protected $casts = [
@@ -74,6 +79,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
@@ -97,5 +107,27 @@ class Product extends Model
     public function scopeInactive($query)
     {
         return $query->where('status', 'inactive');
+    }
+
+    /**
+     * حساب تاريخ الانتهاء بناءً على تاريخ الشراء المخزن
+     * 
+     * @param \Carbon\Carbon|string $purchaseDate
+     * @return \Carbon\Carbon|null
+     */
+    public function getWarrantyExpiryDate($purchaseDate)
+    {
+        if (!$this->warranty_duration || !$this->warranty_unit) {
+            return null;
+        }
+
+        $date = \Carbon\Carbon::parse($purchaseDate);
+
+        return match ($this->warranty_unit) {
+            'days' => $date->addDays($this->warranty_duration),
+            'months' => $date->addMonths($this->warranty_duration),
+            'years' => $date->addYears($this->warranty_duration),
+            default => null,
+        };
     }
 }

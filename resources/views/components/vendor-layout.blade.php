@@ -5,10 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }} - @yield('title')</title>
+    <title>{{ config('app.name', 'متجر صخر الإلكتروني') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/brand/favicon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('assets/brand/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -25,10 +27,12 @@
             class="fixed inset-y-0 right-0 z-30 flex-shrink-0 w-64 overflow-y-auto bg-brand-orange-700 shadow-lg transition-transform duration-300 transform"
             :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'">
             <div class="flex flex-col h-full">
-                <div class="flex items-center justify-center mt-8 flex-shrink-0">
-                    <div class="flex items-center">
-                        <x-application-logo class="w-12 h-12 text-white" />
-                        <span class="mx-2 text-2xl font-semibold text-white">متجري</span>
+                <div class="flex items-center justify-center mt-10 mb-6 flex-shrink-0">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="p-3 bg-transparent rounded-2xl backdrop-blur-md border border-white/20 shadow-xl transition-transform hover:scale-110 duration-300">
+                            <x-application-logo class="w-64 h-28 object-contain" />
+                        </div>
+                        <span class="text-2xl font-black text-white tracking-wider">متجر صخر</span>
                     </div>
                 </div>
 
@@ -151,13 +155,52 @@
                                 clip-rule="evenodd"></path>
                         </svg>
                     </button>
-                    <div class="flex items-center">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="text-gray-700 hover:text-brand-orange-700">تسجيل الخروج</a>
-                        </form>
+                    <div class="flex items-center gap-4">
+                        <!-- User Dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" @click.away="open = false" 
+                                class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
+                                <div class="flex flex-col text-left">
+                                    <span class="text-xs text-gray-400 font-medium tracking-wider uppercase">لوحة التاجر</span>
+                                    <span class="text-sm font-bold text-gray-800 group-hover:text-brand-orange-700">{{ Auth::user()->name }}</span>
+                                </div>
+                                <div class="w-10 h-10 rounded-full border-2 border-brand-orange-500/10 p-1 bg-transparent overflow-hidden shadow-sm group-hover:border-brand-orange-500/30 transition-colors">
+                                    <img src="{{ asset('assets/brand/logo.png') }}" class="w-full h-full object-contain" alt="Logo">
+                                </div>
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-brand-orange-700 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open" 
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                                class="absolute left-0 mt-2 w-56 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2 space-y-1 overflow-hidden z-50 text-right">
+                                
+                                <div class="px-4 py-3 border-b border-gray-50 mb-1 text-right">
+                                    <p class="text-xs text-gray-400">سجلت الدخول بصفتك</p>
+                                    <p class="text-sm font-bold text-gray-900 truncate">{{ Auth::user()->email }}</p>
+                                </div>
+
+                                <a href="{{ route('profile.edit') }}" class="flex items-center justify-end gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-brand-orange-500/5 hover:text-brand-orange-500 rounded-xl transition-all">
+                                    الملف الشخصي
+                                    <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </a>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex items-center justify-end w-full gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all text-right">
+                                        تسجيل الخروج
+                                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>

@@ -12,8 +12,10 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->withCount('products')->paginate(10);
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::with(['parent', 'brands'])->latest()->withCount('products')->paginate(10);
+        $allCategories = Category::active()->whereNull('parent_id')->with('children')->get(); // For parent selection
+        $brands = \App\Models\Brand::all();
+        return view('admin.categories.index', compact('categories', 'allCategories', 'brands'));
     }
 
     public function store(Request $request)
@@ -23,9 +25,12 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string|in:active,inactive',
+            'parent_id' => 'nullable|exists:categories,id',
+            'brand_ids' => 'nullable|array',
+            'brand_ids.*' => 'exists:brands,id',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'brand_ids']);
 
         // Support Arabic slugs or fallback to name if slug is empty
         $data['slug'] = Str::slug($request->name, '-', null);
@@ -39,7 +44,12 @@ class CategoryController extends Controller
             $data['image'] = $request->file('image')->store('categories', 'public');
         }
 
-        Category::create($data);
+        $category = Category::create($data);
+
+        // Sync brands
+        if ($request->has('brand_ids')) {
+            $category->brands()->sync($request->brand_ids);
+        }
 
         return redirect()->back()->with('success', 'تم إضافة التصنيف بنجاح');
     }
@@ -51,9 +61,12 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string|in:active,inactive',
+            'parent_id' => 'nullable|exists:categories,id',
+            'brand_ids' => 'nullable|array',
+            'brand_ids.*' => 'exists:brands,id',
         ]);
 
-        $data = $request->except(['image', '_token', '_method']);
+        $data = $request->except(['image', 'brand_ids', '_token', '_method']);
 
         // Support Arabic slugs or fallback to name if slug is empty
         $data['slug'] = Str::slug($request->name, '-', null);
@@ -69,6 +82,13 @@ class CategoryController extends Controller
         }
 
         $category->update($data);
+
+        // Sync brands
+        if ($request->has('brand_ids')) {
+            $category->brands()->sync($request->brand_ids);
+        } else {
+            $category->brands()->detach();
+        }
 
         return redirect()->back()->with('success', 'تم تعديل التصنيف بنجاح');
     }

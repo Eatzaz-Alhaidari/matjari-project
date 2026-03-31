@@ -60,6 +60,9 @@ class DashboardController extends Controller
         // 19. Activity Log Count (New)
         $activityLogCount = \App\Models\ActivityLog::count();
 
+        // 20. Brands Count (New)
+        $brandsCount = \App\Models\Brand::count();
+
         // --- NEW CHARTS DATA ---
 
         // 1. Users Growth Chart (Line Chart)
@@ -152,6 +155,7 @@ class DashboardController extends Controller
             'newCustomersCount' => $newCustomersCount,
             'categoriesCount' => $categoriesCount,
             'activityLogCount' => $activityLogCount,
+            'brandsCount' => $brandsCount,
             // Chart Data
             'salesLabels' => $salesLabels,
             'salesValues' => $salesValues,

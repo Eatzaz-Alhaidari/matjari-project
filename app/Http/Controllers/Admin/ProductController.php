@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\Category;
+use App\Models\Brand;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +18,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['store', 'category']);
+        $query = Product::with(['store', 'category', 'brand']);
 
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -38,9 +39,10 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $stores = Store::where('is_active', true)->get();
-        $categories = Category::all();
-        return view('admin.products.create', compact('stores', 'categories'));
+        $stores = Store::active()->get();
+        $brands = Brand::orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        return view('admin.products.create', compact('stores', 'brands', 'categories'));
     }
 
     /**
@@ -59,7 +61,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'name' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -71,7 +73,8 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'warranty' => 'nullable|string|max:255',
+            'warranty_duration' => 'nullable|integer|min:1',
+            'warranty_unit' => 'nullable|in:days,months,years',
             'currency' => 'required|in:YER,SAR,USD',
         ]);
 
@@ -89,9 +92,10 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $stores = Store::where('is_active', true)->get();
-        $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'stores', 'categories'));
+        $stores = Store::active()->get();
+        $brands = Brand::orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        return view('admin.products.edit', compact('product', 'stores', 'brands', 'categories'));
     }
 
     /**
@@ -102,7 +106,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -114,7 +118,8 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'warranty' => 'nullable|string|max:255',
+            'warranty_duration' => 'nullable|integer|min:1',
+            'warranty_unit' => 'nullable|in:days,months,years',
             'currency' => 'required|in:YER,SAR,USD',
         ]);
 

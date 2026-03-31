@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="text-center mb-6">
         <h1 class="text-2xl font-bold text-brand-blue">تسجيل الدخول</h1>
-        <p class="text-sm text-gray-500">أهلاً بك مجدداً في متجرنا</p>
+        <p class="text-sm text-gray-500">أهلاً بك مجدداً في متجر صخر</p>
     </div>
 
     <!-- ##### بداية الكود المضاف ##### -->

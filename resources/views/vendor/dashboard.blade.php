@@ -142,6 +142,83 @@
                 @endforelse
             </div>
         </div>
+
+        {{-- Customer Messages --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-brand-orange pr-3">رسائل العملاء</h3>
+            <div class="space-y-4">
+                @forelse($latestMessages as $message)
+                    <div class="pb-3 border-b border-gray-50 last:border-0 p-2 rounded hover:bg-orange-50 transition-colors">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-sm font-bold text-gray-800">{{ $message->customer_name ?? 'عميل' }}</span>
+                            <span class="text-[10px] text-gray-400">{{ $message->created_at->diffForHumans() }}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 line-clamp-2" title="{{ $message->message }}">
+                            {{ $message->message }}
+                        </p>
+                        @if(!$message->is_read)
+                            <span class="mt-1 inline-block w-2 h-2 bg-brand-orange rounded-full"></span>
+                        @endif
+                    </div>
+                @empty
+                    <div class="text-center py-12">
+                        <svg class="w-12 h-12 text-orange-100 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        <p class="text-sm text-gray-500">لا توجد رسائل جديدة حالياً</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+        {{-- Chatbot Management --}}
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-r-4 border-brand-orange pr-3">إدارة الردود التلقائية (Chatbot)</h3>
+            
+            {{-- Form to add new rule --}}
+            <form action="{{ route('vendor.chatbot-rules.store') }}" method="POST" class="mb-6 bg-brand-orange/5 p-4 rounded-lg">
+                @csrf
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-orange-800 mb-1">الكلمة المفتاحية:</label>
+                        <input type="text" name="trigger_keyword" placeholder="مثال: سعر، توصيل، متوفر" 
+                            class="w-full text-sm rounded-md border-gray-200 focus:border-brand-orange focus:ring-brand-orange" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-orange-800 mb-1">نص الرد:</label>
+                        <textarea name="response_text" rows="2" placeholder="اكتب الرد التلقائي هنا..." 
+                            class="w-full text-sm rounded-md border-gray-200 focus:border-brand-orange focus:ring-brand-orange" required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-orange hover:bg-brand-orange-700 text-white text-xs font-bold py-2.5 px-4 rounded-lg shadow-md transition-all duration-300">
+                        إضافة قاعدة رد
+                    </button>
+                </div>
+            </form>
+
+            {{-- List of existing rules --}}
+            <div class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                @forelse($chatbotRules as $rule)
+                    <div class="flex items-start justify-between p-2 border border-gray-100 rounded hover:bg-gray-50 transition-colors group">
+                        <div class="flex-1 min-w-0">
+                            <span class="inline-block px-2 py-0.5 bg-brand-orange/10 text-brand-orange-800 text-[10px] font-bold rounded mb-1">
+                                {{ $rule->trigger_keyword }}
+                            </span>
+                            <p class="text-[11px] text-gray-600 italic">"{{ $rule->response_text }}"</p>
+                        </div>
+                        <form action="{{ route('vendor.chatbot-rules.destroy', $rule) }}" method="POST" class="mr-2 hidden group-hover:block">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-400 hover:text-red-600" onclick="return confirm('هل أنت متأكد من حذف هذه القاعدة؟')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                @empty
+                    <p class="text-center text-xs text-gray-400 py-4">لا توجد قواعد رد تلقائي مبرمجة</p>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">

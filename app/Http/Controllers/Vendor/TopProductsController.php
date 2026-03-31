@@ -65,7 +65,13 @@ class TopProductsController extends Controller
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
-                'products.warranty'
+                'products.warranty_duration',
+                'products.warranty_unit',
+                'products.sku',
+                'products.currency',
+                'products.size',
+                'products.color',
+                'products.region'
             )
             ->orderByDesc('total_quantity_sold')
             ->limit(50); // الحصول على أكثر من 5 للفلترة

@@ -31,18 +31,41 @@
 
                             <!-- Brand -->
                             <div>
-                                <x-input-label for="brand" :value="__('الماركة')" />
-                                <select id="brand" name="brand"
+                                <x-input-label for="brand_id" :value="__('الماركة')" />
+                                <select id="brand_id" name="brand_id"
                                     class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                     <option value="">اختر الماركة</option>
-                                    @foreach(['Apple', 'HP', 'Dell', 'Lenovo', 'Asus', 'Acer', 'Microsoft (Surface)', 'MSI', 'Razer', 'Samsung'] as $brand)
-                                        <option value="{{ $brand }}" {{ old('brand') == $brand ? 'selected' : '' }}>
-                                            {{ $brand }}
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                            {{ $brand->name }}
                                         </option>
                                     @endforeach
-                                    <option value="other" {{ old('brand') == 'other' ? 'selected' : '' }}>أخرى</option>
                                 </select>
-                                <x-input-error :messages="$errors->get('brand')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
+                            </div>
+
+                            <!-- Size -->
+                            <div>
+                                <x-input-label for="size" :value="__('الحجم')" />
+                                <x-text-input id="size" class="block mt-1 w-full" type="text" name="size"
+                                    :value="old('size')" />
+                                <x-input-error :messages="$errors->get('size')" class="mt-2" />
+                            </div>
+
+                            <!-- Color -->
+                            <div>
+                                <x-input-label for="color" :value="__('اللون')" />
+                                <x-text-input id="color" class="block mt-1 w-full" type="text" name="color"
+                                    :value="old('color')" />
+                                <x-input-error :messages="$errors->get('color')" class="mt-2" />
+                            </div>
+
+                            <!-- Region -->
+                            <div>
+                                <x-input-label for="region" :value="__('المنطقة')" />
+                                <x-text-input id="region" class="block mt-1 w-full" type="text" name="region"
+                                    :value="old('region')" />
+                                <x-input-error :messages="$errors->get('region')" class="mt-2" />
                             </div>
 
                             <!-- Price -->
@@ -101,10 +124,19 @@
                             </div>
 
                             <div>
-                                <x-input-label for="warranty" :value="__('الضمان')" />
-                                <x-text-input id="warranty" class="block mt-1 w-full" type="text" name="warranty"
-                                    :value="old('warranty')" placeholder="مثال: سنتين" />
-                                <x-input-error :messages="$errors->get('warranty')" class="mt-2" />
+                                <x-input-label for="warranty_duration" :value="__('الضمان')" />
+                                <div class="flex gap-2">
+                                    <x-text-input id="warranty_duration" class="block mt-1 w-2/3" type="number" name="warranty_duration"
+                                        :value="old('warranty_duration')" placeholder="مثال: 2" min="1" />
+                                    <select id="warranty_unit" name="warranty_unit" class="block mt-1 w-1/3 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                        <option value="" {{ old('warranty_unit') == '' ? 'selected' : '' }}>أختر الوحدة</option>
+                                        <option value="days" {{ old('warranty_unit') == 'days' ? 'selected' : '' }}>يوم</option>
+                                        <option value="months" {{ old('warranty_unit') == 'months' ? 'selected' : '' }}>شهر</option>
+                                        <option value="years" {{ old('warranty_unit') == 'years' ? 'selected' : '' }}>سنة</option>
+                                    </select>
+                                </div>
+                                <x-input-error :messages="$errors->get('warranty_duration')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('warranty_unit')" class="mt-2" />
                             </div>
 
 
@@ -113,22 +145,74 @@
                                 <x-input-label for="status" :value="__('الحالة')" />
                                 <select id="status" name="status"
                                     class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>نشط
-                                    </option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>معطل
-                                    </option>
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>نشط</option>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>معطل</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
 
-                            <!-- Category -->
-                            <div>
-                                <x-input-label for="category_id" :value="__('التصنيف')" />
-                                <select id="category_id" name="category_id"
-                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                    <option value="">اختر التصنيف</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            <!-- Category Management -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                    تصنيف المنتج
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Main Category -->
+                                    <div>
+                                        <x-input-label for="main_category" :value="__('القسم الرئيسي')" />
+                                        <select id="main_category" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl shadow-sm py-3 transition-all" onchange="filterSubCategories(this.value)">
+                                            <option value="">اختر القسم الرئيسي</option>
+                                            @foreach($categories as $parent)
+                                                <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Sub Category -->
+                                    <div>
+                                        <x-input-label for="category_id" :value="__('القسم الفرعي')" />
+                                        <select id="category_id" name="category_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl shadow-sm py-3 transition-all" disabled>
+                                            <option value="">اختر القسم الرئيسي أولاً</option>
+                                        </select>
+                                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                                    </div>
+                                </div>
+
+                                <script>
+                                    const categoriesData = @json($categories);
+
+                                    function filterSubCategories(parentId) {
+                                        const subSelect = document.getElementById('category_id');
+                                        subSelect.innerHTML = '';
+                                        
+                                        if (!parentId) {
+                                            subSelect.innerHTML = '<option value="">اختر القسم الرئيسي أولاً</option>';
+                                            subSelect.disabled = true;
+                                            return;
+                                        }
+
+                                        const parent = categoriesData.find(c => c.id == parentId);
+                                        if (parent && parent.children && parent.children.length > 0) {
+                                            subSelect.disabled = false;
+                                            subSelect.innerHTML = '<option value="">اختر القسم الفرعي</option>';
+                                            parent.children.forEach(child => {
+                                                const opt = document.createElement('option');
+                                                opt.value = child.id;
+                                                opt.textContent = child.name;
+                                                subSelect.appendChild(opt);
+                                            });
+                                        } else {
+                                            subSelect.disabled = false;
+                                            subSelect.innerHTML = `<option value="${parentId}">هذا القسم لا يحتوي على أقسام فرعية (استخدمه كقسم وحيد)</option>`;
+                                        }
+                                    }
+                                </script>
+                            </div>       }
+                                    }
+                                </script>
+                            </div>     </option>
+                                        @endforeach
                                     @endforeach
                                 </select>
                                 <x-input-error :messages="$errors->get('category_id')" class="mt-2" />

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\UserController;
@@ -34,6 +35,13 @@ require __DIR__ . '/auth.php';
 Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
 
+// ==================== Shared Auth Routes ====================
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 // ==================== Admin Routes ====================
 Route::prefix('admin')
     ->middleware(['auth', 'role:super-admin'])
@@ -43,7 +51,8 @@ Route::prefix('admin')
         // 1. Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', CategoryController::class);
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::resource('brands', BrandController::class);
+
 
         // 2. Vendors Management
         Route::post('vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggleStatus');
@@ -187,6 +196,10 @@ Route::prefix('vendor')
 
         // Shipping Info (New)
         Route::get('shipping-info', [\App\Http\Controllers\Vendor\ShippingController::class, 'index'])->name('shipping.index');
+
+        // Chatbot Rules (New)
+        Route::post('chatbot-rules', [\App\Http\Controllers\Vendor\ChatbotController::class, 'store'])->name('chatbot-rules.store');
+        Route::delete('chatbot-rules/{chatbot}', [\App\Http\Controllers\Vendor\ChatbotController::class, 'destroy'])->name('chatbot-rules.destroy');
     });
     Route::get('/fix-api', function() {
     \Artisan::call('route:clear');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -41,8 +42,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
-        return view('vendor.products.create', compact('categories'));
+        $brands = Brand::orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        return view('vendor.products.create', compact('categories', 'brands'));
     }
 
     /**
@@ -53,7 +55,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'name' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -62,7 +64,8 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'min_stock' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
-            'warranty' => 'nullable|string|max:255',
+            'warranty_duration' => 'nullable|integer|min:1',
+            'warranty_unit' => 'nullable|in:days,months,years',
             'status' => 'required|in:active,inactive',
             'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',
@@ -132,8 +135,9 @@ class ProductController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا المنتج');
         }
 
-        $categories = Category::all();
-        return view('vendor.products.edit', compact('product', 'categories'));
+        $brands = Brand::orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        return view('vendor.products.edit', compact('product', 'categories', 'brands'));
     }
 
     /**
@@ -151,7 +155,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -160,7 +164,8 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'min_stock' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
-            'warranty' => 'nullable|string|max:255',
+            'warranty_duration' => 'nullable|integer|min:1',
+            'warranty_unit' => 'nullable|in:days,months,years',
             'status' => 'required|in:active,inactive',
             'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',

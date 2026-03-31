@@ -41,6 +41,14 @@ class User extends Authenticatable
     protected $casts = [ /* ... */];
 
     /**
+     * Get the store associated with the user (for single-store vendors).
+     */
+    public function store()
+    {
+        return $this->hasOne(Store::class);
+    }
+
+    /**
      * Get the stores associated with the user.
      */
     public function stores()

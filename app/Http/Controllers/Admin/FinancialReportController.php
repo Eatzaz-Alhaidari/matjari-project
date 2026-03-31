@@ -106,8 +106,12 @@ class FinancialReportController extends Controller
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
-                'products.warranty',
-                'products.currency'
+                'products.warranty_duration',
+                'products.warranty_unit',
+                'products.currency',
+                'products.size',
+                'products.color',
+                'products.region'
             )
             ->orderByDesc('revenue')
             ->limit(10)

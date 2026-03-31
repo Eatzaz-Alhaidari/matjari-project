@@ -11,6 +11,8 @@ use App\Models\Discount;
 use App\Models\Review;
 use App\Models\OrderItem;
 use App\Models\Wallet;
+use App\Models\StoreMessage;
+use App\Models\ChatbotRule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Vendor\WarehouseController;
 use Illuminate\Http\Request;
@@ -63,8 +65,10 @@ class DashboardController extends Controller
             ->groupBy(
                 'products.id',
                 'products.product_code',
+                'products.sku',
                 'products.name',
                 'products.brand',
+                'products.brand_id',
                 'products.description',
                 'products.notes',
                 'products.full_description',
@@ -79,12 +83,14 @@ class DashboardController extends Controller
                 'products.three_sixty_images',
                 'products.store_id',
                 'products.category_id',
+                'products.warranty_duration',
+                'products.warranty_unit',
                 'products.created_at',
                 'products.updated_at',
-                'products.updated_at',
-                'products.warranty',
-                'products.sku',
-                'products.currency'
+                'products.currency',
+                'products.size',
+                'products.color',
+                'products.region'
             )
             ->orderByDesc('total_quantity_sold')
             ->limit(5)
@@ -150,6 +156,17 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // 6. آخر رسائل العملاء
+        $latestMessages = StoreMessage::where('store_id', $storeId)
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // 7. قواعد الشات بوت
+        $chatbotRules = ChatbotRule::where('store_id', $storeId)
+            ->latest()
+            ->get();
+
         return view('vendor.dashboard', compact(
             'stats',
             'top5Products',
@@ -157,7 +174,9 @@ class DashboardController extends Controller
             'salesChartData',
             'ratingStats',
             'lowStockProducts',
-            'latestPendingOrders'
+            'latestPendingOrders',
+            'latestMessages',
+            'chatbotRules'
         ));
     }
 

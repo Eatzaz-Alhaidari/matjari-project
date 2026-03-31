@@ -114,8 +114,11 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-bold text-gray-900">{{ $category->name }}</div>
+                                            @if($category->parent)
+                                                <div class="text-[10px] text-brand-blue-600 font-semibold">تابعة لـ: {{ $category->parent->name }}</div>
+                                            @endif
                                             @if($category->slug)
-                                                <div class="text-xs text-gray-400">{{ $category->slug }}</div>
+                                                <div class="text-[10px] text-gray-400">{{ $category->slug }}</div>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4">
@@ -135,7 +138,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                             <div class="flex justify-center items-center space-x-3 space-x-reverse">
-                                                <button onclick="edit{{ $category->id }}.showModal()"
+                                                @php
+                                                    $currentParent = $category->parent;
+                                                    $mainParentId = $currentParent ? ($currentParent->parent_id ?: $currentParent->id) : 'null';
+                                                    $subParentId = ($currentParent && $currentParent->parent_id) ? $currentParent->id : 'null';
+                                                @endphp
+                                                <button onclick="initEditCategoryModal({{ $category->id }}, {{ $subParentId }}); edit{{ $category->id }}.showModal()"
                                                     class="text-brand-blue hover:text-blue-900 group" title="تعديل">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                         class="h-5 w-5 transform group-hover:scale-110 transition-transform"
@@ -164,73 +172,119 @@
                                                 </form>
                                             </div>
 
-                                            <!-- Edit Modal -->
-                                            <dialog id="edit{{ $category->id }}" class="modal">
-                                                <div class="modal-box bg-white text-right">
-                                                    <h3 class="font-bold text-lg mb-4 text-brand-blue border-b pb-2">تعديل
-                                                        التصنيف: {{ $category->name }}</h3>
-                                                    <form action="{{ route('admin.categories.update', $category) }}"
-                                                        method="POST" enctype="multipart/form-data" class="no-confirm">
-                                                        @csrf
-                                                        @method('PUT')
+                                            <dialog id="edit{{ $category->id }}" class="backdrop:bg-gray-900/50 p-0 rounded-2xl shadow-2xl border-0 w-11/12 max-w-4xl mx-auto mt-20">
+                                                <div class="bg-white text-right flex flex-col max-h-[85vh]">
+                                                    <!-- Header -->
+                                                    <div class="p-6 border-b border-gray-100 flex-shrink-0 bg-gray-50 flex justify-between items-center">
+                                                        <h3 class="font-bold text-xl text-brand-blue">تعديل التصنيف: {{ $category->name }}</h3>
+                                                        <button type="button" onclick="edit{{ $category->id }}.close()" class="text-gray-400 hover:text-red-500 transition-colors">
+                                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
+                                                    </div>
 
-                                                        <div class="space-y-4">
-                                                            <div>
-                                                                <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1">اسم
-                                                                    التصنيف <span class="text-red-500">*</span></label>
-                                                                <input type="text" name="name" value="{{ $category->name }}"
-                                                                    class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50"
-                                                                    required>
-                                                            </div>
+                                                    <!-- Body -->
+                                                    <div class="p-8 overflow-y-auto">
+                                                        <form id="form-edit-{{ $category->id }}" action="{{ route('admin.categories.update', $category) }}"
+                                                            method="POST" enctype="multipart/form-data" class="no-confirm">
+                                                            @csrf
+                                                            @method('PUT')
 
-                                                            <div>
-                                                                <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
-                                                                <textarea name="description" rows="3"
-                                                                    class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50">{{ $category->description }}</textarea>
-                                                            </div>
+                                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                                <div class="space-y-6">
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">اسم التصنيف <span class="text-red-500">*</span></label>
+                                                                        <input type="text" name="name" value="{{ $category->name }}"
+                                                                            class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3" required>
+                                                                    </div>
 
-                                                            <div>
-                                                                <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
-                                                                <select name="status"
-                                                                    class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50">
-                                                                    <option value="active" {{ $category->status == 'active' ? 'selected' : '' }}>نشط</option>
-                                                                    <option value="inactive" {{ $category->status == 'inactive' ? 'selected' : '' }}>
-                                                                        غير نشط</option>
-                                                                </select>
-                                                            </div>
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">نوع التصنيف / التبعية</label>
+                                                                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                                                            <div class="space-y-4">
+                                                                                @php
+                                                                                    $currentParent = $category->parent;
+                                                                                    $mainParentId = $currentParent ? ($currentParent->parent_id ?: $currentParent->id) : null;
+                                                                                    $subParentId = ($currentParent && $currentParent->parent_id) ? $currentParent->id : null;
+                                                                                @endphp
+                                                                                <!-- القسم الرئيسي -->
+                                                                                <div>
+                                                                                    <span class="text-[11px] text-gray-400 block mb-1">القسم الرئيسي</span>
+                                                                                    <select id="main_parent_select_{{ $category->id }}" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3 transition-all" onchange="handleMainParentChangeEdit(this, {{ $category->id }})">
+                                                                                        <option value="">-- تصنيف رئيسي --</option>
+                                                                                        @foreach($allCategories as $parent)
+                                                                                            @if($parent->id != $category->id)
+                                                                                                <option value="{{ $parent->id }}" data-children='@json($parent->children)' {{ $mainParentId == $parent->id ? 'selected' : '' }}>{{ $parent->name }}</option>
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </div>
 
-                                                            <div>
-                                                                <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1">صورة
-                                                                    التصنيف</label>
-                                                                <div class="flex items-center space-x-4 space-x-reverse">
-                                                                    @if($category->image)
-                                                                        <div class="shrink-0">
-                                                                            <img src="{{ Storage::url($category->image) }}"
-                                                                                class="h-16 w-16 object-cover rounded-lg border">
+                                                                                <!-- القسم الفرعي -->
+                                                                                <div id="sub_parent_container_{{ $category->id }}" class="{{ $subParentId ? '' : 'hidden' }} animate-fade-in">
+                                                                                    <span class="text-[11px] text-gray-400 block mb-1">القسم الفرعي الأوسط</span>
+                                                                                    <select id="sub_parent_select_{{ $category->id }}" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3" onchange="updateFinalParentIdEdit(this, {{ $category->id }})">
+                                                                                        <option value="">-- لا يوجد (تابع للرئيسي) --</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                    @endif
-                                                                    <input type="file" name="image"
-                                                                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100">
+                                                                        <input type="hidden" name="parent_id" id="final_parent_id_{{ $category->id }}" value="{{ $category->parent_id }}">
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">الحالة</label>
+                                                                        <select name="status" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3">
+                                                                            <option value="active" {{ $category->status == 'active' ? 'selected' : '' }}>نشط</option>
+                                                                            <option value="inactive" {{ $category->status == 'inactive' ? 'selected' : '' }}>غير نشط</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="space-y-6">
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">الماركات المرتبطة</label>
+                                                                        <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 border rounded-lg bg-gray-50">
+                                                                            @foreach($brands as $brand)
+                                                                                <label class="flex items-center space-x-2 space-x-reverse cursor-pointer hover:bg-white p-1 rounded transition">
+                                                                                    <input type="checkbox" name="brand_ids[]" value="{{ $brand->id }}" 
+                                                                                        {{ $category->brands->contains($brand->id) ? 'checked' : '' }}
+                                                                                        class="rounded border-gray-300 text-brand-blue focus:ring-brand-blue">
+                                                                                    <span class="text-xs text-gray-700">{{ $brand->name }}</span>
+                                                                                </label>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+
+                                                                <div class="space-y-6">
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">الوصف</label>
+                                                                        <textarea name="description" rows="5" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50" placeholder="اكتب وصفاً قصيراً للنظام...">{{ $category->description }}</textarea>
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <label class="block text-sm font-semibold text-gray-700 mb-2">صورة التصنيف</label>
+                                                                        <div class="flex items-center gap-4">
+                                                                            @if($category->image)
+                                                                                <div class="shrink-0">
+                                                                                    <img src="{{ Storage::url($category->image) }}" class="h-16 w-16 object-cover rounded-lg border shadow-sm">
+                                                                                </div>
+                                                                            @endif
+                                                                            <div class="w-full">
+                                                                                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-gray-200 rounded-lg p-1 transition-all">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </form>
+                                                    </div>
 
-                                                        <div class="modal-action mt-6 border-t pt-4">
-                                                            <button type="submit"
-                                                                class="bg-brand-blue hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">حفظ
-                                                                التغييرات</button>
-                                                            <button type="button" onclick="edit{{ $category->id }}.close()"
-                                                                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors">إلغاء</button>
-                                                        </div>
-                                                    </form>
+                                                    <!-- Footer -->
+                                                    <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 flex-shrink-0">
+                                                        <button type="button" onclick="edit{{ $category->id }}.close()" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold py-2.5 px-6 rounded-lg transition-colors shadow-sm">إلغاء</button>
+                                                        <button type="submit" form="form-edit-{{ $category->id }}" class="bg-brand-blue hover:bg-blue-800 text-white font-bold py-2.5 px-8 rounded-lg shadow-md transition-colors">حفظ التعديلات</button>
+                                                    </div>
                                                 </div>
-                                                <form method="dialog" class="modal-backdrop">
-                                                    <button>close</button>
-                                                </form>
                                             </dialog>
                                         </td>
                                     </tr>
@@ -263,53 +317,201 @@
     </div>
 
     <!-- Add Category Modal -->
-    <dialog id="addCategoryModal" class="modal">
-        <div class="modal-box bg-white text-right">
-            <h3 class="font-bold text-lg mb-4 text-brand-blue border-b pb-2">إضافة تصنيف جديد</h3>
-            <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">اسم التصنيف <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" name="name"
-                            class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50"
-                            placeholder="مثال: لابتوبات" required>
-                    </div>
+    <dialog id="addCategoryModal" class="backdrop:bg-gray-900/50 p-0 rounded-2xl shadow-2xl border-0 w-11/12 max-w-4xl mx-auto mt-20">
+        <div class="bg-white text-right flex flex-col max-h-[85vh]">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-100 flex-shrink-0 bg-gray-50 flex justify-between items-center">
+                <h3 class="font-bold text-xl text-brand-blue">إضافة تصنيف جديد</h3>
+                <button type="button" onclick="document.getElementById('addCategoryModal').close()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
-                        <textarea name="description" rows="3"
-                            class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50"
-                            placeholder="اكتب وصفاً قصيراً للتصنيف..."></textarea>
-                    </div>
+            <!-- Body -->
+            <div class="p-8 overflow-y-auto">
+                <form id="form-add-category" action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">اسم التصنيف <span class="text-red-500">*</span></label>
+                                <input type="text" name="name" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3" placeholder="مثال: لابتوبات" required>
+                            </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
-                        <select name="status"
-                            class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50">
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
-                        </select>
-                    </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">نوع التصنيف / التبعية</label>
+                                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <div class="space-y-4">
+                                        <!-- القسم الرئيسي -->
+                                        <div>
+                                            <span class="text-[11px] text-gray-400 block mb-1">القسم الرئيسي (اتركه إذا كان هذا قسماً رئيسياً جديداً)</span>
+                                            <select id="main_parent_select" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3 transition-all" onchange="handleMainParentChange(this)">
+                                                <option value="">-- اختر القسم الأب (اختياري) --</option>
+                                                @foreach($allCategories as $parent)
+                                                    <option value="{{ $parent->id }}" data-children='@json($parent->children)'>{{ $parent->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">صورة التصنيف</label>
-                        <input type="file" name="image"
-                            class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-gray-200 rounded-lg p-1">
-                    </div>
-                </div>
+                                        <!-- القسم الفرعي (يظهر ديناميكياً) -->
+                                        <div id="sub_parent_container" class="hidden animate-fade-in">
+                                            <span class="text-[11px] text-gray-400 block mb-1">القسم الفرعي الأوسط (اختياري)</span>
+                                            <select id="sub_parent_select" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3" onchange="updateFinalParentId(this)">
+                                                <option value="">-- لا يوجد (اجعله تابعاً للرئيسي مباشرة) --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="parent_id" id="final_parent_id" value="">
+                                
+                                <script>
+                                    function handleMainParentChange(select) {
+                                        const subContainer = document.getElementById('sub_parent_container');
+                                        const subSelect = document.getElementById('sub_parent_select');
+                                        const finalInput = document.getElementById('final_parent_id');
+                                        
+                                        finalInput.value = select.value;
+                                        
+                                        const selectedOption = select.options[select.selectedIndex];
+                                        if (select.value && selectedOption.dataset.children) {
+                                            const children = JSON.parse(selectedOption.dataset.children);
+                                            if (children.length > 0) {
+                                                subSelect.innerHTML = '<option value="">-- لا يوجد (اجعله تابعاً للرئيسي مباشرة) --</option>';
+                                                children.forEach(child => {
+                                                    const opt = document.createElement('option');
+                                                    opt.value = child.id;
+                                                    opt.textContent = child.name;
+                                                    subSelect.appendChild(opt);
+                                                });
+                                                subContainer.classList.remove('hidden');
+                                            } else {
+                                                subContainer.classList.add('hidden');
+                                            }
+                                        } else {
+                                            subContainer.classList.add('hidden');
+                                        }
+                                    }
 
-                <div class="modal-action mt-6 border-t pt-4">
-                    <button type="submit"
-                        class="bg-brand-blue hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow transition-colors">حفظ</button>
-                    <button type="button" onclick="document.getElementById('addCategoryModal').close()"
-                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded-lg transition-colors">إلغاء</button>
-                </div>
-            </form>
+                                    function updateFinalParentId(select) {
+                                        const mainSelect = document.getElementById('main_parent_select');
+                                        const finalInput = document.getElementById('final_parent_id');
+                                        
+                                        if (select.value) {
+                                            finalInput.value = select.value;
+                                        } else {
+                                            finalInput.value = mainSelect.value;
+                                        }
+                                    }
+                                </script>
+                            </div>
+
+                            <script>
+                                function handleMainParentChangeEdit(select, id) {
+                                    const subContainer = document.getElementById('sub_parent_container_' + id);
+                                    const subSelect = document.getElementById('sub_parent_select_' + id);
+                                    const finalInput = document.getElementById('final_parent_id_' + id);
+                                    
+                                    finalInput.value = select.value;
+                                    
+                                    const selectedOption = select.options[select.selectedIndex];
+                                    if (select.value && selectedOption.dataset.children) {
+                                        const children = JSON.parse(selectedOption.dataset.children);
+                                        if (children.length > 0) {
+                                            subSelect.innerHTML = '<option value="">-- لا يوجد (تابع للرئيسي) --</option>';
+                                            children.forEach(child => {
+                                                const opt = document.createElement('option');
+                                                opt.value = child.id;
+                                                opt.textContent = child.name;
+                                                subSelect.appendChild(opt);
+                                            });
+                                            subContainer.classList.remove('hidden');
+                                        } else {
+                                            subContainer.classList.add('hidden');
+                                        }
+                                    } else {
+                                        subContainer.classList.add('hidden');
+                                    }
+                                }
+
+                                function updateFinalParentIdEdit(select, id) {
+                                    const mainSelect = document.getElementById('main_parent_select_' + id);
+                                    const finalInput = document.getElementById('final_parent_id_' + id);
+                                    
+                                    if (select.value) {
+                                        finalInput.value = select.value;
+                                    } else {
+                                        finalInput.value = mainSelect.value;
+                                    }
+                                }
+
+                                function initEditCategoryModal(id, subParentId) {
+                                    const mainSelect = document.getElementById('main_parent_select_' + id);
+                                    const subSelect = document.getElementById('sub_parent_select_' + id);
+                                    const subContainer = document.getElementById('sub_parent_container_' + id);
+
+                                    if (mainSelect.value) {
+                                        const selectedOption = mainSelect.options[mainSelect.selectedIndex];
+                                        if (selectedOption.dataset.children) {
+                                            const children = JSON.parse(selectedOption.dataset.children);
+                                            if (children.length > 0) {
+                                                subSelect.innerHTML = '<option value="">-- لا يوجد (تابع للرئيسي) --</option>';
+                                                children.forEach(child => {
+                                                    const opt = document.createElement('option');
+                                                    opt.value = child.id;
+                                                    opt.textContent = child.name;
+                                                    if (child.id == subParentId) opt.selected = true;
+                                                    subSelect.appendChild(opt);
+                                                });
+                                                subContainer.classList.remove('hidden');
+                                            }
+                                        }
+                                    }
+                                }
+                            </script>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">الماركات المرتبطة</label>
+                                <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 border rounded-lg bg-gray-50">
+                                    @foreach($brands as $brand)
+                                        <label class="flex items-center space-x-2 space-x-reverse cursor-pointer hover:bg-white p-1 rounded transition">
+                                            <input type="checkbox" name="brand_ids[]" value="{{ $brand->id }}" class="rounded border-gray-300 text-brand-blue focus:ring-brand-blue">
+                                            <span class="text-xs text-gray-700">{{ $brand->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">الحالة</label>
+                                <select name="status" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 py-3">
+                                    <option value="active">نشط</option>
+                                    <option value="inactive">غير نشط</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">الوصف</label>
+                                <textarea name="description" rows="5" class="w-full rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50" placeholder="اكتب وصفاً قصيراً للتصنيف..."></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">صورة التصنيف</label>
+                                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-brand-blue hover:file:bg-blue-100 border border-gray-200 rounded-lg p-1 transition-all">
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 flex-shrink-0">
+                <button type="button" onclick="document.getElementById('addCategoryModal').close()" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold py-2.5 px-6 rounded-lg transition-colors shadow-sm">إلغاء</button>
+                <button type="submit" form="form-add-category" class="bg-brand-blue hover:bg-blue-800 text-white font-bold py-2.5 px-8 rounded-lg shadow-md transition-colors">حفظ وإضافة</button>
+            </div>
         </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
     </dialog>
 </x-admin-layout>

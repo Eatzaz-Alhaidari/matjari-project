@@ -15,7 +15,7 @@
                     
                     <div class="mb-6">
                         <form action="{{ route('admin.users.index') }}" method="GET" class="flex items-center">
-                            <input type="text" name="search" placeholder="ابحث بالاسم أو البريد الإلكتروني..." class="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm" value="{{ request('search') }}">
+                            <input type="text" name="search" placeholder="ابحث بالاسم أو البريد الإلكتروني أو رقم الهاتف..." class="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm" value="{{ request('search') }}">
                             <button type="submit" class="mr-3 px-4 py-2 bg-brand-blue text-white font-semibold rounded-lg shadow-md hover:bg-brand-blue-700">بحث</button>
                         </form>
                     </div>
