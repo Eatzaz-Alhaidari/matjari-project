@@ -33,19 +33,26 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      */
-    protected $hidden = [ /* ... */];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * The attributes that should be cast.
      */
-    protected $casts = [ /* ... */];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
-     * Get the store associated with the user (for single-store vendors).
+     * Get the single primary store for the vendor.
+     * تم الإبقاء على نسخة واحدة فقط هنا لحل مشكلة الـ Fatal Error.
      */
     public function store()
     {
-        return $this->hasOne(Store::class);
+        return $this->hasOne(Store::class, 'user_id', 'id');
     }
 
     /**
@@ -54,14 +61,6 @@ class User extends Authenticatable
     public function stores()
     {
         return $this->hasMany(Store::class, 'user_id', 'id');
-    }
-
-    /**
-     * Get the single primary store for the vendor.
-     */
-    public function store()
-    {
-        return $this->hasOne(Store::class, 'user_id', 'id');
     }
 
     /**
