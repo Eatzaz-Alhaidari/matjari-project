@@ -13,7 +13,6 @@
                         @csrf
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Product Code -->
                             <div>
                                 <x-input-label for="product_code" :value="__('رمز المنتج (SKU)')" />
                                 <x-text-input id="product_code" class="block mt-1 w-full" type="text"
@@ -21,7 +20,6 @@
                                 <x-input-error :messages="$errors->get('product_code')" class="mt-2" />
                             </div>
 
-                            <!-- Name -->
                             <div>
                                 <x-input-label for="name" :value="__('اسم المنتج')" />
                                 <x-text-input id="name" class="block mt-1 w-full" type="text" name="name"
@@ -29,7 +27,6 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
-                            <!-- Brand -->
                             <div>
                                 <x-input-label for="brand_id" :value="__('الماركة')" />
                                 <select id="brand_id" name="brand_id"
@@ -44,7 +41,6 @@
                                 <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
                             </div>
 
-                            <!-- Size -->
                             <div>
                                 <x-input-label for="size" :value="__('الحجم')" />
                                 <x-text-input id="size" class="block mt-1 w-full" type="text" name="size"
@@ -52,7 +48,6 @@
                                 <x-input-error :messages="$errors->get('size')" class="mt-2" />
                             </div>
 
-                            <!-- Color -->
                             <div>
                                 <x-input-label for="color" :value="__('اللون')" />
                                 <x-text-input id="color" class="block mt-1 w-full" type="text" name="color"
@@ -60,7 +55,6 @@
                                 <x-input-error :messages="$errors->get('color')" class="mt-2" />
                             </div>
 
-                            <!-- Region -->
                             <div>
                                 <x-input-label for="region" :value="__('المنطقة')" />
                                 <x-text-input id="region" class="block mt-1 w-full" type="text" name="region"
@@ -68,7 +62,6 @@
                                 <x-input-error :messages="$errors->get('region')" class="mt-2" />
                             </div>
 
-                            <!-- Price -->
                             <div class="flex gap-4">
                                 <div class="flex-1">
                                     <x-input-label for="price" :value="__('سعر البيع')" />
@@ -80,18 +73,14 @@
                                     <x-input-label for="currency" :value="__('العملة')" />
                                     <select id="currency" name="currency"
                                         class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                        <option value="YER" {{ old('currency') == 'YER' ? 'selected' : '' }}>ريال يمني
-                                        </option>
-                                        <option value="SAR" {{ old('currency') == 'SAR' ? 'selected' : '' }}>ريال سعودي
-                                        </option>
-                                        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>دولار أمريكي
-                                        </option>
+                                        <option value="YER" {{ old('currency') == 'YER' ? 'selected' : '' }}>ريال يمني</option>
+                                        <option value="SAR" {{ old('currency') == 'SAR' ? 'selected' : '' }}>ريال سعودي</option>
+                                        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>دولار أمريكي</option>
                                     </select>
                                     <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                                 </div>
                             </div>
 
-                            <!-- Price Before Discount -->
                             <div>
                                 <x-input-label for="price_before" :value="__('السعر قبل الخصم (اختياري)')" />
                                 <x-text-input id="price_before" class="block mt-1 w-full" type="number" step="0.01"
@@ -99,7 +88,6 @@
                                 <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
                             </div>
 
-                            <!-- Cost Price -->
                             <div>
                                 <x-input-label for="cost_price" :value="__('تكلفة الشراء (سرية)')" />
                                 <x-text-input id="cost_price" class="block mt-1 w-full" type="number" step="0.01"
@@ -107,7 +95,6 @@
                                 <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
                             </div>
 
-                            <!-- Stock -->
                             <div>
                                 <x-input-label for="stock" :value="__('الكمية الحالية (المخزون)')" />
                                 <x-text-input id="stock" class="block mt-1 w-full" type="number" name="stock"
@@ -115,7 +102,6 @@
                                 <x-input-error :messages="$errors->get('stock')" class="mt-2" />
                             </div>
 
-                            <!-- Min Stock -->
                             <div>
                                 <x-input-label for="min_stock" :value="__('تنبيه عند وصول المخزون لـ')" />
                                 <x-text-input id="min_stock" class="block mt-1 w-full" type="number" name="min_stock"
@@ -139,8 +125,6 @@
                                 <x-input-error :messages="$errors->get('warranty_unit')" class="mt-2" />
                             </div>
 
-
-                            <!-- Status -->
                             <div>
                                 <x-input-label for="status" :value="__('الحالة')" />
                                 <select id="status" name="status"
@@ -151,14 +135,12 @@
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
 
-                            <!-- Category Management -->
                             <div class="col-span-1 md:col-span-2 bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm">
                                 <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
                                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                                     تصنيف المنتج
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <!-- Main Category -->
                                     <div>
                                         <x-input-label for="main_category" :value="__('القسم الرئيسي')" />
                                         <select id="main_category" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl shadow-sm py-3 transition-all" onchange="filterSubCategories(this.value)">
@@ -169,7 +151,6 @@
                                         </select>
                                     </div>
 
-                                    <!-- Sub Category -->
                                     <div>
                                         <x-input-label for="category_id" :value="__('القسم الفرعي')" />
                                         <select id="category_id" name="category_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-xl shadow-sm py-3 transition-all" disabled>
@@ -178,117 +159,89 @@
                                         <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                                     </div>
                                 </div>
-
-                                <script>
-                                    const categoriesData = @json($categories);
-
-                                    function filterSubCategories(parentId) {
-                                        const subSelect = document.getElementById('category_id');
-                                        subSelect.innerHTML = '';
-                                        
-                                        if (!parentId) {
-                                            subSelect.innerHTML = '<option value="">اختر القسم الرئيسي أولاً</option>';
-                                            subSelect.disabled = true;
-                                            return;
-                                        }
-
-                                        const parent = categoriesData.find(c => c.id == parentId);
-                                        if (parent && parent.children && parent.children.length > 0) {
-                                            subSelect.disabled = false;
-                                            subSelect.innerHTML = '<option value="">اختر القسم الفرعي</option>';
-                                            parent.children.forEach(child => {
-                                                const opt = document.createElement('option');
-                                                opt.value = child.id;
-                                                opt.textContent = child.name;
-                                                subSelect.appendChild(opt);
-                                            });
-                                        } else {
-                                            subSelect.disabled = false;
-                                            subSelect.innerHTML = `<option value="${parentId}">هذا القسم لا يحتوي على أقسام فرعية (استخدمه كقسم وحيد)</option>`;
-                                        }
-                                    }
-                                </script>
-                            </div>       }
-                                    }
-                                </script>
-                            </div>     </option>
-                                        @endforeach
-                                    @endforeach
-                                </select>
-                                <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                             </div>
 
-                            <!-- Images -->
                             <div>
-                                <x-input-label for="images" :value="__('صور المنتج (يمكنك اختيار أكثر من صورة)')" />
+                                <x-input-label for="images" :value="__('صور المنتج')" />
                                 <input type="file" id="images" name="images[]" multiple accept="image/*"
                                     class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
-                                    onchange="document.getElementById('image-preview-container').innerHTML = ''; Array.from(this.files).forEach(file => { if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; img.className = 'h-20 w-20 object-cover rounded-md border border-gray-200'; document.getElementById('image-preview-container').appendChild(img); }; reader.readAsDataURL(file); } });" />
-                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
-                                <x-input-error :messages="$errors->get('images.*')" class="mt-2" />
-
-                                <!-- Image Preview Container -->
+                                    onchange="previewImages(this)" />
                                 <div id="image-preview-container" class="mt-4 flex flex-wrap gap-4"></div>
+                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
                             </div>
 
-                            <!-- 3D Model -->
                             <div>
-                                <x-input-label for="three_d_model" :value="__('ملف 3D (glb, gltf, obj, stl)')" />
+                                <x-input-label for="three_d_model" :value="__('ملف 3D')" />
                                 <input type="file" id="three_d_model" name="three_d_model" accept=".glb,.gltf,.obj,.stl"
                                     class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                <p class="text-xs text-gray-500 mt-1">يُدعم ملفات glb, gltf, obj, stl بحد أقصى 20 ميجا
-                                    بايت</p>
                                 <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
                             </div>
-
-                            <!-- 360 Images -->
-                            <div>
-                                <x-input-label for="three_sixty_images" :value="__('صور 360 (ارفع مجموعة من الصور للعرض الدوار)')" />
-                                <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple
-                                    accept="image/*"
-                                    class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
-                                <p class="text-xs text-gray-500 mt-1">يُشترط رفع صور متتالية لتكوين العرض 360 درجة</p>
-                                <x-input-error :messages="$errors->get('three_sixty_images')" class="mt-2" />
-                                <x-input-error :messages="$errors->get('three_sixty_images.*')" class="mt-2" />
-                            </div>
                         </div>
 
-                        <!-- Description -->
                         <div class="mt-6">
                             <x-input-label for="description" :value="__('وصف مختصر')" />
-                            <textarea id="description" name="description" rows="3"
-                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                required>{{ old('description') }}</textarea>
-                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                            <textarea id="description" name="description" rows="3" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>{{ old('description') }}</textarea>
                         </div>
 
-                        <!-- Full Description -->
                         <div class="mt-6">
                             <x-input-label for="full_description" :value="__('الوصف الكامل')" />
-                            <textarea id="full_description" name="full_description" rows="5"
-                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('full_description') }}</textarea>
-                            <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
-                        </div>
-
-                        <!-- Notes -->
-                        <div class="mt-6">
-                            <x-input-label for="notes" :value="__('ملاحظات إضافية (خاصة بالبائع)')" />
-                            <textarea id="notes" name="notes" rows="3"
-                                class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                placeholder="أي ملاحظات تود حفظها عن هذا المنتج">{{ old('notes') }}</textarea>
-                            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+                            <textarea id="full_description" name="full_description" rows="5" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ old('full_description') }}</textarea>
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('vendor.products.index') }}"
-                                class="text-sm text-gray-600 hover:text-gray-900 ml-4">إلغاء</a>
-                            <x-primary-button class="ml-4">
-                                {{ __('حفظ المنتج') }}
-                            </x-primary-button>
+                            <a href="{{ route('vendor.products.index') }}" class="text-sm text-gray-600 hover:text-gray-900 ml-4">إلغاء</a>
+                            <x-primary-button class="ml-4">حفظ المنتج</x-primary-button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const categoriesData = @json($categories);
+
+        function filterSubCategories(parentId) {
+            const subSelect = document.getElementById('category_id');
+            subSelect.innerHTML = '';
+            
+            if (!parentId) {
+                subSelect.innerHTML = '<option value="">اختر القسم الرئيسي أولاً</option>';
+                subSelect.disabled = true;
+                return;
+            }
+
+            const parent = categoriesData.find(c => c.id == parentId);
+            if (parent && parent.children && parent.children.length > 0) {
+                subSelect.disabled = false;
+                subSelect.innerHTML = '<option value="">اختر القسم الفرعي</option>';
+                parent.children.forEach(child => {
+                    const opt = document.createElement('option');
+                    opt.value = child.id;
+                    opt.textContent = child.name;
+                    subSelect.appendChild(opt);
+                });
+            } else {
+                subSelect.disabled = false;
+                subSelect.innerHTML = `<option value="${parentId}">هذا القسم لا يحتوي على أقسام فرعية</option>`;
+            }
+        }
+
+        function previewImages(input) {
+            const container = document.getElementById('image-preview-container');
+            container.innerHTML = '';
+            Array.from(input.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'h-20 w-20 object-cover rounded-md border border-gray-200';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    </script>
 </x-vendor-layout>
