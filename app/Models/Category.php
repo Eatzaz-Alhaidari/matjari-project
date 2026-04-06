@@ -9,14 +9,25 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'description', 'image', 'status', 'parent_id'];
+    protected $fillable = ['name', 'slug', 'description', 'image', 'status', 'parent_id', 'is_brand', 'brand_logo', 'banner', 'icon', 'is_popular'];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'banner_url', 'icon_url'];
 
     public function getImageUrlAttribute()
     {
         return $this->image ? asset('storage/' . $this->image) : null;
     }
+
+    public function getBannerUrlAttribute()
+    {
+        return $this->banner ? asset('storage/' . $this->banner) : null;
+    }
+
+    public function getIconUrlAttribute()
+    {
+        return $this->icon ? asset('storage/' . $this->icon) : null;
+    }
+
 
     public function products()
     {
@@ -35,7 +46,7 @@ class Category extends Model
 
     public function brands()
     {
-        return $this->belongsToMany(Brand::class, 'brand_category');
+        return $this->hasMany(Category::class, 'parent_id')->where('is_brand', true);
     }
 
     public function scopeActive($query)

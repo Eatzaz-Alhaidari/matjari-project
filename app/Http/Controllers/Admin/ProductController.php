@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\Category;
-use App\Models\Brand;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -40,8 +39,9 @@ class ProductController extends Controller
     public function create()
     {
         $stores = Store::active()->get();
-        $brands = Brand::orderBy('name')->get();
-        $categories = Category::with('children')->whereNull('parent_id')->get();
+        // Get all categories marked as brands
+        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('admin.products.create', compact('stores', 'brands', 'categories'));
     }
 
@@ -53,15 +53,12 @@ class ProductController extends Controller
         return view('admin.products.show', compact('product'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'name' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
+            'brand_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -73,15 +70,67 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'warranty_duration' => 'nullable|integer|min:1',
-            'warranty_unit' => 'nullable|in:days,months,years',
+            'warranty_duration' => 'nullable|integer|min:0',
+            'size' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
             'currency' => 'required|in:YER,SAR,USD',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'three_d_model' => 'nullable|file|max:20480', // 20MB max
+            'three_sixty_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $data = $request->except('images');
+        $data = $request->except(['images', 'sizes', 'colors', 'image', 'three_d_model', 'three_sixty_images']);
+        $data['warranty_unit'] = 'days';
 
-        // Create the product first
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        if ($request->hasFile('three_d_model')) {
+            $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
+        }
+
+        if ($request->hasFile('three_sixty_images')) {
+            $paths = [];
+            foreach ($request->file('three_sixty_images') as $file) {
+                $paths[] = $file->store('products/360', 'public');
+            }
+            $data['three_sixty_images'] = $paths;
+        }
+
         $product = Product::create($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('products/gallery', 'public');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
+
+        if ($request->has('sizes')) {
+            foreach ($request->sizes as $sizeName) {
+                if ($sizeName) {
+                    $product->sizes()->create(['name' => $sizeName]);
+                }
+            }
+        }
+
+        if ($request->has('colors')) {
+            foreach ($request->colors as $index => $colorData) {
+                if (!empty($colorData['name'])) {
+                    $colorImagePath = null;
+                    if ($request->hasFile("colors.$index.image")) {
+                        $colorImagePath = $request->file("colors.$index.image")->store('products/colors', 'public');
+                    }
+                    $product->colors()->create([
+                        'name' => $colorData['name'],
+                        'image_path' => $colorImagePath
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم إضافة المنتج بنجاح');
@@ -93,8 +142,8 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $stores = Store::active()->get();
-        $brands = Brand::orderBy('name')->get();
-        $categories = Category::with('children')->whereNull('parent_id')->get();
+        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('admin.products.edit', compact('product', 'stores', 'brands', 'categories'));
     }
 
@@ -106,7 +155,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
+            'brand_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -118,17 +167,99 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive',
             'store_id' => 'required|exists:stores,id',
             'category_id' => 'required|exists:categories,id',
-            'warranty_duration' => 'nullable|integer|min:1',
-            'warranty_unit' => 'nullable|in:days,months,years',
+            'warranty_duration' => 'nullable|integer|min:0',
+            'size' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
             'currency' => 'required|in:YER,SAR,USD',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'three_d_model' => 'nullable|file|max:20480',
+            'three_sixty_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $data = $request->except('images');
-        $data['currency'] = $request->currency; // Force update currency
+        $data = $request->except(['images', 'sizes', 'colors', 'image', 'three_d_model', 'three_sixty_images']);
+        $data['warranty_unit'] = 'days';
+        $data['currency'] = $request->currency;
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        if ($request->hasFile('three_d_model')) {
+            if ($product->three_d_model) {
+                Storage::disk('public')->delete($product->three_d_model);
+            }
+            $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
+        }
+
+        if ($request->hasFile('three_sixty_images')) {
+            if ($product->three_sixty_images) {
+                foreach ($product->three_sixty_images as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+            $paths = [];
+            foreach ($request->file('three_sixty_images') as $file) {
+                $paths[] = $file->store('products/360', 'public');
+            }
+            $data['three_sixty_images'] = $paths;
+        }
+
         $product->update($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('products/gallery', 'public');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
+
+        if ($request->has('sizes')) {
+            $product->sizes()->delete();
+            foreach ($request->sizes as $sizeName) {
+                if ($sizeName) {
+                    $product->sizes()->create(['name' => $sizeName]);
+                }
+            }
+        }
+
+        if ($request->has('colors')) {
+            foreach ($request->colors as $index => $colorData) {
+                if (!empty($colorData['name'])) {
+                    $colorImagePath = null;
+                    if ($request->hasFile("colors.$index.image")) {
+                        $colorImagePath = $request->file("colors.$index.image")->store('products/colors', 'public');
+                    } elseif (!empty($colorData['existing_image'])) {
+                        $colorImagePath = $colorData['existing_image'];
+                    }
+
+                    $product->colors()->updateOrCreate(
+                        ['name' => $colorData['name']],
+                        ['image_path' => $colorImagePath]
+                    );
+                }
+            }
+            $newNames = array_column($request->colors, 'name');
+            $product->colors()->whereNotIn('name', $newNames)->delete();
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم تعديل المنتج بنجاح');
+    }
+
+    public function toggleStatus(Product $product)
+    {
+        $product->status = $product->status === 'active' ? 'inactive' : 'active';
+        $product->save();
+
+        $message = $product->status === 'active' ? 'تم تفعيل المنتج بنجاح' : 'تم تعطيل المنتج بنجاح';
+
+        return redirect()->route('admin.products.index')
+            ->with('success', $message);
     }
 
     /**
@@ -150,16 +281,5 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'تم حذف المنتج بنجاح');
-    }
-
-    public function toggleStatus(Product $product)
-    {
-        $product->status = $product->status === 'active' ? 'inactive' : 'active';
-        $product->save();
-
-        $message = $product->status === 'active' ? 'تم تفعيل المنتج بنجاح' : 'تم تعطيل المنتج بنجاح';
-
-        return redirect()->route('admin.products.index')
-            ->with('success', $message);
     }
 }

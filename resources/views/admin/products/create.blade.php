@@ -42,27 +42,75 @@
                                 <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
                             </div>
 
-                            <!-- Size -->
-                            <div>
-                                <x-input-label for="size" :value="__('الحجم')" />
-                                <x-text-input id="size" class="block mt-1 w-full" type="text" name="size"
-                                    :value="old('size')" />
-                                <x-input-error :messages="$errors->get('size')" class="mt-2" />
+                            <!-- Dynamic Sizes / Specifications -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">المواصفات / الأحجام (مثال: RAM 8GB, 1TB SSD, XL)</label>
+                                <div id="sizes-container" class="space-y-2">
+                                    <div class="flex gap-2">
+                                        <input type="text" name="sizes[]" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="أدخل اسم المواصفة أو الحجم">
+                                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="addSizeRow()" class="mt-2 inline-flex items-center text-sm text-brand-blue-600 font-bold hover:text-brand-blue-800">
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    إضافة مواصفة/حجم آخر
+                                </button>
                             </div>
 
-                            <!-- Color -->
-                            <div>
-                                <x-input-label for="color" :value="__('اللون')" />
-                                <x-text-input id="color" class="block mt-1 w-full" type="text" name="color"
-                                    :value="old('color')" />
-                                <x-input-error :messages="$errors->get('color')" class="mt-2" />
+                            <!-- Dynamic Colors -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">الألوان المتاحة مع الصور التوضيحية</label>
+                                <div id="colors-container" class="space-y-4">
+                                    <div class="color-row flex flex-wrap md:flex-nowrap gap-4 items-end bg-white p-3 rounded-lg border border-gray-200">
+                                        <div class="flex-1">
+                                            <label class="block font-medium text-sm text-gray-700">اسم اللون</label>
+                                            <input type="text" name="colors[0][name]" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="مثال: أسود مطفي">
+                                        </div>
+                                        <div class="flex-1">
+                                            <label class="block font-medium text-sm text-gray-700">صورة اللون</label>
+                                            <input type="file" name="colors[0][image]" class="block w-full text-xs mt-2" accept="image/*">
+                                        </div>
+                                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 mb-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="addColorRow()" class="mt-2 inline-flex items-center text-sm text-brand-blue-600 font-bold hover:text-brand-blue-800">
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    إضافة لون آخر
+                                </button>
                             </div>
 
                             <!-- Region -->
                             <div>
-                                <x-input-label for="region" :value="__('المنطقة')" />
-                                <x-text-input id="region" class="block mt-1 w-full" type="text" name="region"
-                                    :value="old('region')" />
+                                <x-input-label for="region" :value="__('المنطقة (المحافظة)')" />
+                                <select id="region" name="region" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">اختر المحافظة</option>
+                                    <option value="أمانة العاصمة" {{ old('region') == 'أمانة العاصمة' ? 'selected' : '' }}>أمانة العاصمة</option>
+                                    <option value="صنعاء" {{ old('region') == 'صنعاء' ? 'selected' : '' }}>صنعاء</option>
+                                    <option value="عدن" {{ old('region') == 'عدن' ? 'selected' : '' }}>عدن</option>
+                                    <option value="تعز" {{ old('region') == 'تعز' ? 'selected' : '' }}>تعز</option>
+                                    <option value="الحديدة" {{ old('region') == 'الحديدة' ? 'selected' : '' }}>الحديدة</option>
+                                    <option value="حضرموت" {{ old('region') == 'حضرموت' ? 'selected' : '' }}>حضرموت</option>
+                                    <option value="إب" {{ old('region') == 'إب' ? 'selected' : '' }}>إب</option>
+                                    <option value="ذمار" {{ old('region') == 'ذمار' ? 'selected' : '' }}>ذمار</option>
+                                    <option value="حجة" {{ old('region') == 'حجة' ? 'selected' : '' }}>حجة</option>
+                                    <option value="البيضاء" {{ old('region') == 'البيضاء' ? 'selected' : '' }}>البيضاء</option>
+                                    <option value="عمران" {{ old('region') == 'عمران' ? 'selected' : '' }}>عمران</option>
+                                    <option value="صعدة" {{ old('region') == 'صعدة' ? 'selected' : '' }}>صعدة</option>
+                                    <option value="المحويت" {{ old('region') == 'المحويت' ? 'selected' : '' }}>المحويت</option>
+                                    <option value="مأرب" {{ old('region') == 'مأرب' ? 'selected' : '' }}>مأرب</option>
+                                    <option value="لحج" {{ old('region') == 'لحج' ? 'selected' : '' }}>لحج</option>
+                                    <option value="أبين" {{ old('region') == 'أبين' ? 'selected' : '' }}>أبين</option>
+                                    <option value="المهرة" {{ old('region') == 'المهرة' ? 'selected' : '' }}>المهرة</option>
+                                    <option value="شبوة" {{ old('region') == 'شبوة' ? 'selected' : '' }}>شبوة</option>
+                                    <option value="سقطرى" {{ old('region') == 'سقطرى' ? 'selected' : '' }}>سقطرى</option>
+                                    <option value="ريمة" {{ old('region') == 'ريمة' ? 'selected' : '' }}>ريمة</option>
+                                    <option value="الضالع" {{ old('region') == 'الضالع' ? 'selected' : '' }}>الضالع</option>
+                                    <option value="الجوف" {{ old('region') == 'الجوف' ? 'selected' : '' }}>الجوف</option>
+                                </select>
                                 <x-input-error :messages="$errors->get('region')" class="mt-2" />
                             </div>
 
@@ -123,19 +171,11 @@
 
                             <!-- Warranty -->
                             <div>
-                                <x-input-label for="warranty_duration" :value="__('الضمان')" />
-                                <div class="flex gap-2">
-                                    <x-text-input id="warranty_duration" class="block mt-1 w-2/3" type="number" name="warranty_duration"
-                                        :value="old('warranty_duration')" placeholder="مثال: 2" min="1" />
-                                    <select id="warranty_unit" name="warranty_unit" class="block mt-1 w-1/3 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                        <option value="" {{ old('warranty_unit') == '' ? 'selected' : '' }}>أختر الوحدة</option>
-                                        <option value="days" {{ old('warranty_unit') == 'days' ? 'selected' : '' }}>يوم</option>
-                                        <option value="months" {{ old('warranty_unit') == 'months' ? 'selected' : '' }}>شهر</option>
-                                        <option value="years" {{ old('warranty_unit') == 'years' ? 'selected' : '' }}>سنة</option>
-                                    </select>
-                                </div>
+                                <x-input-label for="warranty_duration" :value="__('الضمان (بالأيام)')" />
+                                <x-text-input id="warranty_duration" class="block mt-1 w-full" type="number" name="warranty_duration"
+                                    :value="old('warranty_duration')" placeholder="أدخل عدد الأيام (مثال: 365 لسنة كاملة)" min="0" />
+                                <p class="mt-1 text-[10px] text-amber-600 font-bold">بناءً على الرقم سيتم حساب (يوم، شهر، سنة) تلقائياً.</p>
                                 <x-input-error :messages="$errors->get('warranty_duration')" class="mt-2" />
-                                <x-input-error :messages="$errors->get('warranty_unit')" class="mt-2" />
                             </div>
 
                             <!-- Status -->
@@ -224,6 +264,48 @@
                                 </script>
                             </div>
 
+                            <!-- Media Section -->
+                            <div class="col-span-1 md:col-span-2 bg-brand-blue-50/30 p-6 rounded-2xl border border-brand-blue-100 shadow-sm mt-4">
+                                <h4 class="text-sm font-bold text-brand-blue-800 mb-6 flex items-center">
+                                    <svg class="w-5 h-5 ml-2 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    معرض الصور والمحتوى التفاعلي
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <!-- Main Image -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="image" :value="__('صورة المنتج الأساسية')" class="font-bold text-gray-700 mb-2" />
+                                        <input type="file" id="image" name="image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-blue file:text-white hover:file:bg-brand-blue-600 transition-all" accept="image/*" required />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">هذه الصورة هي التي ستظهر في قوائم المنتجات.</p>
+                                        <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Gallery -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="gallery" :value="__('معرض الصور الإضافية')" class="font-bold text-gray-700 mb-2" />
+                                        <input type="file" id="gallery" name="images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition-all" accept="image/*" />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">يمكنك اختيار عدة صور لإظهار تفاصيل المنتج.</p>
+                                    </div>
+
+                                    <!-- 3D Model -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="three_d_model" :value="__('ملف المنتج 3D (الواقع المعزز)')" class="font-bold text-gray-700 mb-2" />
+                                        <div class="flex items-center space-x-2 space-x-reverse">
+                                            <input type="file" id="three_d_model" name="three_d_model" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 transition-all" accept=".glb,.gltf" />
+                                            <span class="px-2 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded text-[10px] font-bold">GLB / GLTF</span>
+                                        </div>
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">يدعم النظام ملفات الواقع المعزز لتجربة تسوق أفضل.</p>
+                                        <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
+                                    </div>
+
+                                    <!-- 360 Images -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="three_sixty_images" :value="__('صور العرض 360 درجة')" class="font-bold text-gray-700 mb-2" />
+                                        <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all" accept="image/*" />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">ارفع مجموعة صور متسلسلة للمنتج ليتم عرضها بزاوية 360 درجة.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Description -->

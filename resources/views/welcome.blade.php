@@ -76,7 +76,7 @@
         <div class="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
-                    <x-application-logo class="h-20 w-52 object-contain drop-shadow-md" />
+                    <x-application-logo class="h-12 w-auto object-contain" />
                 </div>
 
                 <div class="hidden md:flex items-center space-x-6 space-x-reverse">

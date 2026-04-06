@@ -50,15 +50,37 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'status' => ['required', Rule::in(['active', 'banned'])],
-        ]);
+        $rules = [
+            'name'     => 'required|string|max:255',
+            'phone'    => 'nullable|string|max:20',
+            'status'   => ['required', Rule::in(['active', 'banned'])],
+            'password' => 'nullable|string|min:6',
+        ];
 
-        $user->update($validated);
+        $validated = $request->validate($rules);
 
-        return redirect()->route('admin.users.index')->with('success', 'تم تحديث بيانات العميل بنجاح!');
+        $data = [
+            'name'       => $validated['name'],
+            'phone'      => $validated['phone'],
+            'status'     => $validated['status'],
+            'ban_reason' => $validated['status'] === 'banned' ? $request->ban_reason : null,
+        ];
+
+        // Update password only if provided
+        if (!empty($validated['password'])) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+        }
+
+        // Reset biometric if admin checked the box
+        if ($request->boolean('reset_biometric')) {
+            $data['has_biometric']   = false;
+            $data['biometric_token'] = null;
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'تم تحديث بيانات العميل بنجاح!');
     }
 
     public function destroy(string $id) {}

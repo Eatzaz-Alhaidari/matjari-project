@@ -136,6 +136,45 @@
                 </div>
             </div>
         </a>
+        <!-- عناوين الشحن -->
+        <a href="{{ route('admin.shipping-addresses.index') }}"
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-teal-50 transition-all duration-300 group mt-6 md:mt-0">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-5 bg-teal-100 rounded-xl transition-colors group-hover:bg-teal-200">
+                    <svg class="w-10 h-10 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div class="mr-4 text-right">
+                    <h3 class="text-lg font-bold text-gray-800">عناوين الشحن</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        <span class="font-extrabold text-teal-600">{{ $shippingAddressCount }}</span> عنوان
+                    </p>
+                </div>
+            </div>
+        </a>
+
+        <!-- سجل العمليات للمحافظ -->
+        <a href="{{ route('admin.wallet-transactions.index') }}"
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-emerald-50 transition-all duration-300 group mt-6 md:mt-0">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-5 bg-emerald-100 rounded-xl transition-colors group-hover:bg-emerald-200">
+                    <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                </div>
+                <div class="mr-4 text-right">
+                    <h3 class="text-lg font-bold text-gray-800">عمليات المحافظ</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        <span class="font-extrabold text-emerald-600">{{ $walletTxCount }}</span> عملية
+                    </p>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- 📦 إدارة المحتوى التجاري -->
@@ -158,6 +197,7 @@
                 </div>
             </div>
         </a>
+
         <!-- إدارة التصنيفات -->
         <a href="{{ route('admin.categories.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-violet-50 transition-all duration-300 group">
@@ -171,30 +211,12 @@
                 <div class="mr-4 text-right">
                     <h3 class="text-lg font-bold text-gray-800">إدارة التصنيفات</h3>
                     <p class="mt-1 text-sm text-gray-600">
-                        <span class="font-extrabold text-violet-600">{{ $categoriesCount }}</span> تصنيف
+                        <span class="font-extrabold text-violet-600">{{ $categoriesCount }}</span> تصنيف رئيسي
                     </p>
                 </div>
             </div>
         </a>
 
-        <!-- إدارة الماركات (جديد) -->
-        <a href="{{ route('admin.brands.index') }}"
-            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-indigo-50 transition-all duration-300 group">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 p-5 bg-indigo-100 rounded-xl transition-colors group-hover:bg-indigo-200">
-                    <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                </div>
-                <div class="mr-4 text-right">
-                    <h3 class="text-lg font-bold text-gray-800">إدارة الماركات</h3>
-                    <p class="mt-1 text-sm text-gray-600">
-                        <span class="font-extrabold text-indigo-600">{{ $brandsCount }}</span> ماركة
-                    </p>
-                </div>
-            </div>
-        </a>
         <!-- إدارة العروض والإعلانات -->
         <a href="{{ route('admin.advertisements.index') }}"
             class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-amber-50 transition-all duration-300 group">
@@ -232,6 +254,25 @@
                 </div>
             </div>
         </a>
+        <!-- كوبونات الخصم -->
+        <a href="{{ route('admin.discount-coupons.index') }}"
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-fuchsia-50 transition-all duration-300 group mt-6 md:mt-0">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-5 bg-fuchsia-100 rounded-xl transition-colors group-hover:bg-fuchsia-200">
+                    <svg class="w-10 h-10 text-fuchsia-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                </div>
+                <div class="mr-4 text-right">
+                    <h3 class="text-lg font-bold text-gray-800">كوبونات الخصم</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        <span class="font-extrabold text-fuchsia-600">{{ $discountCouponCount }}</span> كوبون نشط
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
     </div>
 
     <!-- 🏪 إدارة الأطراف -->
@@ -405,6 +446,24 @@
                     <h3 class="text-lg font-bold text-gray-800">سجل الأنشطة</h3>
                     <p class="mt-1 text-sm text-gray-600">
                         <span class="font-extrabold text-slate-600">{{ $activityLogCount }}</span> عملية
+                    </p>
+                </div>
+            </div>
+        </a>
+        <!-- سجل أنشطة عملاء التطبيق -->
+        <a href="{{ route('admin.customer-activities.index') }}"
+            class="block p-8 bg-white rounded-xl shadow-md hover:shadow-xl hover:bg-sky-50 transition-all duration-300 group mt-6 md:mt-0">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 p-5 bg-sky-100 rounded-xl transition-colors group-hover:bg-sky-200">
+                    <svg class="w-10 h-10 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="mr-4 text-right">
+                    <h3 class="text-lg font-bold text-gray-800">سجل نشاط العملاء</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        <span class="font-extrabold text-sky-600">{{ $customerActivityCount }}</span> نشاط
                     </p>
                 </div>
             </div>

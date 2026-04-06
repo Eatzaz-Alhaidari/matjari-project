@@ -26,7 +26,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $user = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@example.com',
-            'password' => bcrypt('password') // كلمة المرور الافتراضية هي 'password'
+            'password' => 'password' // كلمة المرور الافتراضية هي 'password'
         ]);
 
         // منح دور 'super-admin' للمستخدم الذي تم إنشاؤه

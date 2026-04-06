@@ -81,7 +81,7 @@ class Product extends Model
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Category::class, 'brand_id')->where('is_brand', true);
     }
 
     public function orderItems()
@@ -97,6 +97,16 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function sizes()
+    {
+        return $this->hasMany(ProductSize::class);
+    }
+
+    public function colors()
+    {
+        return $this->hasMany(ProductColor::class);
     }
 
     public function scopeActive($query)

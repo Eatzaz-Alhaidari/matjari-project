@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('assets/brand/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
@@ -53,10 +52,9 @@
             <div class="flex flex-col h-full">
                 <div class="flex items-center justify-center mt-10 mb-6 flex-shrink-0">
                     <div class="flex flex-col items-center gap-4">
-                        <div class="p-3 bg-transparent rounded-2xl backdrop-blur-md border border-white/20 transition-transform hover:scale-110 duration-300">
-                            <x-application-logo class="w-64 h-28 object-contain" />
+                        <div class="transition-transform hover:scale-110 duration-300 drop-shadow-xl">
+                            <x-application-logo class="w-44 h-16 object-contain" />
                         </div>
-                        <span class="text-2xl font-black text-white tracking-wider">متجر صخر</span>
                     </div>
                 </div>
 
@@ -145,9 +143,9 @@
             </div>
         </aside>
 
-        <div class="flex flex-col flex-1 w-full transition-all duration-300" :class="{ 'lg:mr-72': sidebarOpen }">
-            <header class="relative z-10 py-4 bg-white shadow-md">
-                <div class="container flex items-center justify-between h-full px-6 mx-auto text-brand-blue">
+        <div class="flex flex-col flex-1 min-w-0 overflow-hidden transition-all duration-300" :class="{ 'lg:mr-72': sidebarOpen }">
+            <header class="relative z-50 py-4 bg-white shadow-md w-full">
+                <div class="flex items-center justify-between h-full px-6 text-brand-blue">
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="p-1 rounded-md focus:outline-none focus:shadow-outline-purple">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -162,7 +160,7 @@
                             <button @click="open = !open" @click.away="open = false" 
                                 class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
                                 <div class="w-10 h-10 rounded-full border-2 border-brand-blue/10 p-1 bg-transparent overflow-hidden shadow-sm group-hover:border-brand-blue/30 transition-colors">
-                                    <img src="{{ asset('assets/brand/logo.png') }}" class="w-full h-full object-contain" alt="Logo">
+                                    <x-application-logo class="w-full h-full" />
                                 </div>
                                 <div class="flex flex-col text-right">
                                     <span class="text-sm font-bold text-gray-800 group-hover:text-brand-blue">{{ Auth::user()->name }}</span>
@@ -205,20 +203,19 @@
                 </div>
             </header>
 
-            <main class="h-full overflow-y-auto bg-mesh relative">
+            <main class="flex-1 overflow-y-auto bg-mesh relative">
                 <!-- Background Decorative Shapes -->
                 <div class="geometric-shape top-20 left-10 w-64 h-64 bg-brand-blue/5 rounded-full blur-3xl"></div>
                 <div class="geometric-shape bottom-20 right-10 w-96 h-96 bg-brand-blue/5 rounded-full blur-3xl"></div>
 
-                <div class="container px-6 py-8 mx-auto relative z-10">
+                <div class="px-6 py-8 relative z-10">
                     <div class="flex items-center justify-between">
                         <h3 class="text-3xl font-bold text-brand-blue-800">@yield('title')</h3>
                         @if(!request()->routeIs('admin.dashboard'))
                             <a href="{{ route('admin.dashboard') }}"
-                                class="group flex items-center px-4 py-2 bg-white text-gray-600 rounded-full shadow-md hover:shadow-lg hover:bg-brand-blue hover:text-white transition-all duration-300 transform hover:-translate-y-1 ring-1 ring-gray-100 hover:ring-brand-blue-300">
+                                class="ml-6 group flex items-center px-4 py-2 bg-white text-gray-600 rounded-full shadow-md hover:shadow-lg hover:bg-brand-blue hover:text-white transition-all duration-300 transform hover:-translate-y-1 ring-1 ring-gray-100 hover:ring-brand-blue-300">
                                 <span
-                                    class="ml-2 font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">عودة
-                                    للرئيسية</span>
+                                    class="ml-2 font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">العودة للرئيسية</span>
                                 <div class="bg-gray-100 p-1.5 rounded-full group-hover:bg-white/20 transition-colors">
                                     <svg class="w-5 h-5 rtl:rotate-180 transition-transform duration-300 group-hover:-translate-x-1"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +226,19 @@
                             </a>
                         @endif
                     </div>
-                    <div class="mt-4">
+                    <div class="max-w-full mx-auto">
+                        @if (session('success'))
+                            <div class="mb-6 px-5 py-3 bg-green-50 border border-green-200 text-green-700 rounded-xl font-bold shadow-sm flex items-center gap-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="mb-6 px-5 py-3 bg-red-50 border border-red-200 text-red-700 rounded-xl font-bold shadow-sm flex items-center gap-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ session('error') }}
+                            </div>
+                        @endif
                         {{ $slot }}
                     </div>
                 </div>
@@ -287,6 +296,7 @@
                         title: title,
                         text: text,
                         icon: icon,
+                        target: form.closest('dialog') || document.querySelector('dialog[open]') || 'body',
                         showCancelButton: true,
                         confirmButtonColor: confirmButtonColor,
                         cancelButtonColor: '#6b7280',

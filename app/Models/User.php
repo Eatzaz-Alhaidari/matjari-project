@@ -28,6 +28,8 @@ class User extends Authenticatable
         'ban_reason',
         'google_id',
         'role',
+        'has_biometric',
+        'biometric_token',
     ];
 
     /**
@@ -43,7 +45,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password'          => 'hashed',
+        'has_biometric'     => 'boolean',
     ];
 
     /**

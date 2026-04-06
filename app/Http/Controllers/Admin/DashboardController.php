@@ -54,14 +54,24 @@ class DashboardController extends Controller
         // 17. Customer Analysis (New Customers this month)
         $newCustomersCount = User::whereDoesntHave('roles')->where('created_at', '>=', now()->subDays(30))->count();
 
-        // 18. Categories Count (New)
-        $categoriesCount = \App\Models\Category::count();
+        // 18. Categories Count (Root Categories only)
+        $categoriesCount = \App\Models\Category::whereNull('parent_id')->count();
 
         // 19. Activity Log Count (New)
         $activityLogCount = \App\Models\ActivityLog::count();
 
-        // 20. Brands Count (New)
-        $brandsCount = \App\Models\Brand::count();
+        // 20. Shipping Addresses Count
+        $shippingAddressCount = \Illuminate\Support\Facades\DB::table('addresses')->count();
+
+        // 21. Wallet Transactions Count
+        $walletTxCount = \App\Models\WalletTransaction::count();
+
+        // 22. Discount Coupons Count
+        $discountCouponCount = \Illuminate\Support\Facades\DB::table('discounts')->where('status', 'active')->count();
+
+        // 23. Customer Activities Count
+        $customerActivityCount = \Illuminate\Support\Facades\DB::table('activity_logs')->count();
+
 
         // --- NEW CHARTS DATA ---
 
@@ -154,8 +164,11 @@ class DashboardController extends Controller
             'paymentCount' => $paymentCount,
             'newCustomersCount' => $newCustomersCount,
             'categoriesCount' => $categoriesCount,
-            'activityLogCount' => $activityLogCount,
-            'brandsCount' => $brandsCount,
+            'activityLogCount'      => $activityLogCount,
+            'shippingAddressCount'  => $shippingAddressCount,
+            'walletTxCount'         => $walletTxCount,
+            'discountCouponCount'   => $discountCouponCount,
+            'customerActivityCount' => $customerActivityCount,
             // Chart Data
             'salesLabels' => $salesLabels,
             'salesValues' => $salesValues,

@@ -1,1 +1,1 @@
-<img src="{{ asset('assets/brand/logo.png') }}" {{ $attributes->merge(['class' => 'h-24 w-auto object-contain']) }} alt="{{ config('app.name', 'متجر صخر الإلكتروني') }}">
+<img src="{{ asset('assets/brand/logo.png') }}" {{ $attributes->merge(['class' => 'h-20 w-auto object-contain max-w-full']) }} alt="{{ config('app.name', 'متجر صخر الإلكتروني') }}">

@@ -15,7 +15,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-brand-blue-50">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-96 h-32 text-brand-blue" />
+                    <x-application-logo class="w-64 h-24 text-brand-blue" />
                 </a>
             </div>
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-xl overflow-hidden sm:rounded-lg">

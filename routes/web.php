@@ -8,6 +8,10 @@ use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ShippingAddressController;
+use App\Http\Controllers\Admin\WalletTransactionController;
+use App\Http\Controllers\Admin\DiscountCouponController;
+use App\Http\Controllers\Admin\CustomerActivityController;
 use App\Http\Controllers\ProfileController;
 
 /*
@@ -51,6 +55,7 @@ Route::prefix('admin')
         // 1. Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', CategoryController::class);
+        Route::patch('/categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('categories.toggleStatus');
         Route::resource('brands', BrandController::class);
 
 
@@ -123,6 +128,25 @@ Route::prefix('admin')
 
         // Activity Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+        // Shipping Addresses
+        Route::get('shipping-addresses', [ShippingAddressController::class, 'index'])->name('shipping-addresses.index');
+        Route::delete('shipping-addresses/{id}', [ShippingAddressController::class, 'destroy'])->name('shipping-addresses.destroy');
+
+        // Wallet Transactions
+        Route::get('wallet-transactions', [WalletTransactionController::class, 'index'])->name('wallet-transactions.index');
+        Route::post('wallet-transactions', [WalletTransactionController::class, 'store'])->name('wallet-transactions.store');
+        Route::delete('wallet-transactions/{walletTransaction}', [WalletTransactionController::class, 'destroy'])->name('wallet-transactions.destroy');
+
+        // Discount Coupons
+        Route::get('discount-coupons', [DiscountCouponController::class, 'index'])->name('discount-coupons.index');
+        Route::post('discount-coupons', [DiscountCouponController::class, 'store'])->name('discount-coupons.store');
+        Route::put('discount-coupons/{id}', [DiscountCouponController::class, 'update'])->name('discount-coupons.update');
+        Route::delete('discount-coupons/{id}', [DiscountCouponController::class, 'destroy'])->name('discount-coupons.destroy');
+        Route::patch('discount-coupons/{id}/toggle-status', [DiscountCouponController::class, 'toggleStatus'])->name('discount-coupons.toggleStatus');
+
+        // Customer Activities
+        Route::get('customer-activities', [CustomerActivityController::class, 'index'])->name('customer-activities.index');
 
         // Coming Soon (Temporary for new features)
         Route::get('coming-soon', function () {

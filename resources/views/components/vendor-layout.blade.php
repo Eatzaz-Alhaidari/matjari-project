@@ -29,10 +29,9 @@
             <div class="flex flex-col h-full">
                 <div class="flex items-center justify-center mt-10 mb-6 flex-shrink-0">
                     <div class="flex flex-col items-center gap-4">
-                        <div class="p-3 bg-transparent rounded-2xl backdrop-blur-md border border-white/20 shadow-xl transition-transform hover:scale-110 duration-300">
-                            <x-application-logo class="w-64 h-28 object-contain" />
+                        <div class="transition-transform hover:scale-110 duration-300 drop-shadow-xl">
+                            <x-application-logo class="w-44 h-16 object-contain" />
                         </div>
-                        <span class="text-2xl font-black text-white tracking-wider">متجر صخر</span>
                     </div>
                 </div>
 
@@ -164,8 +163,8 @@
                                     <span class="text-xs text-gray-400 font-medium tracking-wider uppercase">لوحة التاجر</span>
                                     <span class="text-sm font-bold text-gray-800 group-hover:text-brand-orange-700">{{ Auth::user()->name }}</span>
                                 </div>
-                                <div class="w-10 h-10 rounded-full border-2 border-brand-orange-500/10 p-1 bg-transparent overflow-hidden shadow-sm group-hover:border-brand-orange-500/30 transition-colors">
-                                    <img src="{{ asset('assets/brand/logo.png') }}" class="w-full h-full object-contain" alt="Logo">
+                                <div class="w-10 h-10 rounded-full border-2 border-brand-orange-500/10 p-1 bg-transparent overflow-hidden shadow-sm group-hover:border-brand-orange-500/30 transition-colors text-center">
+                                    <x-application-logo class="w-full h-full" />
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 group-hover:text-brand-orange-700 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -225,13 +224,27 @@
                             </a>
                         @endif
                     </div>
-                    <div class="mt-4">
+                    <div class="max-w-full mx-auto">
+                        @if (session('success'))
+                            <div class="mb-6 px-5 py-3 bg-green-50 border border-green-200 text-green-700 rounded-xl font-bold shadow-sm flex items-center gap-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="mb-6 px-5 py-3 bg-red-50 border border-red-200 text-red-700 rounded-xl font-bold shadow-sm flex items-center gap-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {{ session('error') }}
+                            </div>
+                        @endif
                         {{ $slot }}
                     </div>
                 </div>
             </main>
         </div>
     </div>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.body.addEventListener('submit', function (e) {
@@ -281,6 +294,7 @@
                         title: title,
                         text: text,
                         icon: icon,
+                        target: form.closest('dialog') || document.querySelector('dialog[open]') || 'body',
                         showCancelButton: true,
                         confirmButtonColor: confirmButtonColor,
                         cancelButtonColor: '#6b7280',
