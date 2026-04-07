@@ -30,7 +30,10 @@ class AdvertisementController extends Controller
         }
 
         if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
+            $statusMap = ['active' => 1, 'pending' => 0, 'rejected' => 2];
+            if (isset($statusMap[$request->status])) {
+                $query->where('status', $statusMap[$request->status]);
+            }
         }
 
         $advertisements = $query->latest()->paginate(10);
@@ -143,6 +146,11 @@ class AdvertisementController extends Controller
 
         $advertisement->update($data);
 
+        // If it was rejected, and and vendor edited it, set back to pending?
+        if ($advertisement->status === 2) {
+            $advertisement->update(['status' => 0]);
+        }
+
         return redirect()->route('vendor.advertisements.index')
             ->with('success', 'تم تعديل الإعلان بنجاح');
     }
@@ -174,10 +182,15 @@ class AdvertisementController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا الإعلان');
         }
 
-        $advertisement->status = $advertisement->status === 'active' ? 'inactive' : 'active';
+        // Can only toggle if not pending or rejected
+        if ($advertisement->status === 0 || $advertisement->status === 2) {
+             return redirect()->back()->with('error', 'لا يمكن تفعيل/تعطيل إعلان قيد المراجعة أو مرفوض.');
+        }
+
+        $advertisement->status = $advertisement->status === 1 ? 3 : 1; 
         $advertisement->save();
 
-        $message = $advertisement->status === 'active' ? 'تم تفعيل الإعلان بنجاح' : 'تم تعطيل الإعلان بنجاح';
+        $message = $advertisement->status === 1 ? 'تم تفعيل الإعلان بنجاح' : 'تم تعطيل الإعلان مؤقتاً';
 
         return redirect()->route('vendor.advertisements.index')
             ->with('success', $message);

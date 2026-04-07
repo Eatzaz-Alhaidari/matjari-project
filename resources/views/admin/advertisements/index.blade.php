@@ -3,7 +3,7 @@
         إدارة العروض والإعلانات
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6" x-data="{ rejectAdId: null, rejectAdTitle: '', rejectionReason: '' }">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
@@ -19,28 +19,37 @@
                 <div class="p-6 bg-white border-b border-gray-100">
                     
                     <!-- Filters & Header -->
-                    <div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <h2 class="text-2xl font-black text-brand-blue-800">
+                    <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <h2 class="text-2xl font-black text-brand-blue-900">
                             {{ $status == 'pending' ? 'طلبات العروض المعلقة' : 'قائمة العروض والإعلانات' }}
                         </h2>
                         
-                        <div class="inline-flex p-1 bg-gray-100 rounded-xl shadow-inner">
-                            <a href="{{ route('admin.advertisements.index', ['status' => 'all']) }}" 
-                               class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 {{ $status == 'all' ? 'bg-brand-blue text-white shadow-md' : 'text-gray-600 hover:text-brand-blue hover:bg-white/50' }}">
-                                الكل
+                        <div class="flex flex-col items-end gap-3 w-full md:w-auto">
+                            <!-- Add Button (Now Above) -->
+                            <a href="{{ route('admin.advertisements.create') }}" class="px-5 py-2.5 bg-brand-blue text-white font-black rounded-xl shadow-lg shadow-brand-blue/20 hover:bg-brand-blue-600 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex items-center gap-2 text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                إضافة إعلان جديد
                             </a>
-                            <a href="{{ route('admin.advertisements.index', ['status' => 'pending']) }}" 
-                               class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 {{ $status == 'pending' ? 'bg-amber-500 text-white shadow-md' : 'text-gray-600 hover:text-amber-600 hover:bg-white/50' }}">
-                                <span>طلبات الانتظار</span>
-                                @php $pendingCount = \App\Models\Advertisement::where('status', 0)->count(); @endphp
-                                @if($pendingCount > 0)
-                                    <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ring-2 ring-white shadow-sm">{{ $pendingCount }}</span>
-                                @endif
-                            </a>
-                            <a href="{{ route('admin.advertisements.index', ['status' => 'active']) }}" 
-                               class="px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 {{ $status == 'active' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-600 hover:text-emerald-600 hover:bg-white/50' }}">
-                                النشطة حالياً
-                            </a>
+
+                            <!-- Filters (Now Below) -->
+                            <div class="inline-flex p-1 bg-gray-100/80 backdrop-blur-sm rounded-xl shadow-inner border border-gray-200/50">
+                                <a href="{{ route('admin.advertisements.index', ['status' => 'all']) }}" 
+                                   class="px-4 py-1.5 rounded-lg text-[13px] font-black transition-all duration-300 {{ $status == 'all' ? 'bg-brand-blue text-white shadow-md' : 'text-gray-500 hover:text-brand-blue' }}">
+                                    الكل
+                                </a>
+                                <a href="{{ route('admin.advertisements.index', ['status' => 'pending']) }}" 
+                                   class="px-4 py-1.5 rounded-lg text-[13px] font-black transition-all duration-300 flex items-center gap-2 {{ $status == 'pending' ? 'bg-amber-500 text-white shadow-md' : 'text-gray-500 hover:text-amber-600' }}">
+                                    <span>طلبات الانتظار</span>
+                                    @php $pendingCount = \App\Models\Advertisement::where('status', 0)->count(); @endphp
+                                    @if($pendingCount > 0)
+                                        <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full ring-1 ring-white animate-pulse">{{ $pendingCount }}</span>
+                                    @endif
+                                </a>
+                                <a href="{{ route('admin.advertisements.index', ['status' => 'active']) }}" 
+                                   class="px-4 py-1.5 rounded-lg text-[13px] font-black transition-all duration-300 {{ $status == 'active' ? 'bg-emerald-600 text-white shadow-md' : 'text-gray-500 hover:text-emerald-600' }}">
+                                    النشطة حالياً
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -117,8 +126,21 @@
                                             {{ number_format($ad->budget, 2) }} <span class="text-[10px] text-gray-400 font-normal mr-1">ر.ي</span>
                                         </td>
                                         <td class="px-6 py-5 whitespace-nowrap text-right">
-                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-black shadow-sm ring-1 ring-inset {{ $ad->status === 1 ? 'bg-emerald-50 text-emerald-700 ring-emerald-500/30' : 'bg-amber-50 text-amber-700 ring-amber-500/30' }}">
-                                                <span class="w-2 h-2 rounded-full ml-2 {{ $ad->status === 1 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]' }}"></span>
+                                            @php
+                                                $statusClasses = [
+                                                    0 => 'bg-amber-50 text-amber-700 ring-amber-500/30',
+                                                    1 => 'bg-emerald-50 text-emerald-700 ring-emerald-500/30',
+                                                    2 => 'bg-rose-50 text-rose-700 ring-rose-500/30',
+                                                ];
+                                                $statusDots = [
+                                                    0 => 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]',
+                                                    1 => 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]',
+                                                    2 => 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]',
+                                                ];
+                                            @endphp
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-black shadow-sm ring-1 ring-inset {{ $statusClasses[$ad->status] ?? 'bg-gray-50 text-gray-700 ring-gray-500/30' }}" 
+                                                  title="{{ $ad->status === 2 ? 'سبب الرفض: ' . $ad->rejection_reason : '' }}">
+                                                <span class="w-2 h-2 rounded-full ml-2 {{ $statusDots[$ad->status] ?? 'bg-gray-500' }}"></span>
                                                 {{ $ad->status_text }}
                                             </span>
                                         </td>
@@ -131,21 +153,34 @@
                                                         data-confirm-button="نعم، تفعيل الآن">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="p-2.5 text-white bg-emerald-600 rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:scale-110 active:scale-95 transition-all duration-200">
+                                                        <button type="submit" class="p-2.5 text-white bg-emerald-600 rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:scale-110 active:scale-95 transition-all duration-200" title="قبول ونشر">
                                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                                             </svg>
                                                         </button>
                                                     </form>
+
+                                                    <button type="button" @click="rejectAdId = {{ $ad->id }}; rejectAdTitle = '{{ $ad->title }}'" 
+                                                        class="p-2.5 text-white bg-amber-500 rounded-xl shadow-lg shadow-amber-100 hover:bg-amber-600 hover:scale-110 active:scale-95 transition-all duration-200" title="رفض الإعلان">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                                        </svg>
+                                                    </button>
                                                 @endif
                                                 
+                                                <a href="{{ route('admin.advertisements.edit', $ad->id) }}" class="p-2.5 text-brand-blue bg-white border border-gray-100 rounded-xl shadow-sm hover:bg-brand-blue hover:text-white hover:scale-110 active:scale-95 transition-all duration-200" title="تعديل البيانات">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </a>
+
                                                 <form action="{{ route('admin.advertisements.destroy', $ad->id) }}" method="POST" class="inline-block"
                                                     data-confirm-title="حذف هذا الإعلان؟"
                                                     data-confirm-text="سيتم إزالة هذا العرض نهائياً من قاعدة البيانات ولا يمكن استرجاعه."
                                                     data-confirm-button="نعم، حذف">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="p-2.5 text-white bg-rose-500 rounded-xl shadow-lg shadow-rose-100 hover:bg-rose-600 hover:scale-110 active:scale-95 transition-all duration-200">
+                                                    <button type="submit" class="p-2.5 text-white bg-rose-500 rounded-xl shadow-lg shadow-rose-100 hover:bg-rose-600 hover:scale-110 active:scale-95 transition-all duration-200" title="حذف نهائي">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                         </svg>
@@ -181,5 +216,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Rejection Modal -->
+        <template x-if="rejectAdId">
+            <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+                <div @click.away="rejectAdId = null" class="bg-white rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden p-10 animate-in zoom-in duration-300 ring-1 ring-black/5">
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="bg-amber-50 p-3 rounded-2xl text-amber-600">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <button @click="rejectAdId = null" class="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-full transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                    </div>
+                    <h3 class="text-2xl font-black text-brand-blue-900 mb-2">رفض الإعلان</h3>
+                    <p class="text-sm text-gray-500 mb-10 leading-relaxed font-medium">يرجى كتابة سبب الرفض ليتم إرساله للتاجر لصاحب إعلان: <span class="font-black text-brand-blue" x-text="rejectAdTitle"></span>.</p>
+                    
+                    <form :action="`/admin/advertisements/${rejectAdId}/reject`" method="POST" class="space-y-8">
+                        @csrf
+                        @method('PATCH')
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-gray-700 uppercase tracking-widest mr-1">سبب الرفض:</label>
+                            <textarea name="rejection_reason" required placeholder="مثلاً: الصورة غير مناسبة، أو الرابط لا يعمل..." class="w-full rounded-2xl border-gray-100 bg-gray-50 focus:ring-4 focus:ring-brand-blue/10 focus:border-brand-blue focus:bg-white transition-all py-4 px-6 min-h-[120px]"></textarea>
+                        </div>
+                        <div class="flex gap-4 pt-4">
+                            <button type="submit" class="flex-[2] bg-rose-500 text-white font-black py-5 rounded-2xl shadow-xl shadow-rose-100 hover:bg-rose-600 hover:-translate-y-1 transition-all active:scale-95 text-lg">تأكيد الرفض</button>
+                            <button type="button" @click="rejectAdId = null" class="flex-1 bg-gray-100 text-gray-600 font-bold py-5 rounded-2xl hover:bg-gray-200 transition-all text-lg">إلغاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </template>
     </div>
 </x-admin-layout>

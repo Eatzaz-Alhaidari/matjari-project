@@ -107,16 +107,22 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
-                                            <span class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                            @if($advertisement->status === 'active')
-                                                                                bg-green-100 text-green-800
-                                                                            @elseif($advertisement->status === 'inactive')
-                                                                                bg-red-100 text-red-800
-                                                                            @else
-                                                                                bg-yellow-100 text-yellow-800
-                                                                            @endif">
+                                            @php
+                                                $statusClasses = [
+                                                    0 => 'bg-yellow-100 text-yellow-800', // Pending
+                                                    1 => 'bg-green-100 text-green-800',  // Active
+                                                    2 => 'bg-red-100 text-red-800',    // Rejected
+                                                    3 => 'bg-gray-100 text-gray-800',   // Paused
+                                                ];
+                                            @endphp
+                                            <span class="px-2 py-1 text-xs rounded-full font-semibold {{ $statusClasses[$advertisement->status] ?? 'bg-gray-100 text-gray-800' }}">
                                                 {{ $advertisement->status_text }}
                                             </span>
+                                            @if($advertisement->status === 2 && $advertisement->rejection_reason)
+                                                <div class="text-[10px] text-red-600 mt-1 max-w-[150px] italic">
+                                                    السبب: {{ Str::limit($advertisement->rejection_reason, 50) }}
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="px-5 py-4 text-sm text-gray-900">
                                             {{ $advertisement->start_date->format('Y-m-d') }}
@@ -159,19 +165,19 @@
                                                             d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
                                                 </a>
-                                                @if($advertisement->status !== 'pending')
+                                                @if($advertisement->status === 1 || $advertisement->status === 3)
                                                     <form
                                                         action="{{ route('vendor.advertisements.toggleStatus', $advertisement->id) }}"
                                                         method="POST" class="inline-block"
-                                                        data-confirm-title="{{ $advertisement->status === 'active' ? 'تعطيل الإعلان' : 'تفعيل الإعلان' }}"
-                                                        data-confirm-text="{{ $advertisement->status === 'active' ? 'سيتم إيقاف عرض الإعلان.' : 'سيتم تنشيط الإعلان وبدء حملته.' }}"
+                                                        data-confirm-title="{{ $advertisement->status === 1 ? 'تعطيل الإعلان' : 'تفعيل الإعلان' }}"
+                                                        data-confirm-text="{{ $advertisement->status === 1 ? 'سيتم إيقاف عرض الإعلان مؤقتاً.' : 'سيتم إعادة تنشيط الإعلان.' }}"
                                                         data-confirm-button="نعم، نفذ">
                                                         @csrf
                                                         @method('PATCH')
                                                         <button type="submit"
                                                             class="px-2 py-1 text-xs rounded-full font-semibold
-                                                                                                                    {{ $advertisement->status === 'active' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
-                                                            {{ $advertisement->status === 'active' ? 'تعطيل' : 'تفعيل' }}
+                                                                                                                    {{ $advertisement->status === 1 ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200' }}">
+                                                            {{ $advertisement->status === 1 ? 'تعطيل' : 'تفعيل' }}
                                                         </button>
                                                     </form>
                                                 @endif

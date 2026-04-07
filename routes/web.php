@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ShippingAddressController;
 use App\Http\Controllers\Admin\WalletTransactionController;
 use App\Http\Controllers\Admin\DiscountCouponController;
 use App\Http\Controllers\Admin\CustomerActivityController;
+use App\Http\Controllers\Admin\AdvertisementController as AdminAdController;
 use App\Http\Controllers\ProfileController;
 
 /*
@@ -125,9 +126,10 @@ Route::prefix('admin')
         Route::resource('electronic-wallets', \App\Http\Controllers\Admin\ElectronicWalletController::class);
 
         // 14. Advertisements Management (New)
-        Route::get('advertisements', [\App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
-        Route::patch('advertisements/{advertisement}/approve', [\App\Http\Controllers\Admin\AdvertisementController::class, 'approve'])->name('advertisements.approve');
-        Route::delete('advertisements/{advertisement}', [\App\Http\Controllers\Admin\AdvertisementController::class, 'destroy'])->name('advertisements.destroy');
+        Route::get('advertisements', [AdminAdController::class, 'index'])->name('advertisements.index');
+        Route::patch('advertisements/{advertisement}/approve', [AdminAdController::class, 'approve'])->name('advertisements.approve');
+        Route::patch('advertisements/{advertisement}/reject', [AdminAdController::class, 'reject'])->name('advertisements.reject');
+        Route::resource('advertisements', AdminAdController::class);
 
         // Activity Logs
         Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
