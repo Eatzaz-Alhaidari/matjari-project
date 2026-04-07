@@ -21,7 +21,17 @@
 </head>
 
 <body class="font-sans antialiased bg-slate-100 overflow-hidden">
-    <div x-data="{ sidebarOpen: true }" class="flex h-screen bg-slate-100">
+    <div x-data="{ 
+        sidebarOpen: true, 
+        activeTab: localStorage.getItem('vendorActiveTab') || 'home',
+        switchTab(tab) {
+            this.activeTab = tab;
+            localStorage.setItem('vendorActiveTab', tab);
+            if (window.location.pathname !== '{{ route('vendor.dashboard', [], false) }}') {
+                window.location.href = '{{ route('vendor.dashboard') }}';
+            }
+        }
+    }" class="flex h-screen bg-slate-100">
 
         <aside
             class="fixed inset-y-0 right-0 z-30 flex-shrink-0 w-64 overflow-y-auto bg-brand-orange-700 shadow-lg transition-transform duration-300 transform"
@@ -35,111 +45,76 @@
                     </div>
                 </div>
 
-                <nav class="mt-4 flex-grow px-2">
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.dashboard') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <nav class="mt-4 flex-grow px-2 space-y-2">
+                    <!-- الرئيسية -->
+                    <button @click="switchTab('home')"
+                        class="flex items-center w-full px-4 py-3 text-white rounded-xl transition-all duration-200 group"
+                        :class="activeTab === 'home' ? 'bg-white/20 shadow-inner' : 'hover:bg-white/10'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        <span class="mx-3 font-semibold">الرئيسية</span>
-                    </a>
+                        <span class="mx-3 font-bold text-lg text-right w-full">الرئيسية</span>
+                    </button>
 
-                    <hr class="my-4 border-white">
+                    <div class="my-4 border-t border-white/20"></div>
 
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.products.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <!-- إدارة العمليات -->
+                    <button @click="switchTab('operations')"
+                        class="flex items-center w-full px-4 py-3 text-white/90 rounded-xl transition-all duration-200 group text-right"
+                        :class="activeTab === 'operations' ? 'bg-white/20 text-white shadow-inner' : 'hover:bg-white/10 hover:text-white'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
-                        <span class="mx-3 font-semibold">إدارة المنتجات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.orders.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="mx-3 font-semibold w-full text-right">إدارة العمليات</span>
+                    </button>
+
+                    <!-- التسويق والمحتوى -->
+                    <button @click="switchTab('content')"
+                        class="flex items-center w-full px-4 py-3 text-white/90 rounded-xl transition-all duration-200 group text-right"
+                        :class="activeTab === 'content' ? 'bg-white/20 text-white shadow-inner' : 'hover:bg-white/10 hover:text-white'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
-                        <span class="mx-3 font-semibold">إدارة الطلبات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.shipping.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                        </svg>
-                        <span class="mx-3 font-semibold">معلومات الشحن</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.warehouse.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m0 10l8 4m-8-4v--8 4-8-4" />
-                        </svg>
-                        <span class="mx-3 font-semibold">إدارة المخازن</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.advertisements.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.834 9.168-4.432" />
-                        </svg>
-                        <span class="mx-3 font-semibold">إدارة الإعلانات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.discounts.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                        </svg>
-                        <span class="mx-3 font-semibold">إدارة الخصومات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.sales.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                        <span class="mx-3 font-semibold">إدارة المبيعات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.reviews.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        <span class="mx-3 font-semibold">التقييمات</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.top-products.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <span class="mx-3 font-semibold">المنتجات الأكثر طلباً</span>
-                    </a>
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.financial-reports.index') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="mx-3 font-semibold w-full text-right">التسويق والمحتوى</span>
+                    </button>
+
+                    <!-- التحليل والتقارير -->
+                    <button @click="switchTab('reports')"
+                        class="flex items-center w-full px-4 py-3 text-white/90 rounded-xl transition-all duration-200 group text-right"
+                        :class="activeTab === 'reports' ? 'bg-white/20 text-white shadow-inner' : 'hover:bg-white/10 hover:text-white'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <span class="mx-3 font-semibold">التقارير المالية</span>
-                    </a>
+                        <span class="mx-3 font-semibold w-full text-right">التحليل والتقارير</span>
+                    </button>
 
-                    <hr class="my-4 border-white">
-
-                    <a class="flex items-center px-4 py-3 mt-2 text-white rounded-lg hover:bg-white/10 hover:text-white"
-                        href="{{ route('vendor.store.edit') }}">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <!-- الدعم والتفاعل -->
+                    <button @click="switchTab('support')"
+                        class="flex items-center w-full px-4 py-3 text-white/90 rounded-xl transition-all duration-200 group text-right"
+                        :class="activeTab === 'support' ? 'bg-white/20 text-white shadow-inner' : 'hover:bg-white/10 hover:text-white'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span class="mx-3 font-semibold w-full text-right">الدعم والتفاعل</span>
+                    </button>
+
+                    <!-- إعدادات المتجر -->
+                    <button @click="switchTab('settings')"
+                        class="flex items-center w-full px-4 py-3 text-white/90 rounded-xl transition-all duration-200 group text-right"
+                        :class="activeTab === 'settings' ? 'bg-white/20 text-white shadow-inner' : 'hover:bg-white/10 hover:text-white'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296-.07 2.572-1.065z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span class="mx-3 font-semibold">إعدادات المتجر</span>
-                    </a>
+                        <span class="mx-3 font-semibold w-full text-right">إعدادات المتجر</span>
+                    </button>
                 </nav>
             </div>
         </aside>

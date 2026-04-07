@@ -161,16 +161,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 6. آخر رسائل العملاء
-        $latestMessages = StoreMessage::where('store_id', $storeId)
-            ->latest()
-            ->limit(5)
-            ->get();
 
-        // 7. قواعد الشات بوت
-        $chatbotRules = ChatbotRule::where('store_id', $storeId)
-            ->latest()
-            ->get();
 
         return view('vendor.dashboard', compact(
             'stats',
@@ -179,9 +170,7 @@ class DashboardController extends Controller
             'salesChartData',
             'ratingStats',
             'lowStockProducts',
-            'latestPendingOrders',
-            'latestMessages',
-            'chatbotRules'
+            'latestPendingOrders'
         ));
     }
 

@@ -223,8 +223,12 @@ Route::prefix('vendor')
         Route::get('shipping-info', [\App\Http\Controllers\Vendor\ShippingController::class, 'index'])->name('shipping.index');
 
         // Chatbot Rules (New)
+        Route::get('chatbot-rules', [\App\Http\Controllers\Vendor\ChatbotController::class, 'index'])->name('chatbot-rules.index');
         Route::post('chatbot-rules', [\App\Http\Controllers\Vendor\ChatbotController::class, 'store'])->name('chatbot-rules.store');
         Route::delete('chatbot-rules/{chatbot}', [\App\Http\Controllers\Vendor\ChatbotController::class, 'destroy'])->name('chatbot-rules.destroy');
+
+        // Messages (New)
+        Route::get('messages', [\App\Http\Controllers\Vendor\MessageController::class, 'index'])->name('messages.index');
     });
     Route::get('/fix-api', function() {
     \Artisan::call('route:clear');

@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 class ChatbotController extends Controller
 {
     /**
+     * View chatbot rules page
+     */
+    public function index()
+    {
+        $storeId = auth()->user()->store->id;
+        $chatbotRules = ChatbotRule::where('store_id', $storeId)->latest()->get();
+        return view('vendor.chatbot.index', compact('chatbotRules'));
+    }
+    /**
      * حفظ قاعدة شات بوت جديدة
      */
     public function store(Request $request)
