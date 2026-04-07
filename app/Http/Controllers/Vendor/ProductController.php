@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class ProductController extends Controller
 {
@@ -95,7 +96,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
+                $path = ImageService::processAndStore($image, 'products', 'product');
 
                 ProductImage::create([
                     'product_id' => $product->id,
@@ -208,7 +209,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
+                $path = ImageService::processAndStore($image, 'products', 'product');
 
                 ProductImage::create([
                     'product_id' => $product->id,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class AdvertisementController extends Controller
 {
@@ -72,7 +73,7 @@ class AdvertisementController extends Controller
         $data['is_admin'] = false;
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('advertisements', 'public');
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'advertisements', 'advertisement');
         }
 
         $advertisement = Advertisement::create($data);
@@ -141,7 +142,7 @@ class AdvertisementController extends Controller
             if ($advertisement->image) {
                 Storage::disk('public')->delete($advertisement->image);
             }
-            $data['image'] = $request->file('image')->store('advertisements', 'public');
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'advertisements', 'advertisement');
         }
 
         $advertisement->update($data);

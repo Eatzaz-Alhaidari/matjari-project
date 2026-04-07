@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class ProductController extends Controller
 {
@@ -85,7 +86,7 @@ class ProductController extends Controller
         $data['warranty_unit'] = 'days';
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'products', 'product');
         }
 
         if ($request->hasFile('three_d_model')) {
@@ -104,7 +105,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                $path = $file->store('products/gallery', 'public');
+                $path = ImageService::processAndStore($file, 'products/gallery', 'product');
                 $product->images()->create(['image_path' => $path]);
             }
         }
@@ -186,7 +187,7 @@ class ProductController extends Controller
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'products', 'product');
         }
 
         if ($request->hasFile('three_d_model')) {
@@ -213,7 +214,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                $path = $file->store('products/gallery', 'public');
+                $path = ImageService::processAndStore($file, 'products/gallery', 'product');
                 $product->images()->create(['image_path' => $path]);
             }
         }
