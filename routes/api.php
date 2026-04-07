@@ -100,6 +100,57 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // مزامنة المخزون (النسخة المحمية)
     Route::post('/protected/sync-inventory', [ProductController::class, 'syncFromDesktop']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Statistics APIs (واحد لكل بطاقة)
+    |--------------------------------------------------------------------------
+    */
+
+    // 1. لوحة تحكم الأدمن (Admin Dashboard)
+    Route::middleware('role:admin')->prefix('admin/stats')->group(function () {
+        Route::get('vendors-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getVendorsCount']);
+        Route::get('active-stores-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getActiveStoresCount']);
+        Route::get('customers-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getCustomersCount']);
+        Route::get('products-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getProductsCount']);
+        Route::get('orders-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getOrdersCount']);
+        Route::get('returns-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getReturnsCount']);
+        Route::get('open-complaints-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getOpenComplaintsCount']);
+        Route::get('reviews-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getReviewsCount']);
+        Route::get('notifications-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getNotificationsCount']);
+        Route::get('financial-reports-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getFinancialReportsCount']);
+        Route::get('shipping-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getShippingCount']);
+        Route::get('ads-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getAdsCount']);
+        Route::get('payments-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getPaymentsCount']);
+        Route::get('new-customers-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getNewCustomersCount']);
+        Route::get('categories-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getCategoriesCount']);
+        Route::get('activity-logs-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getActivityLogsCount']);
+        Route::get('shipping-addresses-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getShippingAddressesCount']);
+        Route::get('wallet-transactions-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getWalletTransactionsCount']);
+        Route::get('active-coupons-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getActiveCouponsCount']);
+        Route::get('customer-activities-count', [\App\Http\Controllers\API\Admin\DashboardStatsController::class, 'getCustomerActivitiesCount']);
+    });
+
+    // 2. لوحة تحكم التاجر (Vendor Dashboard)
+    Route::middleware('role:vendor')->prefix('vendor/stats')->group(function () {
+        Route::get('products-total', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getTotalProducts']);
+        Route::get('products-active', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getActiveProducts']);
+        Route::get('products-inactive', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getInactiveProducts']);
+        Route::get('orders-total', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getTotalOrders']);
+        Route::get('orders-pending', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getPendingOrders']);
+        Route::get('orders-processing', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getProcessingOrders']);
+        Route::get('orders-shipped', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getShippedOrders']);
+        Route::get('orders-delivered', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getDeliveredOrders']);
+        Route::get('sales-total', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getTotalSales']);
+        Route::get('low-stock-count', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getLowStockCount']);
+        Route::get('ads-active-count', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getActiveAdsCount']);
+        Route::get('discounts-active-count', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getActiveDiscountsCount']);
+        Route::get('reviews-total-count', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getTotalReviewsCount']);
+        Route::get('reviews-pending-count', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getPendingReviewsCount']);
+        Route::get('average-rating', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getAverageRating']);
+        Route::get('wallet-balance', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getWalletBalance']);
+        Route::get('earnings-total', [\App\Http\Controllers\API\Vendor\DashboardStatsController::class, 'getTotalEarnings']);
+    });
 });
 
 /*
