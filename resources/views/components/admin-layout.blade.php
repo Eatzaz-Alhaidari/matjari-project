@@ -50,15 +50,15 @@
             class="fixed inset-y-0 right-0 z-30 flex-shrink-0 w-72 overflow-y-auto bg-brand-blue shadow-lg transition-transform duration-300 transform"
             :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'">
             <div class="flex flex-col h-full">
-                <div class="flex items-center justify-center mt-10 mb-6 flex-shrink-0">
-                    <div class="flex flex-col items-center gap-4">
-                        <div class="transition-transform hover:scale-110 duration-300 drop-shadow-xl">
-                            <x-application-logo class="w-44 h-16 object-contain" />
+                <div class="flex items-center justify-center mt-6 mb-2 flex-shrink-0">
+                    <div class="flex flex-col items-center">
+                        <div class="transition-transform hover:scale-105 duration-300 bg-white/95 px-4 py-2 rounded-2xl shadow-lg ring-4 ring-white/10 mx-4">
+                            <x-application-logo class="w-36 h-14 object-contain" />
                         </div>
                     </div>
                 </div>
 
-                <nav class="mt-10 flex-grow px-4 space-y-2">
+                <nav class="mt-4 flex-grow px-4 space-y-2">
                     <!-- الرئيسية -->
                     <button @click="switchTab('home')"
                         class="flex items-center w-full px-4 py-3 text-white rounded-xl transition-all duration-200 group"

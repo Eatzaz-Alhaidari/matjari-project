@@ -102,7 +102,7 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}"
-                            class="flex items-center py-4 px-12 rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition shadow-xl shadow-brand-blue-500/30 font-bold text-xl tracking-wide">تسجيل
+                            class="flex items-center py-2.5 px-6 rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition shadow-md shadow-brand-blue-500/20 font-semibold text-sm tracking-wide">تسجيل
                             الدخول</a>
 
                     @endauth
@@ -134,10 +134,13 @@
         </div>
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-brand-blue-900 mb-8 leading-tight whitespace-nowrap">
-                اكتشف أحدث <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-green-600">الأجهزة الإلكترونية</span>
-                بأفضل الأسعار
+            <h1 class="font-black text-brand-blue-900 mb-8 max-w-5xl mx-auto flex flex-col gap-4 sm:gap-8">
+                <span class="text-4xl sm:text-5xl md:text-6xl leading-normal block">
+                    اكتشف أحدث <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-green-600">الأجهزة الإلكترونية</span>
+                </span>
+                <span class="text-4xl sm:text-5xl md:text-6xl leading-normal block mt-2">
+                    بأفضل الأسعار
+                </span>
             </h1>
             <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                 أحدث المنتجات، أفضل الماركات، وتجربة شراء لا تُنسى. ابدأ رحلتك معنا اليوم واستمتع بالعروض الحصرية.
