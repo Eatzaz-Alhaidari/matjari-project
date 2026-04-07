@@ -7,10 +7,6 @@
             <h1 class="text-3xl font-black text-gray-800 tracking-tight">إدارة الردود التلقائية</h1>
             <p class="text-gray-500 mt-2 font-medium">إعداد قواعد متقدمة للرد الذكي على أسئلة العملاء المتكررة.</p>
         </div>
-        <a href="{{ route('vendor.dashboard') }}" class="flex items-center text-gray-500 hover:text-brand-orange transition-colors font-bold space-x-2 space-x-reverse">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            <span>العودة للرئيسية</span>
-        </a>
     </div>
 
     <!-- Main Content -->

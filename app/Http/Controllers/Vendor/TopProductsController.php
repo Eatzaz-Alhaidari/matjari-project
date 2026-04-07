@@ -49,6 +49,7 @@ class TopProductsController extends Controller
                 'products.product_code',
                 'products.name',
                 'products.brand',
+                'products.brand_id',
                 'products.description',
                 'products.notes',
                 'products.full_description',
