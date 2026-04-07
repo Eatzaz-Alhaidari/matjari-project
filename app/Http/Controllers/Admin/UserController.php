@@ -83,5 +83,69 @@ class UserController extends Controller
             ->with('success', 'تم تحديث بيانات العميل بنجاح!');
     }
 
+    /**
+     * Toggle user status (Active/Banned)
+     */
+    public function toggleStatus(User $user): RedirectResponse
+    {
+        $user->status = ($user->status === 'active') ? 'banned' : 'active';
+        $user->save();
+
+        $statusAr = $user->status === 'active' ? 'تفعيل' : 'حظر';
+        return back()->with('success', "تم $statusAr حساب العميل بنجاح.");
+    }
+
+    /**
+     * Admin manually resets a user's password.
+     */
+    public function resetPassword(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'تم تعديل كلمة سر العميل بنجاح.');
+    }
+
+    /**
+     * Admin manually sends a verification OTP to the customer.
+     */
+    public function sendOtp(User $user): RedirectResponse
+    {
+        if (!$user->phone) {
+            return back()->with('error', 'العميل لا يمتلك رقم هاتف مسجل.');
+        }
+
+        $code = rand(100000, 999999);
+        $expiresAt = now()->addMinutes(15);
+
+        \App\Models\OtpCode::create([
+            'identifier' => $user->phone,
+            'code'       => $code,
+            'type'       => 'verification',
+            'expires_at' => $expiresAt,
+        ]);
+
+        // Note: Real SMS provider integration should be called here
+        // \App\Services\SmsService::send($user->phone, "رمز التحقق الخاص بك هو: $code");
+
+        return back()->with('success', "تم توليد وإرسال رمز التحقق ($code) بنجاح.");
+    }
+
+    /**
+     * Admin manually marks a customer as verified.
+     */
+    public function verifyAccount(User $user): RedirectResponse
+    {
+        $user->email_verified_at = now();
+        $user->save();
+
+        return back()->with('success', 'تم تأكيد حساب العميل يدوياً بنجاح.');
+    }
+
     public function destroy(string $id) {}
 }

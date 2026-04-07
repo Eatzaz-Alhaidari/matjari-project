@@ -240,4 +240,92 @@ class AuthController extends Controller
             'message' => 'تم تغيير كلمة السر بنجاح.'
         ]);
     }
+
+    /**
+     * التحقق من الحساب وتفعيله عبر رمز OTP
+     */
+    public function verifyAccountWithOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'identifier' => 'required|string', // phone or email
+            'code'       => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $otp = OtpCode::where('identifier', $request->identifier)
+            ->where('code', $request->code)
+            ->where('is_used', false)
+            ->where('expires_at', '>', Carbon::now())
+            ->latest()
+            ->first();
+
+        if (!$otp) {
+            return response()->json(['success' => false, 'message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.'], 400);
+        }
+
+        $user = User::where('email', $request->identifier)
+            ->orWhere('phone', $request->identifier)
+            ->first();
+
+        if ($user) {
+            $user->update(['email_verified_at' => now()]);
+            $otp->update(['is_used' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم توثيق وتفعيل الحساب بنجاح.'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'المستخدم غير موجود.'], 404);
+    }
+
+    /**
+     * إعادة تعيين كلمة السر باستخدام رمز التحقق (Forgot Password)
+     */
+    public function resetPasswordWithOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'identifier' => 'required|string',
+            'code'       => 'required|string',
+            'password'   => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $otp = OtpCode::where('identifier', $request->identifier)
+            ->where('code', $request->code)
+            ->where('is_used', false)
+            ->where('expires_at', '>', Carbon::now())
+            ->latest()
+            ->first();
+
+        if (!$otp) {
+            return response()->json(['success' => false, 'message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية.'], 400);
+        }
+
+        $user = User::where('email', $request->identifier)
+            ->orWhere('phone', $request->identifier)
+            ->first();
+
+        if ($user) {
+            $user->update([
+                'password' => Hash::make($request->password),
+                'email_verified_at' => $user->email_verified_at ?? now()
+            ]);
+            $otp->update(['is_used' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تمت إعادة تعيين كلمة السر بنجاح.'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'المستخدم غير موجود.'], 404);
+    }
 }

@@ -92,6 +92,9 @@ Route::prefix('admin')
 
         // 7. Users (Customers) Management
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
+        Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
+        Route::post('users/{user}/send-otp', [UserController::class, 'sendOtp'])->name('users.sendOtp');
+        Route::post('users/{user}/verify-account', [UserController::class, 'verifyAccount'])->name('users.verifyAccount');
         Route::resource('users', UserController::class);
 
 

@@ -28,6 +28,8 @@ use App\Http\Controllers\Api\WalletController;
 // التوثيق والتحقق (Auth & OTP)
 Route::post('/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/verify-account', [AuthController::class, 'verifyAccountWithOtp']); // New
+Route::post('/password/reset-with-otp', [AuthController::class, 'resetPasswordWithOtp']); // New
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
