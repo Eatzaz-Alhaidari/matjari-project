@@ -36,7 +36,7 @@
 
                     <!-- Download Template Card -->
                     <div
-                        class="mb-10 p-6 bg-brand-orange/5 rounded-2xl border border-brand-orange/10 flex items-center justify-between">
+                        class="mb-6 p-6 bg-brand-orange/5 rounded-2xl border border-brand-orange/10 flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center ml-4">
                                 <svg class="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor"
@@ -54,6 +54,46 @@
                             class="px-5 py-2.5 bg-brand-orange text-white text-sm font-bold rounded-xl shadow-lg shadow-brand-orange/20 hover:bg-brand-orange-700 transition-all flex items-center">
                             <span>تحميل القالب</span>
                         </a>
+                    </div>
+
+                    <!-- Instructions Section -->
+                    <div class="mb-10 bg-blue-50 border-r-4 border-blue-500 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <h4 class="text-blue-900 font-bold mb-4 flex items-center text-lg">
+                            <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            تعليمات هامة لرفع ملف المنتجات
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <ul class="text-sm text-blue-800 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>يجب أن يكون الملف بصيغة <strong>CSV</strong> (يمكنك حفظ ملف الإكسل بصيغة CSV من خلال "Save As").</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>تأكد من وجود عمود <strong>رمز المنتج (product_code)</strong> بشكل فريد لكل منتج.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>الحقول الأساسية المطلوبة: (الرمز، الاسم، الكمية).</span>
+                                </li>
+                            </ul>
+                            <ul class="text-sm text-blue-800 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>تأكد من استخدام ترميز <strong>UTF-8</strong> للملف لضمان ظهور الأحرف العربية بشكل صحيح.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>القيم الرقمية (الأسعار والكميات) يجب ألا تحتوي على رموز عملات أو فواصل آلاف.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 ml-2 mt-1">•</span>
+                                    <span>في الخطوة القادمة، ستتمكن من ربط أعمدة ملفك مع حقول المنصة يدوياً.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Upload Form -->
