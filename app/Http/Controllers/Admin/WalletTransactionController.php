@@ -10,7 +10,7 @@ class WalletTransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = WalletTransaction::with('user');
+        $query = WalletTransaction::with(['user', 'wallet']);
 
         if ($request->filled('search')) {
             $q = $request->search;
@@ -33,15 +33,18 @@ class WalletTransactionController extends Controller
         $totalAmount    = WalletTransaction::sum('amount');
         $totalFees      = WalletTransaction::sum('fee');
         $countToday     = WalletTransaction::whereDate('created_at', today())->count();
+        
+        $wallets = \App\Models\ElectronicWallet::where('is_active', true)->get();
 
         return view('admin.wallet-transactions.index', compact(
-            'transactions', 'totalAmount', 'totalFees', 'countToday'
+            'transactions', 'totalAmount', 'totalFees', 'countToday', 'wallets'
         ));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'electronic_wallet_id'    => 'required|exists:electronic_wallets,id',
             'reference_number'        => 'nullable|string|max:100',
             'operation'               => 'nullable|string|max:200',
             'transaction_date'        => 'nullable|date',

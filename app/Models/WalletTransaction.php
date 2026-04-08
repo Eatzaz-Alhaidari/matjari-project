@@ -11,6 +11,7 @@ class WalletTransaction extends Model
 
     protected $fillable = [
         'user_id',
+        'electronic_wallet_id',
         'reference_number',
         'operation',
         'transaction_date',
@@ -36,6 +37,11 @@ class WalletTransaction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function wallet()
+    {
+        return $this->belongsTo(ElectronicWallet::class, 'electronic_wallet_id');
     }
 }
 

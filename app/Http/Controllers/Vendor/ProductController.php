@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::where('store_id', auth()->user()->store->id)
-            ->with(['store', 'category']);
+            ->with(['store', 'category', 'sizes', 'colors', 'brand']);
 
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -43,8 +43,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $brands = Brand::orderBy('name')->get();
-        $categories = Category::with('children')->whereNull('parent_id')->get();
+        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('vendor.products.create', compact('categories', 'brands'));
     }
 
@@ -56,7 +56,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'name' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
+            'brand_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -65,46 +65,67 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'min_stock' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
-            'warranty_duration' => 'nullable|integer|min:1',
-            'warranty_unit' => 'nullable|in:days,months,years',
             'status' => 'required|in:active,inactive',
-            'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'three_d_model' => 'nullable|file|mimes:glb,gltf,obj,stl|max:20480', // 20MB max
-            'three_sixty_images' => 'nullable|array',
-            'three_sixty_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'warranty_duration' => 'nullable|integer|min:0',
+            'size' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'currency' => 'required|in:YER,SAR,USD',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'three_d_model' => 'nullable|file|max:20480', // 20MB max
+            'three_sixty_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $data = $request->except(['images', 'three_d_model', 'three_sixty_images']);
+        $data = $request->except(['images', 'sizes', 'colors', 'image', 'three_d_model', 'three_sixty_images']);
+        $data['warranty_unit'] = 'days';
         $data['store_id'] = auth()->user()->store->id;
+
+        if ($request->hasFile('image')) {
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'products', 'product');
+        }
 
         if ($request->hasFile('three_d_model')) {
             $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
         }
 
         if ($request->hasFile('three_sixty_images')) {
-            $threeSixtyPaths = [];
-            foreach ($request->file('three_sixty_images') as $image) {
-                $threeSixtyPaths[] = $image->store('products/360', 'public');
+            $paths = [];
+            foreach ($request->file('three_sixty_images') as $file) {
+                $paths[] = $file->store('products/360', 'public');
             }
-            $data['three_sixty_images'] = $threeSixtyPaths;
+            $data['three_sixty_images'] = $paths;
         }
 
         $product = Product::create($data);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = ImageService::processAndStore($image, 'products', 'product');
+            foreach ($request->file('images') as $file) {
+                $path = ImageService::processAndStore($file, 'products/gallery', 'product');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $path,
-                ]);
+        if ($request->has('sizes')) {
+            foreach ($request->sizes as $sizeName) {
+                if ($sizeName) {
+                    $product->sizes()->create(['name' => $sizeName]);
+                }
+            }
+        }
 
-                if ($index === 0) {
-                    $product->update(['image' => $path]);
+        if ($request->has('colors')) {
+            foreach ($request->colors as $index => $colorData) {
+                if (!empty($colorData['name'])) {
+                    $colorImagePath = null;
+                    if ($request->hasFile("colors.$index.image")) {
+                        $colorImagePath = $request->file("colors.$index.image")->store('products/colors', 'public');
+                    }
+                    $product->colors()->create([
+                        'name' => $colorData['name'],
+                        'image_path' => $colorImagePath
+                    ]);
                 }
             }
         }
@@ -136,8 +157,8 @@ class ProductController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا المنتج');
         }
 
-        $brands = Brand::orderBy('name')->get();
-        $categories = Category::with('children')->whereNull('parent_id')->get();
+        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('vendor.products.edit', compact('product', 'categories', 'brands'));
     }
 
@@ -156,7 +177,7 @@ class ProductController extends Controller
         $request->validate([
             'product_code' => 'nullable|string|max:255|unique:products,product_code,' . $product->id,
             'name' => 'required|string|max:255',
-            'brand_id' => 'nullable|exists:brands,id',
+            'brand_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'full_description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -165,25 +186,34 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'min_stock' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
-            'warranty_duration' => 'nullable|integer|min:1',
-            'warranty_unit' => 'nullable|in:days,months,years',
+            'warranty_duration' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
-            'currency' => 'required|in:YER,SAR,USD',
             'category_id' => 'required|exists:categories,id',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'three_d_model' => 'nullable|file|mimes:glb,gltf,obj,stl|max:20480',
-            'three_sixty_images' => 'nullable|array',
-            'three_sixty_images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'size' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'currency' => 'required|in:YER,SAR,USD',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'three_d_model' => 'nullable|file|max:20480',
+            'three_sixty_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $data = $request->except(['images', 'three_d_model', 'three_sixty_images']);
+        $data = $request->except(['images', 'sizes', 'colors', 'image', 'three_d_model', 'three_sixty_images']);
+        $data['warranty_unit'] = 'days';
         $data['currency'] = $request->currency; // Force update currency
 
         \Illuminate\Support\Facades\Log::info('Vendor Product Update - Final Data:', $data);
 
         $updated = $product->update($data);
         \Illuminate\Support\Facades\Log::info('Vendor Product Update - Result:', ['updated' => $updated, 'new_currency' => $product->fresh()->currency]);
+
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = ImageService::processAndStore($request->file('image'), 'products', 'product');
+        }
 
         if ($request->hasFile('three_d_model')) {
             if ($product->three_d_model) {
@@ -198,28 +228,49 @@ class ProductController extends Controller
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-            $threeSixtyPaths = [];
-            foreach ($request->file('three_sixty_images') as $image) {
-                $threeSixtyPaths[] = $image->store('products/360', 'public');
+            $paths = [];
+            foreach ($request->file('three_sixty_images') as $file) {
+                $paths[] = $file->store('products/360', 'public');
             }
-            $data['three_sixty_images'] = $threeSixtyPaths;
+            $data['three_sixty_images'] = $paths;
         }
 
         $product->update($data);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = ImageService::processAndStore($image, 'products', 'product');
+            foreach ($request->file('images') as $file) {
+                $path = ImageService::processAndStore($file, 'products/gallery', 'product');
+                $product->images()->create(['image_path' => $path]);
+            }
+        }
 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $path,
-                ]);
-
-                if (!$product->image && $index === 0) {
-                    $product->update(['image' => $path]);
+        if ($request->has('sizes')) {
+            $product->sizes()->delete();
+            foreach ($request->sizes as $sizeName) {
+                if ($sizeName) {
+                    $product->sizes()->create(['name' => $sizeName]);
                 }
             }
+        }
+
+        if ($request->has('colors')) {
+            foreach ($request->colors as $index => $colorData) {
+                if (!empty($colorData['name'])) {
+                    $colorImagePath = null;
+                    if ($request->hasFile("colors.$index.image")) {
+                        $colorImagePath = $request->file("colors.$index.image")->store('products/colors', 'public');
+                    } elseif (!empty($colorData['existing_image'])) {
+                        $colorImagePath = $colorData['existing_image'];
+                    }
+
+                    $product->colors()->updateOrCreate(
+                        ['name' => $colorData['name']],
+                        ['image_path' => $colorImagePath]
+                    );
+                }
+            }
+            $newNames = array_column($request->colors, 'name');
+            $product->colors()->whereNotIn('name', $newNames)->delete();
         }
 
         return redirect()->route('vendor.products.index')

@@ -84,6 +84,7 @@
                             <thead class="bg-brand-blue-50 border-b border-gray-200">
                                 <tr>
                                     <th class="px-4 py-3 text-xs font-bold text-brand-blue-800 uppercase">رقم المرجع</th>
+                                    <th class="px-4 py-3 text-xs font-bold text-brand-blue-800 uppercase">المحفظة</th>
                                     <th class="px-4 py-3 text-xs font-bold text-brand-blue-800 uppercase">العملية</th>
                                     <th class="px-4 py-3 text-xs font-bold text-brand-blue-800 uppercase">المرسل</th>
                                     <th class="px-4 py-3 text-xs font-bold text-brand-blue-800 uppercase">المستفيد</th>
@@ -103,6 +104,11 @@
                                             @if($tx->network_transfer_number)
                                                 <div class="text-xs text-gray-400 mt-0.5">حوالة: {{ $tx->network_transfer_number }}</div>
                                             @endif
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="text-sm font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded inline-block">
+                                                {{ $tx->wallet->wallet_name ?? 'غير محدد' }}
+                                            </div>
                                         </td>
                                         <td class="px-4 py-4">
                                             <div class="text-sm text-gray-700">{{ $tx->operation ?? '-' }}</div>
@@ -187,6 +193,15 @@
             <form method="POST" action="{{ route('admin.wallet-transactions.store') }}" class="p-6 space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">المحفظة الإلكترونية <span class="text-red-500">*</span></label>
+                        <select name="electronic_wallet_id" class="w-full border-gray-300 rounded-lg shadow-sm text-sm" required>
+                            <option value="">اختر المحفظة</option>
+                            @foreach($wallets as $wallet)
+                                <option value="{{ $wallet->id }}">{{ $wallet->wallet_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">رقم مرجع العملية</label>
                         <input type="text" name="reference_number" placeholder="مثال: 17751784787335"

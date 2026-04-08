@@ -5,506 +5,438 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-6 flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">تعديل المنتج: {{ $product->name }}</h2>
-            </div>
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-brand-orange-800 mb-6">تعديل المنتج</h2>
 
-            <form id="edit-product-form" action="{{ route('vendor.products.update', $product->id) }}" method="POST"
-                enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+                    <form action="{{ route('vendor.products.update', $product->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Main Content (2 Columns on Large Screens) -->
-                    <div class="lg:col-span-2 space-y-6">
-
-                        <!-- Basic Information Card -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                                <h3 class="text-lg font-medium text-gray-900">المعلومات الأساسية</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Product Code -->
+                            <div>
+                                <x-input-label for="product_code" :value="__('رمز المنتج (SKU)')" />
+                                <x-text-input id="product_code" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="text"
+                                    name="product_code" :value="old('product_code', $product->product_code)"
+                                    placeholder="مثال: PRD-001" />
+                                <x-input-error :messages="$errors->get('product_code')" class="mt-2" />
                             </div>
-                            <div class="p-6 space-y-6">
-                                <!-- Product Code -->
-                                <div>
-                                    <x-input-label for="product_code" :value="__('رمز المنتج (SKU)')" />
-                                    <x-text-input id="product_code" class="block mt-1 w-full" type="text"
-                                        name="product_code" :value="old('product_code', $product->product_code)"
-                                        placeholder="مثال: PRD-001" />
-                                    <x-input-error :messages="$errors->get('product_code')" class="mt-2" />
-                                </div>
 
-                                <!-- Name -->
-                                <div>
-                                    <x-input-label for="name" :value="__('اسم المنتج')" />
-                                    <x-text-input id="name" class="block mt-1 w-full" type="text" name="name"
-                                        :value="old('name', $product->name)" required autofocus />
-                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                                </div>
-
-                                <!-- Brand -->
-                                <div>
-                                    <x-input-label for="brand_id" :value="__('الماركة')" />
-                                    <select id="brand_id" name="brand_id"
-                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
-                                        <option value="">اختر الماركة</option>
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
-                                                {{ $brand->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
-                                </div>
-
-                                <!-- Short Description -->
-                                <div>
-                                    <x-input-label for="description" :value="__('وصف مختصر')" />
-                                    <textarea id="description" name="description" rows="3"
-                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange round-md shadow-sm rounded-md"
-                                        required>{{ old('description', $product->description) }}</textarea>
-                                    <x-input-error :messages="$errors->get('description')" class="mt-2" />
-                                </div>
-
-                                <!-- Full Description -->
-                                <div>
-                                    <x-input-label for="full_description" :value="__('الوصف الكامل')" />
-                                    <textarea id="full_description" name="full_description" rows="5"
-                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">{{ old('full_description', $product->full_description) }}</textarea>
-                                    <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
-                                </div>
-
-                                <!-- Notes -->
-                                <div>
-                                    <x-input-label for="notes" :value="__('ملاحظات المرفق (خاصة بك)')" />
-                                    <textarea id="notes" name="notes" rows="2"
-                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm"
-                                        placeholder="ملاحظات تظهر لك فقط">{{ old('notes', $product->notes) }}</textarea>
-                                    <x-input-error :messages="$errors->get('notes')" class="mt-2" />
-                                </div>
+                            <!-- Name -->
+                            <div>
+                                <x-input-label for="name" :value="__('اسم المنتج')" />
+                                <x-text-input id="name" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="text" name="name"
+                                    :value="old('name', $product->name)" required autofocus />
+                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
-                        </div>
 
-                        <!-- Pricing & Inventory Card -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                                <h3 class="text-lg font-medium text-gray-900">الأسعار والمخزون</h3>
+                            <!-- Brand -->
+                            <div>
+                                <x-input-label for="brand_id" :value="__('الماركة')" />
+                                <select id="brand_id" name="brand_id"
+                                    class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                    <option value="">اختر الماركة</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
                             </div>
-                            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Price -->
-                                <div>
-                                    <x-input-label for="price" :value="__('سعر البيع الحالي')" />
-                                    <div class="flex gap-2">
-                                        <div class="relative mt-1 rounded-md shadow-sm flex-1">
-                                            <div
-                                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                                <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+
+                            <!-- Dynamic Sizes / Specifications -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">المواصفات / الأحجام (مثال: RAM 8GB, 1TB SSD, XL)</label>
+                                <div id="sizes-container" class="space-y-2">
+                                    @forelse($product->sizes as $size)
+                                        <div class="flex gap-2">
+                                            <input type="text" name="sizes[]" class="block w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" value="{{ $size->name }}">
+                                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                            </button>
+                                        </div>
+                                    @empty
+                                        <div class="flex gap-2">
+                                            <input type="text" name="sizes[]" class="block w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" placeholder="أدخل المواصفة أو الحجم">
+                                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                            </button>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <button type="button" onclick="addSizeRow()" class="mt-2 inline-flex items-center text-sm text-brand-orange-600 font-bold hover:text-brand-orange-800">
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    إضافة مواصفة/حجم آخر
+                                </button>
+                            </div>
+
+                            <!-- Dynamic Colors -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">الألوان المتاحة مع الصور</label>
+                                <div id="colors-container" class="space-y-4">
+                                    @foreach($product->colors as $index => $color)
+                                        <div class="color-row flex flex-wrap md:flex-nowrap gap-4 items-end bg-white p-3 rounded-lg border border-gray-200">
+                                            <div class="flex-1">
+                                                <label class="block font-medium text-sm text-gray-700">اسم اللون</label>
+                                                <input type="text" name="colors[{{ $index }}][name]" class="block w-full mt-1 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" value="{{ $color->name }}">
                                             </div>
-                                            <x-text-input id="price" class="block w-full" type="number" step="0.01"
-                                                name="price" :value="old('price', $product->price)" required />
+                                            <div class="flex-none w-24">
+                                                @if($color->image_path)
+                                                    <img src="{{ Storage::url($color->image_path) }}" class="w-12 h-12 rounded border shadow-sm mb-1">
+                                                    <input type="hidden" name="colors[{{ $index }}][existing_image]" value="{{ $color->image_path }}">
+                                                @endif
+                                                <input type="file" name="colors[{{ $index }}][image]" class="block w-full text-[10px]" accept="image/*">
+                                            </div>
+                                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 mb-2">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                            </button>
                                         </div>
-                                        <div class="w-1/3 mt-1">
-                                            <select id="currency" name="currency"
-                                                class="block w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
-                                                <option value="YER" {{ old('currency', $product->currency) == 'YER' ? 'selected' : '' }}>ريال يمني</option>
-                                                <option value="SAR" {{ old('currency', $product->currency) == 'SAR' ? 'selected' : '' }}>ريال سعودي</option>
-                                                <option value="USD" {{ old('currency', $product->currency) == 'USD' ? 'selected' : '' }}>دولار أمريكي</option>
-                                            </select>
+                                    @endforeach
+                                    @if($product->colors->count() == 0)
+                                        <div class="color-row flex flex-wrap md:flex-nowrap gap-4 items-end bg-white p-3 rounded-lg border border-gray-200">
+                                            <div class="flex-1">
+                                                <label class="block font-medium text-sm text-gray-700">اسم اللون</label>
+                                                <input type="text" name="colors[0][name]" class="block w-full mt-1 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                            </div>
+                                            <div class="flex-1">
+                                                <label class="block font-medium text-sm text-gray-700">صورة اللون</label>
+                                                <input type="file" name="colors[0][image]" class="block w-full text-xs mt-2" accept="image/*">
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
+                                </div>
+                                <button type="button" onclick="addColorRow()" class="mt-2 inline-flex items-center text-sm text-brand-orange-600 font-bold hover:text-brand-orange-800">
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    إضافة لون آخر
+                                </button>
+                            </div>
+
+                            <!-- Region -->
+                            <div>
+                                <x-input-label for="region" :value="__('المنطقة (المحافظة)')" />
+                                <select id="region" name="region" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                    <option value="">اختر المحافظة</option>
+                                    @php
+                                        $governorates = [
+                                            'أمانة العاصمة', 'صنعاء', 'عدن', 'تعز', 'الحديدة', 'حضرموت', 'إب', 'ذمار', 'حجة', 
+                                            'البيضاء', 'عمران', 'صعدة', 'المحويت', 'مأرب', 'لحج', 'أبين', 'المهرة', 'شبوة', 
+                                            'سقطرى', 'ريمة', 'الضالع', 'الجوف'
+                                        ];
+                                        $currentRegion = old('region', $product->region);
+                                    @endphp
+                                    @foreach($governorates as $gov)
+                                        <option value="{{ $gov }}" {{ $currentRegion == $gov ? 'selected' : '' }}>{{ $gov }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('region')" class="mt-2" />
+                            </div>
+
+                            <!-- Price -->
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <x-input-label for="price" :value="__('سعر البيع الحالي')" />
+                                    <x-text-input id="price" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" step="0.01"
+                                        name="price" :value="old('price', $product->price)" required />
                                     <x-input-error :messages="$errors->get('price')" class="mt-2" />
+                                </div>
+                                <div class="w-1/3">
+                                    <x-input-label for="currency" :value="__('العملة')" />
+                                    <select id="currency" name="currency"
+                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                        <option value="YER" {{ old('currency', $product->currency) == 'YER' ? 'selected' : '' }}>ريال يمني (YER)</option>
+                                        <option value="SAR" {{ old('currency', $product->currency) == 'SAR' ? 'selected' : '' }}>ريال سعودي (SAR)</option>
+                                        <option value="USD" {{ old('currency', $product->currency) == 'USD' ? 'selected' : '' }}>دولار أمريكي (USD)</option>
+                                    </select>
                                     <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                                 </div>
-
-                                <!-- Price Before -->
-                                <div>
-                                    <x-input-label for="price_before" :value="__('السعر قبل الخصم')" />
-                                    <div class="relative mt-1 rounded-md shadow-sm">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
-                                        </div>
-                                        <x-text-input id="price_before" class="block w-full pr-12" type="number"
-                                            step="0.01" name="price_before" :value="old('price_before', $product->price_before)" />
-                                    </div>
-                                    <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
-                                </div>
-
-                                <!-- Cost Price -->
-                                <div>
-                                    <x-input-label for="cost_price" :value="__('تكلفة الشراء')" />
-                                    <div class="relative mt-1 rounded-md shadow-sm">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
-                                        </div>
-                                        <x-text-input id="cost_price" class="block w-full pr-12" type="number"
-                                            step="0.01" name="cost_price" :value="old('cost_price', $product->cost_price)" />
-                                    </div>
-                                    <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
-                                </div>
-
-                                <!-- Stock -->
-                                <div>
-                                    <x-input-label for="stock" :value="__('الكمية المتوفرة')" />
-                                    <x-text-input id="stock" class="block mt-1 w-full" type="number" name="stock"
-                                        :value="old('stock', $product->stock)" required />
-                                    <x-input-error :messages="$errors->get('stock')" class="mt-2" />
-                                </div>
-
-                                <!-- Min Stock -->
-                                <div>
-                                    <x-input-label for="min_stock" :value="__('الحد الأدنى للتنبيه')" />
-                                    <x-text-input id="min_stock" class="block mt-1 w-full" type="number"
-                                        name="min_stock" :value="old('min_stock', $product->min_stock)" required />
-                                    <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
-                                </div>
-
-                                <!-- Warranty -->
-                                <div class="md:col-span-2">
-                                    <x-input-label for="warranty_duration" :value="__('الضمان')" />
-                                    <div class="flex gap-2">
-                                        <x-text-input id="warranty_duration" class="block mt-1 w-2/3" type="number" name="warranty_duration"
-                                            :value="old('warranty_duration', $product->warranty_duration)" placeholder="المدة" min="1" />
-                                        <select id="warranty_unit" name="warranty_unit" class="block mt-1 w-1/3 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
-                                            <option value="" {{ old('warranty_unit', $product->warranty_unit) == '' ? 'selected' : '' }}>أختر الوحدة</option>
-                                            <option value="days" {{ old('warranty_unit', $product->warranty_unit) == 'days' ? 'selected' : '' }}>يوم</option>
-                                            <option value="months" {{ old('warranty_unit', $product->warranty_unit) == 'months' ? 'selected' : '' }}>شهر</option>
-                                            <option value="years" {{ old('warranty_unit', $product->warranty_unit) == 'years' ? 'selected' : '' }}>سنة</option>
-                                        </select>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('warranty_duration')" class="mt-2" />
-                                    <x-input-error :messages="$errors->get('warranty_unit')" class="mt-2" />
-                                </div>
                             </div>
-                        </div>
 
-                    </div>
-
-                    <!-- Sidebar (1 Column on Large Screens) -->
-                    <div class="space-y-6">
-
-                        <!-- Organization Card -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                                <h3 class="text-lg font-medium text-gray-900">التنظيم</h3>
-                            </div>
-                            <div class="p-6 space-y-6">
-                                <!-- Status -->
-                                <div>
-                                    <x-input-label for="status" :value="__('الحالة')" />
-                                    <select id="status" name="status"
-                                        class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
-                                        <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>نشط</option>
-                                        <option value="inactive" {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>معطل</option>
-                                    </select>
-                                    <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                            <!-- Price Before Discount -->
+                            <div>
+                                <x-input-label for="price_before" :value="__('السعر قبل الخصم')" />
+                                <div class="relative mt-1">
+                                    <x-text-input id="price_before" class="block w-full pr-12 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" step="0.01"
+                                        name="price_before" :value="old('price_before', $product->price_before)" />
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+                                    </div>
                                 </div>
+                                <x-input-error :messages="$errors->get('price_before')" class="mt-2" />
+                            </div>
 
-                                <!-- Category Management -->
-                                <div>
-                                    <h4 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
-                                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                                        تصنيف المنتج
-                                    </h4>
-                                    
+                            <!-- Cost Price -->
+                            <div>
+                                <div class="relative mt-1">
+                                    <x-text-input id="cost_price" class="block w-full pr-12 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" step="0.01"
+                                        name="cost_price" :value="old('cost_price', $product->cost_price)" />
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-gray-500 sm:text-sm currency-label">ر.ي</span>
+                                    </div>
+                                </div>
+                                <x-input-error :messages="$errors->get('cost_price')" class="mt-2" />
+                            </div>
+
+                            <!-- Stock -->
+                            <div>
+                                <x-input-label for="stock" :value="__('الكمية (المخزون)')" />
+                                <x-text-input id="stock" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" name="stock"
+                                    :value="old('stock', $product->stock)" required />
+                                <x-input-error :messages="$errors->get('stock')" class="mt-2" />
+                            </div>
+
+                            <!-- Min Stock -->
+                            <div>
+                                <x-input-label for="min_stock" :value="__('الحد الأدنى للمخزون')" />
+                                <x-text-input id="min_stock" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" name="min_stock"
+                                    :value="old('min_stock', $product->min_stock)" required />
+                                <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
+                            </div>
+
+                            <!-- Warranty -->
+                            <div>
+                                <x-input-label for="warranty_duration" :value="__('الضمان (بالأيام)')" />
+                                <x-text-input id="warranty_duration" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" type="number" name="warranty_duration"
+                                    :value="old('warranty_duration', $product->warranty_duration)" placeholder="أدخل عدد الأيام" min="0" />
+                                <p class="mt-1 text-[10px] text-amber-600 font-bold">بناءً على الرقم سيتم حساب (يوم، شهر، سنة) تلقائياً.</p>
+                                <x-input-error :messages="$errors->get('warranty_duration')" class="mt-2" />
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <x-input-label for="status" :value="__('الحالة')" />
+                                <select id="status" name="status"
+                                    class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">
+                                    <option value="active" {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>نشط</option>
+                                    <option value="inactive" {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>معطل</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                            </div>
+
+                            <!-- Category Management -->
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm">
+                                <h4 class="text-sm font-bold text-brand-orange-800 mb-4 flex items-center">
+                                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                    تصنيف المنتج
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Main Category -->
                                     @php
                                         $currentCategory = $product->category;
                                         $currentParentId = $currentCategory ? ($currentCategory->parent_id ?: $currentCategory->id) : null;
                                         $currentSubId = ($currentCategory && $currentCategory->parent_id) ? $currentCategory->id : null;
                                     @endphp
-
-                                    <div class="space-y-4">
-                                        <!-- Main Category -->
-                                        <div>
-                                            <x-input-label for="main_category" :value="__('القسم الرئيسي')" />
-                                            <select id="main_category" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm py-2 transition-all" onchange="filterSubCategories(this.value)">
-                                                <option value="">اختر القسم الرئيسي</option>
-                                                @foreach($categories as $parent)
-                                                    <option value="{{ $parent->id }}" {{ $currentParentId == $parent->id ? 'selected' : '' }}>{{ $parent->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <!-- Sub Category -->
-                                        <div>
-                                            <x-input-label for="category_id" :value="__('القسم الفرعي')" />
-                                            <select id="category_id" name="category_id" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm py-2 transition-all">
-                                                <option value="">اختر القسم الرئيسي أولاً</option>
-                                            </select>
-                                            <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                                        </div>
+                                    <div>
+                                        <x-input-label for="main_category" :value="__('القسم الرئيسي')" />
+                                        <select id="main_category" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-xl shadow-sm py-3 transition-all" onchange="filterSubCategories(this.value)">
+                                            <option value="">اختر القسم الرئيسي</option>
+                                            @foreach($categories as $parent)
+                                                <option value="{{ $parent->id }}" {{ $currentParentId == $parent->id ? 'selected' : '' }}>{{ $parent->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
-                                    <script>
-                                        const categoriesData = @json($categories);
-                                        const initialMainId = "{{ $currentParentId }}";
-                                        const initialSubId = "{{ $currentSubId }}";
+                                    <!-- Sub Category -->
+                                    <div>
+                                        <x-input-label for="category_id" :value="__('القسم الفرعي')" />
+                                        <select id="category_id" name="category_id" class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-xl shadow-sm py-3 transition-all">
+                                            <option value="">اختر القسم الرئيسي أولاً</option>
+                                        </select>
+                                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                                    </div>
+                                </div>
 
-                                        function filterSubCategories(parentId, selectedSubId = null) {
-                                            const subSelect = document.getElementById('category_id');
-                                            subSelect.innerHTML = '';
-                                            
-                                            if (!parentId) {
-                                                subSelect.innerHTML = '<option value="">اختر القسم الرئيسي أولاً</option>';
-                                                subSelect.disabled = true;
-                                                return;
-                                            }
+                                <script>
+                                    const categoriesData = @json($categories);
+                                    const initialMainId = "{{ $currentParentId }}";
+                                    const initialSubId = "{{ $currentSubId }}";
 
-                                            const parent = categoriesData.find(c => c.id == parentId);
-                                            if (parent && parent.children && parent.children.length > 0) {
-                                                subSelect.disabled = false;
-                                                subSelect.innerHTML = '<option value="">اختر القسم الفرعي</option>';
-                                                parent.children.forEach(child => {
-                                                    const opt = document.createElement('option');
-                                                    opt.value = child.id;
-                                                    opt.textContent = child.name;
-                                                    if (selectedSubId && child.id == selectedSubId) {
-                                                        opt.selected = true;
-                                                    }
-                                                    subSelect.appendChild(opt);
-                                                });
-                                            } else {
-                                                subSelect.disabled = false;
-                                                subSelect.innerHTML = `<option value="${parentId}" selected>هذا القسم لا يحتوي على أقسام فرعية (استخدمه كقسم وحيد)</option>`;
-                                            }
+                                    function filterSubCategories(parentId, selectedSubId = null) {
+                                        const subSelect = document.getElementById('category_id');
+                                        subSelect.innerHTML = '';
+                                        
+                                        if (!parentId) {
+                                            subSelect.innerHTML = '<option value="">اختر القسم الرئيسي أولاً</option>';
+                                            subSelect.disabled = true;
+                                            return;
                                         }
 
-                                        // Initialization
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            if (initialMainId) {
-                                                filterSubCategories(initialMainId, initialSubId);
-                                            }
-                                        });
-                                    </script>
+                                        const parent = categoriesData.find(c => c.id == parentId);
+                                        if (parent && parent.children && parent.children.length > 0) {
+                                            subSelect.disabled = false;
+                                            subSelect.innerHTML = '<option value="">اختر القسم الفرعي</option>';
+                                            parent.children.forEach(child => {
+                                                const opt = document.createElement('option');
+                                                opt.value = child.id;
+                                                opt.textContent = child.name;
+                                                if (selectedSubId && child.id == selectedSubId) {
+                                                    opt.selected = true;
+                                                }
+                                                subSelect.appendChild(opt);
+                                            });
+                                        } else {
+                                            subSelect.disabled = false;
+                                            subSelect.innerHTML = `<option value="${parentId}" selected>هذا القسم لا يحتوي على أقسام فرعية (استخدمه كقسم وحيد)</option>`;
+                                        }
+                                    }
+
+                                    // Initialization
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        if (initialMainId) {
+                                            filterSubCategories(initialMainId, initialSubId);
+                                        }
+                                    });
+                                </script>
+                            </div>
+
+                            <!-- Media Section -->
+                            <div class="col-span-1 md:col-span-2 bg-brand-orange-50/30 p-6 rounded-2xl border border-brand-orange-100 shadow-sm mt-4">
+                                <h4 class="text-sm font-bold text-brand-orange-800 mb-6 flex items-center">
+                                    <svg class="w-5 h-5 ml-2 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    إدارة معرض الصور والمحتوى التفاعلي
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <!-- Main Image -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="image" :value="__('صورة المنتج الأساسية')" class="font-bold text-gray-700 mb-2" />
+                                        @if($product->image)
+                                            <div class="mb-3 relative group w-20 h-20">
+                                                <img src="{{ asset('storage/' . $product->image) }}" class="w-20 h-20 object-cover rounded-lg border shadow-sm">
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center text-[8px] text-white font-bold">الحالية</div>
+                                            </div>
+                                        @endif
+                                        <input type="file" id="image" name="image" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-orange file:text-white hover:file:bg-brand-orange-600 transition-all" accept="image/*" />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">رفع صورة جديدة سيستبدل الصورة الحالية.</p>
+                                        <x-input-error :messages="$errors->get('image')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Gallery -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="gallery" :value="__('إضافة صور للمعرض')" class="font-bold text-gray-700 mb-2" />
+                                        @if($product->images->count() > 0)
+                                            <div class="flex flex-wrap gap-2 mb-3 bg-gray-50 p-2 rounded-lg">
+                                                @foreach($product->images as $img)
+                                                    <div class="relative group">
+                                                        <img src="{{ asset('storage/' . $img->image_path) }}" class="w-12 h-12 object-cover rounded border">
+                                                        <div class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                            <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        <input type="file" id="gallery" name="images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 transition-all" accept="image/*" />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">الصور الجديدة ستنظاف للمجموعة الحالية.</p>
+                                    </div>
+
+                                    <!-- 3D Model -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="three_d_model" :value="__('تحديث ملف 3D (الواقع المعزز)')" class="font-bold text-gray-700 mb-2" />
+                                        @if($product->three_d_model)
+                                            <div class="mb-3 flex items-center bg-amber-50 p-2 rounded border border-amber-100 text-[10px] text-amber-700">
+                                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>يوجد ملف 3D حالي مرفوع</span>
+                                            </div>
+                                        @endif
+                                        <div class="flex items-center space-x-2 space-x-reverse">
+                                            <input type="file" id="three_d_model" name="three_d_model" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 transition-all" accept=".glb,.gltf" />
+                                            <span class="px-2 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded text-[10px] font-bold">GLB / GLTF</span>
+                                        </div>
+                                        <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
+                                    </div>
+
+                                    <!-- 360 Images -->
+                                    <div class="bg-white p-4 rounded-xl border border-gray-100">
+                                        <x-input-label for="three_sixty_images" :value="__('تحديث صور 360 درجة')" class="font-bold text-gray-700 mb-2" />
+                                        @if($product->three_sixty_images && count($product->three_sixty_images) > 0)
+                                            <div class="mb-3 flex items-center bg-indigo-50 p-2 rounded border border-indigo-100 text-[10px] text-indigo-700">
+                                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                <span>يوجد عدد ({{ count($product->three_sixty_images) }}) صور بزاوية 360 درجة</span>
+                                            </div>
+                                        @endif
+                                        <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all" accept="image/*" />
+                                        <p class="mt-2 text-[10px] text-gray-400 italic">رفع صور جديدة سيحل محل المجموعة القديمة.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Media Card -->
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                            <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-lg">
-                                <h3 class="text-lg font-medium text-gray-900">صور المنتج</h3>
-                            </div>
-                            <div class="p-6">
-                                <!-- عرض الصور الحالية -->
-                                @if($product->images->count() > 0)
-                                    <div class="grid grid-cols-2 gap-2 mb-4">
-                                        @foreach($product->images as $img)
-                                            <img src="{{ asset('storage/' . $img->image_path) }}"
-                                                class="w-full h-20 object-cover rounded border">
-                                        @endforeach
-                                    </div>
-                                @elseif($product->image)
-                                    <div class="mb-4">
-                                        <img src="{{ asset('storage/' . $product->image) }}"
-                                            class="w-full h-32 object-cover rounded border">
-                                    </div>
-                                @endif
-
-                                <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
-                                    id="image-preview-container">
-                                    <div class="text-center">
-                                        <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24"
-                                            fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd"
-                                                d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <div class="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                                            <label for="images"
-                                                class="relative cursor-pointer rounded-md bg-white font-semibold text-brand-orange focus-within:outline-none focus-within:ring-2 focus-within:ring-brand-orange focus-within:ring-offset-2 hover:text-brand-orange-700">
-                                                <span>رفع صور إضافية</span>
-                                                <input id="images" name="images[]" type="file" class="sr-only"
-                                                    accept="image/*" multiple>
-                                            </label>
-                                        </div>
-                                        <p class="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 2MB</p>
-                                        <p id="file-name" class="mt-2 text-sm text-gray-500 hidden"></p>
-                                    </div>
-                                </div>
-                                <x-input-error :messages="$errors->get('images')" class="mt-2" />
-
-                                <div class="mt-8 pt-6 border-t border-gray-100">
-                                    <h4 class="text-md font-medium text-gray-800 mb-4">عرض 3D</h4>
-                                    @if($product->three_d_model)
-                                        <div
-                                            class="mb-3 p-2 bg-blue-50 rounded text-xs text-blue-700 flex justify-between items-center">
-                                            <span>ملف 3D الحالي موجود</span>
-                                            <a href="{{ asset('storage/' . $product->three_d_model) }}" target="_blank"
-                                                class="underline">تحميل/عرض</a>
-                                        </div>
-                                    @endif
-                                    <x-input-label for="three_d_model" :value="__('تحديث ملف 3D (.glb, .gltf, .obj, .stl)')" />
-                                    <input type="file" id="three_d_model" name="three_d_model"
-                                        accept=".glb,.gltf,.obj,.stl"
-                                        class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                                    <x-input-error :messages="$errors->get('three_d_model')" class="mt-2" />
-                                </div>
-
-                                <div class="mt-8 pt-6 border-t border-gray-100">
-                                    <h4 class="text-md font-medium text-gray-800 mb-4">عرض 360 درجة</h4>
-                                    @if($product->three_sixty_images)
-                                        <div class="grid grid-cols-4 gap-2 mb-4">
-                                            @foreach($product->three_sixty_images as $path)
-                                                <img src="{{ asset('storage/' . $path) }}"
-                                                    class="w-full h-10 object-cover rounded border">
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    <x-input-label for="three_sixty_images" :value="__('تحديث صور 360 (ارفع المجموعة بالكامل)')" />
-                                    <input type="file" id="three_sixty_images" name="three_sixty_images[]" multiple
-                                        accept="image/*"
-                                        class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
-                                    <x-input-error :messages="$errors->get('three_sixty_images')" class="mt-2" />
-                                </div>
-                            </div>
+                        <!-- Description -->
+                        <div class="mt-6">
+                            <x-input-label for="description" :value="__('وصف مختصر')" />
+                            <textarea id="description" name="description" rows="3"
+                                class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm"
+                                required>{{ old('description', $product->description) }}</textarea>
+                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
 
-                        <!-- Actions -->
-                        <div class="flex items-center justify-end gap-4 mt-6">
+                        <!-- Full Description -->
+                        <div class="mt-6">
+                            <x-input-label for="full_description" :value="__('الوصف الكامل')" />
+                            <textarea id="full_description" name="full_description" rows="5"
+                                class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">{{ old('full_description', $product->full_description) }}</textarea>
+                            <x-input-error :messages="$errors->get('full_description')" class="mt-2" />
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mt-6">
+                            <x-input-label for="notes" :value="__('ملاحظات إقليمية (خاصة بالنظام)')" />
+                            <textarea id="notes" name="notes" rows="3"
+                                class="block mt-1 w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm">{{ old('notes', $product->notes) }}</textarea>
+                            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
+                        </div>
+
+                        <div class="flex items-center justify-end mt-6">
                             <a href="{{ route('vendor.products.index') }}"
-                                class="text-sm font-semibold leading-6 text-gray-900 hover:text-red-500">إلغاء</a>
-                            <x-primary-button>
+                                class="text-sm text-gray-600 hover:text-gray-900 ml-4">إلغاء</a>
+                            <x-primary-button class="ml-4">
                                 {{ __('حفظ التعديلات') }}
                             </x-primary-button>
                         </div>
-
-                    </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-
     <script>
-        // Track initial values
-        const form = document.getElementById('edit-product-form');
-        const initialValues = {};
-        const fieldLabels = {
-            'product_code': 'رمز المنتج',
-            'name': 'اسم المنتج',
-            'brand': 'الماركة',
-            'description': 'الوصف المختصر',
-            'full_description': 'الوصف الكامل',
-            'price': 'سعر البيع',
-            'price_before': 'السعر قبل الخصم',
-            'cost_price': 'تكلفة الشراء',
-            'stock': 'الكمية',
-            'min_stock': 'الحد الأدنى',
-            'notes': 'الملاحظات',
-            'warranty_duration': 'صلاحية الضمان',
-            'warranty_unit': 'وحدة الضمان',
-            'status': 'الحالة',
-            'category_id': 'التصنيف',
-            'currency': 'العملة'
-        };
+        let colorIndex = {{ $product->colors->count() > 0 ? $product->colors->count() : 1 }};
 
-        const statusLabels = {
-            'active': 'نشط',
-            'inactive': 'معطل'
-        };
+        function addSizeRow() {
+            const container = document.getElementById('sizes-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 mt-2';
+            div.innerHTML = `
+                <input type="text" name="sizes[]" class="block w-full border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" placeholder="أدخل المواصفة أو الحجم">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </button>
+            `;
+            container.appendChild(div);
+        }
 
-        const categoryNames = {
-            @foreach($categories as $parent)
-                '{{ $parent->id }}': '{{ $parent->name }}',
-                @foreach($parent->children as $child)
-                    '{{ $child->id }}': '{{ $child->name }}',
-                @endforeach
-            @endforeach
-        };
-
-        const brandNames = {
-            @foreach($brands as $brand)
-                '{{ $brand->id }}': '{{ $brand->name }}',
-            @endforeach
-        };
-
-        // Initialize values
-        document.querySelectorAll('#edit-product-form input, #edit-product-form textarea, #edit-product-form select').forEach(input => {
-            if (input.name && input.name !== '_token' && input.name !== '_method') {
-                if (input.name === 'images[]') return;
-                initialValues[input.name] = input.value;
-            }
-        });
-
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const currentValues = {};
-            const changes = [];
-
-            document.querySelectorAll('#edit-product-form input, #edit-product-form textarea, #edit-product-form select').forEach(input => {
-                if (input.name && input.name !== '_token' && input.name !== '_method') {
-                    if (input.name === 'images[]') {
-                        if (input.files.length > 0) {
-                            changes.push(`<li><strong>صور المنتج:</strong> تم اختيار ${input.files.length} صورة جديدة</li>`);
-                        }
-                        return;
-                    }
-
-                    if (input.value !== initialValues[input.name]) {
-                        let oldVal = initialValues[input.name];
-                        let newVal = input.value;
-
-                        // Handle status translation
-                        if (input.name === 'status') {
-                            oldVal = statusLabels[oldVal] || oldVal;
-                            newVal = statusLabels[newVal] || newVal;
-                        }
-
-                        // Handle category translation
-                        if (input.name === 'category_id') {
-                            oldVal = categoryNames[oldVal] || oldVal;
-                            newVal = categoryNames[newVal] || newVal;
-                        }
-
-                        // Handle brand translation
-                        if (input.name === 'brand_id') {
-                            oldVal = brandNames[oldVal] || oldVal;
-                            newVal = brandNames[newVal] || newVal;
-                        }
-
-                        changes.push(`<li><strong>${fieldLabels[input.name] || input.name}:</strong> من "${oldVal}" إلى "${newVal}"</li>`);
-                    }
-                }
-            });
-
-            if (changes.length === 0) {
-                Swal.fire({
-                    title: 'لا توجد تغييرات',
-                    text: 'لم تقم بإجراء أي تعديلات على المنتج.',
-                    icon: 'info',
-                    confirmButtonText: 'إغلاق',
-                    confirmButtonColor: '#f97316',
-                });
-                return;
-            }
-
-            let changesHtml = '<ul style="text-align: right; direction: rtl; list-style-type: disc; padding-right: 20px;">' + changes.join('') + '</ul>';
-
-            Swal.fire({
-                title: 'تأكيد التعديلات',
-                html: `
-                    <div class="text-right" dir="rtl">
-                        <p class="mb-3">لقد قمت بتعديل الحقول التالية:</p>
-                        ${changesHtml}
-                        <p class="mt-4 font-bold text-center">هل أنت متأكد من حفظ هذه التعديلات؟</p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، حفظ',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#f97316', // brand-orange
-                cancelButtonColor: '#6b7280',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
+        function addColorRow() {
+            const container = document.getElementById('colors-container');
+            const div = document.createElement('div');
+            div.className = 'color-row flex flex-wrap md:flex-nowrap gap-4 items-end bg-white p-3 rounded-lg border border-gray-200 mt-2';
+            div.innerHTML = `
+                <div class="flex-1">
+                    <label class="block font-medium text-sm text-gray-700">اسم اللون</label>
+                    <input type="text" name="colors[${colorIndex}][name]" class="block w-full mt-1 border-gray-300 focus:border-brand-orange focus:ring-brand-orange rounded-md shadow-sm" placeholder="مثال: أسود ملكي">
+                </div>
+                <div class="flex-1">
+                    <label class="block font-medium text-sm text-gray-700">صورة اللون</label>
+                    <input type="file" name="colors[${colorIndex}][image]" class="block w-full text-xs mt-2" accept="image/*">
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </button>
+            `;
+            container.appendChild(div);
+            colorIndex++;
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Currency update logic
             const currencySelect = document.getElementById('currency');
             const currencyLabels = document.querySelectorAll('.currency-label');
 
@@ -517,8 +449,6 @@
                 if (selectedCurrency === 'SAR') symbol = 'ر.س';
                 else if (selectedCurrency === 'USD') symbol = '$';
 
-                console.log('Updating currency labels to:', symbol); // Debug
-
                 currencyLabels.forEach(label => {
                     label.textContent = symbol;
                 });
@@ -526,23 +456,8 @@
 
             if (currencySelect) {
                 currencySelect.addEventListener('change', updateCurrencyLabels);
-                // Initialize on load
                 updateCurrencyLabels();
             }
         });
-
-        // Image preview logic fix
-        const imagesInput = document.getElementById('images');
-        if (imagesInput) {
-            imagesInput.addEventListener('change', function (e) {
-                const fileNameElement = document.getElementById('file-name');
-                if (this.files.length > 0) {
-                    fileNameElement.textContent = 'تم اختيار ' + this.files.length + ' صور';
-                    fileNameElement.classList.remove('hidden');
-                } else {
-                    fileNameElement.classList.add('hidden');
-                }
-            });
-        }
     </script>
 </x-vendor-layout>

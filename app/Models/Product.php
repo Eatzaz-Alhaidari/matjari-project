@@ -81,7 +81,7 @@ class Product extends Model
 
     public function brand()
     {
-        return $this->belongsTo(Category::class, 'brand_id')->where('is_brand', true);
+        return $this->belongsTo(Category::class, 'brand_id');
     }
 
     public function orderItems()

@@ -39,6 +39,7 @@ class ComplaintController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:2000',
             'order_id' => 'nullable|exists:orders,id',
+            'image'    => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -48,17 +49,23 @@ class ComplaintController extends Controller
             ], 422);
         }
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('complaints', 'public');
+        }
+
         $complaint = Complaint::create([
             'user_id' => Auth::id(),
             'order_id' => $request->order_id,
             'subject' => $request->subject,
             'message' => $request->message,
+            'image'   => $imagePath,
             'status' => 'open',
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Complaint submitted successfully.',
+            'message' => 'تم تقديم الشكوى بنجاح.',
             'data' => $complaint
         ], 201);
     }

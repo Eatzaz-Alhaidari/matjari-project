@@ -34,7 +34,7 @@ class PaymentController extends Controller
                 'id' => 'cash_on_delivery',
                 'name' => 'الدفع عند الاستلام',
                 'description' => 'ادفع نقداً عند استلام طلبك',
-                'icon' => 'cod_icon_url_here' // Replace with asset url if needed
+                'icon' => asset('assets/icons/cod.png') 
             ];
         }
 
@@ -44,7 +44,7 @@ class PaymentController extends Controller
                 'id' => 'wallet',
                 'name' => 'محفظة جـيب',
                 'description' => 'ادفع من رصيدك في المحفظة',
-                'icon' => 'wallet_icon_url_here'
+                'icon' => asset('assets/icons/wallet.png')
             ];
         }
 
@@ -54,7 +54,7 @@ class PaymentController extends Controller
                 'id' => 'bank_transfer',
                 'name' => 'تحويل بنكي',
                 'description' => 'تحويل المبلغ إلى حسابنا البنكي',
-                'icon' => 'bank_icon_url_here',
+                'icon' => asset('assets/icons/bank.png'),
                 'bank_details' => [
                     'bank_name' => $settings['bank_name'] ?? '',
                     'account_name' => $settings['bank_account_name'] ?? '',
@@ -67,6 +67,23 @@ class PaymentController extends Controller
         return response()->json([
             'status' => true,
             'data' => $methods
+        ]);
+    }
+
+    /**
+     * Get list of Electronic Wallets for manual charging from Mobile App
+     */
+    public function getWallets()
+    {
+        $wallets = \App\Models\ElectronicWallet::where('is_active', true)
+            ->get(['id', 'wallet_name', 'wallet_logo', 'provider', 'merchant_number', 'address']);
+
+        return response()->json([
+            'status' => true,
+            'data' => $wallets->map(function($w) {
+                $w->wallet_logo = $w->wallet_logo ? asset('storage/'.$w->wallet_logo) : null;
+                return $w;
+            })
         ]);
     }
 }
