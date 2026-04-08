@@ -107,7 +107,7 @@
                                             @endif
                                         </td>
                                         <td class="px-5 py-4 whitespace-nowrap text-center text-sm">
-                                            <span class="font-bold {{ $product->stock > 5 ? 'text-green-600' : 'text-red-600' }}">{{ $product->stock }}</span>
+                                            <span id="qty-{{ $product->product_code }}" class="font-bold {{ $product->stock > 5 ? 'text-green-600' : 'text-red-600' }}">{{ $product->stock }}</span>
                                         </td>
                                         <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <div class="max-w-[120px] truncate" title="{{ $product->region }}">{{ $product->region ?? 'غير محدد' }}</div>
@@ -179,4 +179,41 @@
             </div>
         </div>
     </div>
+
+    <!-- Real-time Inventory Listener -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Pusher !== 'undefined') {
+                const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+                    cluster: '{{ env("PUSHER_APP_CLUSTER", "mt1") }}',
+                    forceTLS: true
+                });
+
+                const channel = pusher.subscribe('inventory-updates');
+                channel.bind('qty.updated', function(data) {
+                    console.log('Stock Update Received:', data);
+                    const element = document.getElementById('qty-' + data.product_code);
+                    if (element) {
+                        element.innerText = data.new_qty;
+                        
+                        // Micro-animation for feedback
+                        element.style.transition = 'all 0.5s ease';
+                        element.style.color = '#2563eb'; // blue-600
+                        element.style.transform = 'scale(1.5)';
+                        
+                        setTimeout(() => {
+                            element.style.transform = 'scale(1)';
+                            // Update color based on threshold
+                            if (data.new_qty > 5) {
+                                element.style.color = '#16a34a'; // green-600
+                            } else {
+                                element.style.color = '#dc2626'; // red-600
+                            }
+                        }, 1000);
+                    }
+                });
+            }
+        });
+    </script>
 </x-admin-layout>

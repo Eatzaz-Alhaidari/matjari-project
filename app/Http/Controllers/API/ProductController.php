@@ -275,15 +275,20 @@ class ProductController extends Controller
                     continue; // تم إنشاء المنتج وحفظه
                 }
 
-                $product->stock = (int) round((float) $qty);
-                // تحديث الاسم والسعر في حال تم إرسالهم ولم يكونوا فارغين
-                if (!empty($item['name'])) {
-                    $product->name = $item['name'];
+                $oldQty = (int) $product->stock;
+                $newQty = (int) round((float) $qty);
+
+                $product->stock = $newQty;
+
+                // الكفاءة: بث تحديث الرصيد فقط إذا تغير فعلياً (Dirty Checking)
+                // ملحوظة: لم نعد نحدث الاسم أو السعر هنا بناءً على طلبك للحفاظ على تعديلات لوحة التحكم
+                if ($oldQty !== $newQty) {
+                    $product->save();
+                    event(new \App\Events\ProductQtyUpdated($product->product_code, $newQty));
+                } else {
+                    $product->save();
                 }
-                if (isset($item['price'])) {
-                    $product->price = (float) $item['price'];
-                }
-                $product->save();
+
                 $updatedCount++;
             }
 
