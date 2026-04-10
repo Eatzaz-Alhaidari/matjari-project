@@ -27,126 +27,105 @@
                     </div>
 
                     <div class="overflow-x-auto bg-white min-h-[400px]">
-                        <table class="min-w-full text-right">
-                            <thead class="bg-brand-blue-50 border-b border-gray-200">
+                        <table class="min-w-full text-right divide-y divide-gray-200">
+                            <thead class="bg-brand-blue-50">
                                 <tr>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التصنيف</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الصورة</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider">التصنيف الفرعي</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الصورة</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider">الماركة</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الصورة</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الحالة</th>
-                                    <th class="px-5 py-3 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الإجراءات</th>
+                                    <th class="px-5 py-4 text-xs font-bold text-brand-blue-800 uppercase tracking-wider w-1/4">قسم السوبر (الرئيسي)</th>
+                                    <th class="px-5 py-4 text-xs font-bold text-brand-blue-800 uppercase tracking-wider w-1/3 text-right">الأقسام الفرعية</th>
+                                    <th class="px-5 py-4 text-xs font-bold text-brand-blue-800 uppercase tracking-wider w-1/4 text-right">الماركات الشائعة</th>
+                                    <th class="px-5 py-4 text-xs font-bold text-brand-blue-800 uppercase tracking-wider text-center">الإجراءات</th>
                                 </tr>
                             </thead>
-                            @forelse($categories as $category)
-                                @php
-                                    $subcategories = $category->children->where('is_brand', false)->values();
-                                    $brands = $category->children->where('is_brand', true)->values();
-                                    
-                                    $flattened = [];
-                                    $max = max($subcategories->count(), $brands->count());
-                                    
-                                    if ($max == 0) {
-                                        $flattened = [];
-                                    } else {
-                                        for($i=0; $i<$max; $i++) {
-                                            $flattened[] = [
-                                                'sub' => $subcategories->get($i),
-                                                'brand' => $brands->get($i)
-                                            ];
-                                        }
-                                    }
-                                    $totalRows = count($flattened);
-                                @endphp
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @forelse($categories as $category)
+                                    @php
+                                        $subcategories = $category->children->where('is_brand', false);
+                                        $brands = $category->children->where('is_brand', true);
+                                    @endphp
+                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                        <!-- القسم الرئيسي -->
+                                        <td class="px-5 py-6 whitespace-nowrap">
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex-shrink-0 w-12 h-12 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-center p-1.5 overflow-hidden">
+                                                    @if($category->image)
+                                                        <img src="{{ Storage::url($category->image) }}" class="w-full h-full object-contain">
+                                                    @else
+                                                        <div class="text-gray-300">
+                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-bold text-brand-blue-900">{{ $category->name }}</div>
+                                                    <div class="text-[10px] text-gray-400">ID: #{{ $category->id }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                                <tbody x-data="{ expanded: false }" class="divide-y divide-gray-100 border-b border-gray-200">
-                                    @if($totalRows === 0)
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-5 py-4">
-                                                <div class="text-sm font-bold text-gray-900">{{ $category->name }}</div>
-                                            </td>
-                                            <td class="px-5 py-4 text-center">
-                                                @if($category->image)
-                                                    <img src="{{ Storage::url($category->image) }}" class="w-10 h-10 rounded-full border border-gray-200 shadow-sm mx-auto object-contain bg-white">
-                                                @endif
-                                            </td>
-                                            <td colspan="4" class="px-5 py-4 text-xs text-gray-400 italic text-center">لا توجد أفرع أو ماركات</td>
-                                            @include('admin.categories.partials.status-actions', ['item' => $category, 'root' => $category])
-                                        </tr>
-                                    @else
-                                        @foreach($flattened as $index => $row)
-                                            @php
-                                                $sub = $row['sub'];
-                                                $brand = $row['brand'];
-                                                $isFirstOverall = ($index === 0);
-                                            @endphp
-                                            <tr class="hover:bg-gray-50 transition-colors"
-                                                x-show="{{ $isFirstOverall ? 'true' : 'expanded' }}"
-                                                @if(!$isFirstOverall) x-transition:enter="transition duration-200" x-transition:enter-start="opacity-0 -translate-y-1" @endif>
-                                                
-                                                @if($isFirstOverall)
-                                                    <td class="px-5 py-4 align-top font-bold text-gray-900" rowspan="{{ $totalRows }}" :rowspan="expanded ? {{ $totalRows }} : 1">
-                                                        {{ $category->name }}
-                                                    </td>
-                                                    <td class="px-5 py-4 align-top text-center" rowspan="{{ $totalRows }}" :rowspan="expanded ? {{ $totalRows }} : 1">
-                                                        @if($category->image)
-                                                            <img src="{{ Storage::url($category->image) }}" class="w-10 h-10 rounded-full shadow-sm mx-auto object-contain border border-gray-200 bg-white">
-                                                        @endif
-                                                    </td>
-                                                @endif
-
-                                                <td class="px-5 py-4">
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="text-sm font-medium text-gray-900">{{ $sub ? $sub->name : '-' }}</div>
-                                                        @if($isFirstOverall && $totalRows > 1)
-                                                            <button @click="expanded = !expanded" class="text-[10px] text-brand-blue hover:text-brand-blue-800 font-bold bg-brand-blue-50 px-2 py-0.5 rounded-md flex items-center gap-1 transition-colors border border-brand-blue-100">
-                                                                <span x-text="expanded ? 'إخفاء' : '+ {{ $totalRows - 1 }}'"></span>
-                                                                <svg class="w-3 h-3 transition-transform" :class="{'rotate-180': expanded}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                                                            </button>
-                                                        @endif
+                                        <!-- الأقسام الفرعية -->
+                                        <td class="px-5 py-6">
+                                            <div class="flex flex-wrap gap-2">
+                                                @forelse($subcategories as $sub)
+                                                    <div class="inline-flex items-center bg-blue-50 text-brand-blue-700 px-2.5 py-1 rounded-lg border border-blue-100 shadow-sm hover:bg-blue-100 transition-colors cursor-default">
+                                                        <span class="text-xs font-bold">{{ $sub->name }}</span>
                                                     </div>
-                                                </td>
-                                                <td class="px-5 py-4 text-center">
-                                                    @if($sub && $sub->icon)
-                                                        <img src="{{ Storage::url($sub->icon) }}" class="w-8 h-8 rounded-lg mx-auto object-contain bg-white border border-gray-100 shadow-sm">
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
+                                                @empty
+                                                    <span class="text-xs text-gray-300 italic">لا توجد أقسام فرعية</span>
+                                                @endforelse
+                                            </div>
+                                        </td>
 
-                                                <td class="px-5 py-4">
-                                                    <div class="text-sm text-gray-700">{{ $brand ? $brand->name : '-' }}</div>
-                                                </td>
-                                                <td class="px-5 py-4 text-center">
-                                                    @if($brand && ($brand->brand_logo ?? $brand->image))
-                                                        <img src="{{ Storage::url($brand->brand_logo ?? $brand->image) }}" class="w-8 h-8 rounded-full mx-auto object-contain bg-white border border-gray-100 shadow-sm">
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
+                                        <!-- الماركات -->
+                                        <td class="px-5 py-6">
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @forelse($brands as $brand)
+                                                    <div class="inline-flex items-center bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 hover:border-brand-blue-200 transition-all group cursor-default">
+                                                        <span class="text-[10px] font-medium group-hover:text-brand-blue">{{ $brand->name }}</span>
+                                                    </div>
+                                                @empty
+                                                    <span class="text-xs text-gray-300 italic">لا توجد ماركات</span>
+                                                @endforelse
+                                            </div>
+                                        </td>
 
-                                                @if($isFirstOverall)
-                                                    @include('admin.categories.partials.status-actions', ['item' => $category, 'root' => $category, 'rowspan' => $totalRows])
-                                                @endif
-                                            </tr>
-                                        @endforeach
-                                    @endif
-                                </tbody>
-                            @empty
-                                <tbody>
-                                    <tr>
-                                        <td colspan="8" class="px-6 py-20 text-center text-gray-500 font-medium">لم يتم العثور على أي تصنيفات</td>
+                                        <!-- الإجراءات -->
+                                        <td class="px-5 py-6 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <!-- زر الحالة -->
+                                                <form action="{{ route('admin.categories.toggleStatus', $category->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="px-3 py-1 text-[10px] font-bold rounded-full {{ $category->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
+                                                        {{ $category->status === 'active' ? 'نشط' : 'معطل' }}
+                                                    </button>
+                                                </form>
+
+                                                <!-- تعديل -->
+                                                <button onclick="editCategory({{ $category->id }})" class="p-2 text-brand-blue hover:bg-brand-blue-50 rounded-lg transition-colors shadow-sm bg-white border border-gray-100">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                </button>
+
+                                                <!-- حذف -->
+                                                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('حذف هذا القسم سيؤدي لحذف كافة توابعه، هل أنت متاكد؟')" class="inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors shadow-sm bg-white border border-gray-100">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </tbody>
-                            @endforelse
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-20 text-center text-gray-400 italic">لم يتم العثور على أي تصنيفات</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
                         </table>
                     </div>
 
                     <!-- Pagination -->
                     @if($categories->hasPages())
-                        <div class="mt-8 font-sans">
+                        <div class="mt-8">
                             {{ $categories->links() }}
                         </div>
                     @endif
@@ -156,5 +135,18 @@
     </div>
 
     @include('admin.categories.partials.modals')
+
+    @push('scripts')
+    <script>
+        function editCategory(id) {
+            const modal = document.getElementById('editModal' + id);
+            if (modal) {
+                modal.showModal();
+            } else {
+                console.error('Modal not found for category ID: ' + id);
+            }
+        }
+    </script>
+    @endpush
 
 </x-admin-layout>

@@ -13,6 +13,7 @@ class Address extends Model
         'user_id',
         'label',
         'address',
+        'details',
         'city',
         'phone',
         'is_default',

@@ -4,99 +4,70 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Category;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. تنظيف البيانات القديمة (اختياري، يفضل استخدامه لضمان بناء الشجرة من جديد)
-        // \App\Models\Product::query()->update(['category_id' => null]);
-        // Category::query()->delete();
+        // 1. تنظيف البيانات القديمة
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Category::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        $tree = [
-            'لابتوبات' => [
-                'لابتوبات ألعاب (Gaming)', 
-                'لابتوبات أعمال', 
-                'لابتوبات للدراسة', 
-                'أجهزة 2 في 1'
+        $structure = [
+            'كمبيوتر ومكتب' => [
+                'لابتوبات' => ['Apple', 'Dell', 'HP', 'Lenovo'],
+                'كمبيوترات مكتبية' => ['HP', 'Dell', 'Lenovo'],
+                'سرفرات' => ['Dell', 'HP'],
+                'طابعات' => ['HP', 'Sony', 'Samsung'],
             ],
-            'فلاشات USB' => [
-                'فلاشات USB 3.0', 
-                'فلاشات Type-C', 
-                'فلاشات للايفون', 
-                'سعة 128GB+'
+            'مكونات الكمبيوتر' => [
+                'رامات' => ['Samsung', 'Kingston'],
+                'هاردات' => ['Samsung', 'Western Digital'],
             ],
-            'فارات (فأرة)' => [
-                'ماوس ألعاب', 
-                'ماوس لاسلكي', 
-                'ماوس بلوتوث', 
-                'ماوس مريح'
+            'الشبكات والاتصالات' => [
+                'مودمات' => ['TP-Link', 'Huawei'],
+                'سوتشات' => ['Cisco', 'TP-Link'],
+                'لوازم الشبكة' => [],
             ],
-            'كيبوردات' => [
-                'كيبورد ميكانيكي', 
-                'كيبورد ألعاب RGB', 
-                'كيبورد لاسلكي', 
-                'كيبورد عربي/إنجليزي'
+            'إلكترونيات استهلاكية' => [
+                'كاميرات' => ['Sony', 'Samsung', 'LG'],
+                'سماعات' => ['Apple', 'Sony'],
             ],
-            'طابعات' => [
-                'طابعات ليزر', 
-                'طابعات حبر', 
-                'طابعات صور', 
-                'طابعات الكل في واحد'
-            ],
-            'سماعات' => [
-                'سماعات ألعاب', 
-                'سماعات بلوتوث', 
-                'سماعات سلكية', 
-                'سماعات رياضية'
-            ],
-            'شاشات' => [
-                'شاشات ألعاب (144Hz+)', 
-                'شاشات 4K', 
-                'شاشات منحنية', 
-                'شاشات مكتبية'
-            ],
-            'برمجيات' => [
-                'أنظمة ويندوز', 
-                'برامج حماية', 
-                'حزمة أوفيس', 
-                'برامج تصميم'
-            ],
-            'شواحن' => [
-                'شواحن لابتوب', 
-                'شواحن هواتف سريعة', 
-                'منصات شحن لاسلكي'
-            ],
-            'معالجات' => [
-                'معالجات Intel Core', 
-                'معالجات AMD Ryzen', 
-                'معالجات سيرفرات'
+            'ملحقات وأدوات' => [
+                'فلاشات' => ['Samsung', 'SanDisk'],
+                'لوحة تحكم' => [],
+                'إكسسوارات إلكترونية' => [],
             ],
         ];
 
-        foreach ($tree as $mainCategoryName => $subCategories) {
-            // إنشاء التصنيف الرئيسي
-            $mainCategory = Category::updateOrCreate(
-                ['name' => $mainCategoryName],
-                [
-                    'slug' => \Illuminate\Support\Str::slug($mainCategoryName),
-                    'status' => 'active',
-                    'parent_id' => null
-                ]
-            );
+        foreach ($structure as $rootName => $subCategories) {
+            $root = Category::create([
+                'name' => $rootName,
+                'slug' => Str::slug($rootName, '-', 'ar') ?: Str::random(8),
+                'status' => 'active',
+                'parent_id' => null
+            ]);
 
-            foreach ($subCategories as $subName) {
-                // إنشاء التصنيفات الفرعية
-                Category::updateOrCreate(
-                    ['name' => $subName, 'parent_id' => $mainCategory->id],
-                    [
-                        'slug' => \Illuminate\Support\Str::slug($subName),
-                        'status' => 'active'
-                    ]
-                );
+            foreach ($subCategories as $subName => $brands) {
+                $sub = Category::create([
+                    'name' => $subName,
+                    'slug' => Str::slug($subName, '-', 'ar') ?: Str::random(8),
+                    'status' => 'active',
+                    'parent_id' => $root->id
+                ]);
+
+                foreach ($brands as $brandName) {
+                    Category::create([
+                        'name' => $brandName,
+                        'slug' => Str::slug($sub->name . '-' . $brandName),
+                        'status' => 'active',
+                        'parent_id' => $sub->id,
+                        'is_brand' => true
+                    ]);
+                }
             }
         }
     }

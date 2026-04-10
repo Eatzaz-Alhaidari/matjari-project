@@ -8,6 +8,7 @@ class StoreMessage extends Model
 {
     protected $fillable = [
         'store_id',
+        'user_id',
         'customer_name',
         'message',
         'is_read',
@@ -17,5 +18,10 @@ class StoreMessage extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

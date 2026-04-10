@@ -1,8 +1,6 @@
 <!-- Main Add Category Modal -->
 <dialog id="addCategoryModal" class="p-0 rounded-[2rem] shadow-2xl border-0 w-full max-w-lg overflow-hidden backdrop:bg-brand-blue/20 backdrop:backdrop-blur-sm"
     x-data="{ 
-        subs: [{name: '', id: Date.now()}],
-        brands: [{name: '', id: Date.now()}],
         addSub() { this.subs.push({name: '', id: Date.now()}) },
         removeSub(index) { if(this.subs.length > 1) this.subs.splice(index, 1) },
         addBrand() { this.brands.push({name: '', id: Date.now()}) },
@@ -45,10 +43,8 @@
                     <div class="space-y-3">
                         <template x-for="(sub, index) in subs" :key="sub.id">
                             <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative">
-                                <button type="button" @click="removeSub(index)" x-show="subs.length > 1" class="absolute top-2 left-2 w-6 h-6 flex items-center justify-center text-red-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors text-lg">×</button>
                                 <div class="grid grid-cols-1 gap-3">
                                     <input type="text" name="sub_names[]" x-model="sub.name" class="w-full px-3 py-2 text-sm rounded-lg border-gray-50 bg-gray-50/30" placeholder="اسم الفرع">
-                                    <input type="file" :name="'sub_icons['+index+']'" class="text-[9px] text-gray-400">
                                 </div>
                             </div>
                         </template>
@@ -64,10 +60,8 @@
                     <div class="space-y-3">
                         <template x-for="(brand, index) in brands" :key="brand.id">
                             <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm relative">
-                                <button type="button" @click="removeBrand(index)" x-show="brands.length > 1" class="absolute top-2 left-2 w-6 h-6 flex items-center justify-center text-red-200 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors text-lg">×</button>
                                 <div class="grid grid-cols-1 gap-3">
                                     <input type="text" name="brand_names[]" x-model="brand.name" class="w-full px-3 py-2 text-sm rounded-lg border-gray-50 bg-gray-50/30" placeholder="اسم الماركة">
-                                    <input type="file" :name="'brand_logos['+index+']'" class="text-[9px] text-gray-400">
                                 </div>
                             </div>
                         </template>
@@ -98,11 +92,11 @@
 @foreach($categories->getCollection() as $root)
 <dialog id="editModal{{ $root->id }}" class="p-0 rounded-[2rem] shadow-2xl border-0 w-full max-w-lg overflow-hidden backdrop:bg-brand-blue/20 backdrop:backdrop-blur-sm text-right font-sans"
     x-data="{ 
-        subs: {{ json_encode($root->children()->where('is_brand', false)->get()->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'icon' => $s->icon])) }},
-        brands: {{ json_encode($root->children()->where('is_brand', true)->get()->map(fn($b) => ['id' => $b->id, 'name' => $b->name, 'logo' => $b->brand_logo])) }},
-        addSub() { this.subs.push({id: null, name: '', icon: null}) },
+        subs: {{ json_encode($root->children()->where('is_brand', false)->get()->map(fn($s) => ['id' => $s->id, 'name' => $s->name])) }},
+        brands: {{ json_encode($root->children()->where('is_brand', true)->get()->map(fn($b) => ['id' => $b->id, 'name' => $b->name])) }},
+        addSub() { this.subs.push({id: null, name: ''}) },
         removeSub(index) { if(this.subs.length > 0) this.subs.splice(index, 1) },
-        addBrand() { this.brands.push({id: null, name: '', logo: null}) },
+        addBrand() { this.brands.push({id: null, name: ''}) },
         removeBrand(index) { if(this.brands.length > 0) this.brands.splice(index, 1) }
     }">
     <div class="bg-white">
@@ -146,12 +140,6 @@
                                 <input type="hidden" name="sub_ids[]" :value="sub.id">
                                 <div class="grid grid-cols-1 gap-3">
                                     <input type="text" name="sub_names[]" x-model="sub.name" class="w-full px-3 py-2 text-sm rounded-lg border-gray-50 bg-gray-50/30" placeholder="اسم الفرع">
-                                    <div class="flex items-center gap-3">
-                                        <template x-if="sub.icon">
-                                            <img :src="'/storage/' + sub.icon" class="w-8 h-8 rounded-lg object-contain bg-gray-50">
-                                        </template>
-                                        <input type="file" :name="'sub_icons['+index+']'" class="text-[9px] text-gray-400">
-                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -171,12 +159,6 @@
                                 <input type="hidden" name="brand_ids[]" :value="brand.id">
                                 <div class="grid grid-cols-1 gap-3">
                                     <input type="text" name="brand_names[]" x-model="brand.name" class="w-full px-3 py-2 text-sm rounded-lg border-gray-50 bg-gray-50/30" placeholder="اسم الماركة">
-                                    <div class="flex items-center gap-3">
-                                        <template x-if="brand.logo">
-                                            <img :src="'/storage/' + brand.logo" class="w-8 h-8 rounded-lg object-contain bg-gray-50">
-                                        </template>
-                                        <input type="file" :name="'brand_logos['+index+']'" class="text-[9px] text-gray-400">
-                                    </div>
                                 </div>
                             </div>
                         </template>

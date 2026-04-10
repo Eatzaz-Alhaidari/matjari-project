@@ -50,11 +50,9 @@ class CategoryController extends Controller
             
             // Subcategories arrays
             'sub_names.*' => 'nullable|string|max:255',
-            'sub_icons.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             
             // Brands arrays
             'brand_names.*' => 'nullable|string|max:255',
-            'brand_logos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $data = $request->except(['image', 'brand_logo', 'banner', 'icon', 'is_popular', 'sub_names', 'sub_icons', 'brand_names', 'brand_logos']);
@@ -100,14 +98,8 @@ class CategoryController extends Controller
                     'is_brand' => false,
                 ];
 
-                $subData['slug'] = Str::slug($subName, '-', null);
-                if (empty($subData['slug'])) {
-                    $subData['slug'] = str_replace(' ', '-', $subName);
-                }
-
-                if ($request->hasFile("sub_icons.$index")) {
-                    $subData['icon'] = $request->file("sub_icons.$index")->store('categories/icons', 'public');
-                }
+                $slugBase = Str::slug($subName, '-', null) ?: str_replace(' ', '-', $subName);
+                $subData['slug'] = $slugBase . '-' . rand(100, 9999);
 
                 Category::create($subData);
             }
@@ -125,14 +117,8 @@ class CategoryController extends Controller
                     'is_brand' => true,
                 ];
 
-                $brandData['slug'] = Str::slug($brandName, '-', null);
-                if (empty($brandData['slug'])) {
-                    $brandData['slug'] = str_replace(' ', '-', $brandName);
-                }
-
-                if ($request->hasFile("brand_logos.$index")) {
-                    $brandData['brand_logo'] = $request->file("brand_logos.$index")->store('brands', 'public');
-                }
+                $slugBase = Str::slug($brandName, '-', null) ?: str_replace(' ', '-', $brandName);
+                $brandData['slug'] = $slugBase . '-' . rand(100, 9999);
 
                 Category::create($brandData);
             }
@@ -151,12 +137,10 @@ class CategoryController extends Controller
             // Subcategories
             'sub_ids.*' => 'nullable|exists:categories,id',
             'sub_names.*' => 'nullable|string|max:255',
-            'sub_icons.*' => 'nullable|image|max:2048',
             
             // Brands
             'brand_ids.*' => 'nullable|exists:categories,id',
             'brand_names.*' => 'nullable|string|max:255',
-            'brand_logos.*' => 'nullable|image|max:2048',
         ]);
 
         // 1. Update Root Category
@@ -189,12 +173,9 @@ class CategoryController extends Controller
                 $sub->parent_id = $category->id;
                 $sub->is_brand = false;
                 $sub->status = $category->status; // Inherit status or keep separate? Usually same.
-                $sub->slug = Str::slug($subName, '-', null) ?: str_replace(' ', '-', $subName);
+                $slugBase = Str::slug($subName, '-', null) ?: str_replace(' ', '-', $subName);
+                $sub->slug = $slugBase . '-' . rand(100, 9999);
 
-                if ($request->hasFile("sub_icons.$index")) {
-                    if ($sub->icon) Storage::disk('public')->delete($sub->icon);
-                    $sub->icon = $request->file("sub_icons.$index")->store('categories/icons', 'public');
-                }
                 $sub->save();
             }
         }
@@ -218,12 +199,9 @@ class CategoryController extends Controller
                 $brand->parent_id = $category->id;
                 $brand->is_brand = true;
                 $brand->status = $category->status;
-                $brand->slug = Str::slug($brandName, '-', null) ?: str_replace(' ', '-', $brandName);
+                $slugBase = Str::slug($brandName, '-', null) ?: str_replace(' ', '-', $brandName);
+                $brand->slug = $slugBase . '-' . rand(100, 9999);
 
-                if ($request->hasFile("brand_logos.$index")) {
-                    if ($brand->brand_logo) Storage::disk('public')->delete($brand->brand_logo);
-                    $brand->brand_logo = $request->file("brand_logos.$index")->store('brands', 'public');
-                }
                 $brand->save();
             }
         }
@@ -235,9 +213,7 @@ class CategoryController extends Controller
     {
         // Recursively delete children images
         foreach($category->children as $child) {
-            if ($child->image) Storage::disk('public')->delete($child->image);
-            if ($child->icon) Storage::disk('public')->delete($child->icon);
-            if ($child->brand_logo) Storage::disk('public')->delete($child->brand_logo);
+            // Children no longer have images we manage this way
         }
         
         if ($category->image) Storage::disk('public')->delete($category->image);

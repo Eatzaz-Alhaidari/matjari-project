@@ -2,130 +2,89 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\ReviewController;
-use App\Http\Controllers\Api\StoreController;
-use App\Http\Controllers\Api\AdvertisementController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\ComplaintController;
-use App\Http\Controllers\API\AddressController;
-use App\Http\Controllers\API\WishlistController;
-use App\Http\Controllers\API\CategoryController;
-use App\Http\Controllers\API\ProductController;
-use App\Http\Controllers\API\ImageController;
-use App\Http\Controllers\Api\SupportSettingsController;
-use App\Http\Controllers\API\OrderController;
-use App\Http\Controllers\Api\OrderReturnController;
-use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\Api\v1\AuthController;
+use App\Http\Controllers\Api\v1\CategoryController;
+use App\Http\Controllers\Api\v1\AdController;
+use App\Http\Controllers\Api\v1\ProductController;
+use App\Http\Controllers\Api\v1\DiscountController;
+use App\Http\Controllers\Api\v1\StoreController;
+use App\Http\Controllers\Api\v1\ChatbotController;
+use App\Http\Controllers\Api\v1\NotificationController;
+use App\Http\Controllers\Api\v1\CustomerController;
+use App\Http\Controllers\Api\v1\AddressController;
+use App\Http\Controllers\Api\v1\PaymentController;
+use App\Http\Controllers\Api\v1\OrderController;
+use App\Http\Controllers\Api\v1\ActivityController;
+use App\Http\Controllers\Api\v1\ReturnController;
+use App\Http\Controllers\Api\v1\ReviewController;
+use App\Http\Controllers\Api\v1\ComplaintController;
+use App\Http\Controllers\Api\v1\SupportController;
+use App\Http\Controllers\Api\v1\MessageController;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (المسارات العامة)
+| API v1 Standard Routes
 |--------------------------------------------------------------------------
 */
 
-// التوثيق والتحقق (Auth & OTP)
-Route::post('/send-otp', [AuthController::class, 'sendOtp']);
-Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-Route::post('/verify-account', [AuthController::class, 'verifyAccountWithOtp']); // New
-Route::post('/password/reset-with-otp', [AuthController::class, 'resetPasswordWithOtp']); // New
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::prefix('v1')->group(function () {
 
-// المتاجر والإعلانات
-Route::get('/stores', [StoreController::class, 'index']);
-Route::get('/stores/{id}', [StoreController::class, 'show']);
-Route::get('/stores/{store}/advertisements', [AdvertisementController::class, 'index']);
-Route::get('/advertisements', [AdvertisementController::class, 'index']);
-
-// المنتجات والفئات والتقييمات (للزوار)
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/top-selling', [ProductController::class, 'getTopSellingProducts']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::get('/products/{id}/reviews', [ReviewController::class, 'index']);
-
-// الخدمات العامة والوسائط
-Route::get('/settings/support', [SupportSettingsController::class, 'getSettings']);
-Route::post('/messages', [StoreController::class, 'submitMessage']); // الشات بوت الذكي
-Route::get('/payment-methods', [PaymentController::class, 'getPaymentMethods']);
-Route::get('/wallets', [PaymentController::class, 'getWallets']);
-Route::get('/image/{path}', [ImageController::class, 'show'])->where('path', '.*');
-
-// أنشطة العملاء والخصومات
-Route::post('/activities', [\App\Http\Controllers\Api\ActivityController::class, 'store']);
-Route::get('/coupons', [\App\Http\Controllers\Api\CouponController::class, 'index']);
-
-// مسار استقبال تحديث المخزون من برنامج C# (عام)
-Route::post('/sync-inventory', [ProductController::class, 'syncFromDesktop']);
-
-/*
-|--------------------------------------------------------------------------
-| Protected Routes (المسارات المحمية - Sanctum)
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->group(function () {
-
-    // الملف الشخصي والحساب
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/change-password', [AuthController::class, 'changePassword']);
-
-    // الشكاوي والعناوين
-    Route::get('/complaints', [ComplaintController::class, 'index']);
-    Route::post('/complaints', [ComplaintController::class, 'store']);
-    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
-    Route::apiResource('addresses', AddressController::class);
-    Route::post('/addresses/{address}/default', [AddressController::class, 'setDefault']);
-
-    // المفضلة والتقييمات (للمسجلين)
-    Route::get('/wishlist', [WishlistController::class, 'index']);
-    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
-    Route::post('/reviews', [ReviewController::class, 'store']);
-
-    // إدارة المتاجر (للبائعين / التجار)
-    Route::post('/stores', [StoreController::class, 'store']);
-    Route::put('/stores/{id}', [StoreController::class, 'update']);
-    Route::delete('/stores/{id}', [StoreController::class, 'destroy']);
-    Route::post('/stores/{store}/advertisements', [AdvertisementController::class, 'store']);
-    Route::get('/vendor/messages', [StoreController::class, 'getVendorMessages']);
-
-    // الطلبات والإرجاع والمحفظة
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::post('/order-returns', [OrderReturnController::class, 'store']);
-    Route::get('/wallet', [WalletController::class, 'show']);
-    Route::post('/wallet/transactions', [WalletController::class, 'storeTransaction']);
-    Route::post('/coupons/validate', [\App\Http\Controllers\Api\CouponController::class, 'validateCoupon']);
-
-    // الإشعارات
-    Route::get('/notifications', [NotificationController::class, 'index']);
+    // 1-11 المسارات السابقة
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/admin/ads', [AdController::class, 'adminAds']);
+    Route::get('/products/top-selling', [ProductController::class, 'topSelling']);
+    Route::get('/admin/discounts', [DiscountController::class, 'adminDiscounts']);
+    Route::get('/stores', [StoreController::class, 'index']);
+    Route::get('/stores/{id}/ads', [StoreController::class, 'ads']);
+    Route::get('/stores/{id}/discounts', [StoreController::class, 'discounts']);
+    Route::post('/chatbot/responses', [ChatbotController::class, 'storeResponse']);
     Route::post('/notifications', [NotificationController::class, 'store']);
-
-    // مزامنة المخزون (النسخة المحمية)
-    Route::post('/protected/sync-inventory', [ProductController::class, 'syncFromDesktop']);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Functional Management APIs (إدارة العمليات والبيانات)
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware('role:vendor')->prefix('vendor/management')->group(function () {
-        // إدارة منتجات المتجر (CRUD كامل)
-        Route::get('products/top-selling', [\App\Http\Controllers\API\Vendor\ProductManagementController::class, 'getTopSellingProducts']);
-        Route::apiResource('products', \App\Http\Controllers\API\Vendor\ProductManagementController::class);
-
-        // التفاعل والخصومات والتقييمات والرسائل
-        Route::get('advertisements', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'getAdvertisements']);
-        Route::get('discounts', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'getDiscounts']);
-        Route::get('reviews', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'getReviews']);
-        Route::post('reviews/{id}/reply', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'replyToReview']);
-        Route::get('messages', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'getMessages']);
-        Route::get('chatbot-report', [\App\Http\Controllers\API\Vendor\EngagementController::class, 'getChatbotReport']);
+    Route::post('/customers', [CustomerController::class, 'register']);
+    
+    Route::prefix('auth')->group(function () {
+        Route::post('/send-code', [AuthController::class, 'sendCode']);
+        Route::post('/verify-code', [AuthController::class, 'verifyCode']);
     });
+
+    /* -------------------------------------------------------------------------- */
+    /* التكملة المطلوبة (12-22) */
+    /* -------------------------------------------------------------------------- */
+
+    // 12. استقبال عناوين الشحن
+    Route::post('/shipping-addresses', [AddressController::class, 'store']);
+
+    // 13. إرسال طرق الدفع
+    Route::get('/payment-methods', [PaymentController::class, 'index']);
+
+    // 14. استقبال الطلبات
+    Route::post('/orders', [OrderController::class, 'store']);
+
+    // 15. استقبال سجل أنشطة العملاء
+    Route::post('/customer-activities', [ActivityController::class, 'store']);
+
+    // 16. استقبال المنتجات المسترجعة
+    Route::post('/returns', [ReturnController::class, 'store']);
+
+    // 17. استقبال تقييمات المنتجات
+    Route::post('/product-reviews', [ReviewController::class, 'storeProductReview']);
+
+    // 18. استقبال تقييمات المتاجر
+    Route::post('/store-reviews', [ReviewController::class, 'storeStoreReview']);
+
+    // 19. استقبال شكاوى العملاء
+    Route::post('/complaints', [ComplaintController::class, 'store']);
+
+    // 20. استقبال بيانات الدعم الفني
+    Route::post('/support', [SupportController::class, 'store']);
+
+    // 21. استقبال الرسائل الخاصة بالتجار
+    Route::post('/messages', [MessageController::class, 'store']);
+
+    // 22. تغيير كلمة المرور للعملاء (محمي بـ Sanctum)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
+    });
+
 });
 
 /*

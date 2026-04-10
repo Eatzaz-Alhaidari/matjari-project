@@ -49,6 +49,11 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->where('is_brand', true);
     }
 
+    public function subCategories()
+    {
+        return $this->hasMany(Category::class, 'parent_id')->where('is_brand', false);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
