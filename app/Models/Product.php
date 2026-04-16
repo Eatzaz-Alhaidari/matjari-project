@@ -35,6 +35,7 @@ class Product extends Model
         'size',
         'color',
         'region',
+        'category',
     ];
 
     protected $casts = [

@@ -132,6 +132,9 @@ Route::prefix('v1')->group(function () {
 
 });
 
+// مسار متوافق مع تطبيق السي شارب (Compatibility Route)
+Route::post('/sync-inventory', [App\Http\Controllers\Api\v1\InventoryController::class, 'syncProducts']);
+
 /*
 |--------------------------------------------------------------------------
 | Onyx ERP Integration (يمن سوفت)
