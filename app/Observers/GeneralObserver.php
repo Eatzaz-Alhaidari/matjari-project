@@ -4,12 +4,21 @@ namespace App\Observers;
 
 class GeneralObserver
 {
+    protected static $isLogging = false;
+
     /**
      * Handle the model "created" event.
      */
     public function created($model): void
     {
-        $this->logActivity('create', $model);
+        if (static::$isLogging) return;
+        static::$isLogging = true;
+
+        try {
+            $this->logActivity('create', $model);
+        } finally {
+            static::$isLogging = false;
+        }
     }
 
     /**
@@ -17,9 +26,15 @@ class GeneralObserver
      */
     public function updated($model): void
     {
-        // Avoid logging if no meaningful changes (or specific ignored fields)
-        if ($model->wasChanged()) {
-            $this->logActivity('update', $model);
+        if (static::$isLogging) return;
+        static::$isLogging = true;
+
+        try {
+            if ($model->wasChanged()) {
+                $this->logActivity('update', $model);
+            }
+        } finally {
+            static::$isLogging = false;
         }
     }
 
@@ -28,7 +43,14 @@ class GeneralObserver
      */
     public function deleted($model): void
     {
-        $this->logActivity('delete', $model);
+        if (static::$isLogging) return;
+        static::$isLogging = true;
+
+        try {
+            $this->logActivity('delete', $model);
+        } finally {
+            static::$isLogging = false;
+        }
     }
 
     protected function logActivity($action, $model)

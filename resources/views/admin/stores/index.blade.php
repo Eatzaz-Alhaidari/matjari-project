@@ -6,16 +6,6 @@
     <div class="py-6">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="mb-4 px-4 py-2 bg-red-100 border border-red-200 text-red-700 rounded-md">
-                    {{ session('error') }}
-                </div>
-            @endif
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
@@ -38,7 +28,13 @@
                                 <tr>
                                     <th
                                         class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        الشعار</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         اسم المتجر</th>
+                                    <th
+                                        class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        صورة الغلاف</th>
                                     <th
                                         class="px-5 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         المالك (البائع)</th>
@@ -60,9 +56,32 @@
                                 @forelse ($stores as $store)
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-5 py-4">
+                                            @if ($store->logo_path)
+                                                <img src="{{ asset('storage/' . $store->logo_path) }}" alt="{{ $store->name }}"
+                                                    class="h-10 w-10 rounded-lg object-cover border border-gray-200">
+                                            @else
+                                                <div
+                                                    class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
+                                                    <i class="fas fa-store"></i>
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td class="px-5 py-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $store->name }}</div>
                                             <div class="text-xs text-gray-500">{{ $store->address ?? 'لا يوجد عنوان' }}
                                             </div>
+                                        </td>
+                                        <td class="px-5 py-4">
+                                            @if ($store->cover_image_path)
+                                                <img src="{{ asset('storage/' . $store->cover_image_path) }}"
+                                                    alt="{{ $store->name }} Cover"
+                                                    class="h-10 w-20 rounded-lg object-cover border border-gray-200 shadow-sm">
+                                            @else
+                                                <div
+                                                    class="h-10 w-20 rounded-lg bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200">
+                                                    <span class="text-[10px]">لا غلاف</span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="px-5 py-4">
                                             <div class="text-sm font-medium text-gray-900">

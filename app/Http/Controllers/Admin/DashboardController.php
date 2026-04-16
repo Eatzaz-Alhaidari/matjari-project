@@ -69,8 +69,8 @@ class DashboardController extends Controller
         // 22. Discount Coupons Count
         $discountCouponCount = \Illuminate\Support\Facades\DB::table('discounts')->where('status', 'active')->count();
 
-        // 23. Customer Activities Count
-        $customerActivityCount = \Illuminate\Support\Facades\DB::table('activity_logs')->count();
+        // 23. Customer Activities Count (From App)
+        $customerActivityCount = \App\Models\CustomerActivity::count();
 
 
         // --- NEW CHARTS DATA ---

@@ -16,7 +16,7 @@ class StoreController extends BaseController
      */
     public function index(): JsonResponse
     {
-        $stores = Store::where('status', 'active')->get();
+        $stores = Store::active()->get();
         return $this->sendResponse($stores, 'تم جلب المتاجر النشطة بنجاح');
     }
 

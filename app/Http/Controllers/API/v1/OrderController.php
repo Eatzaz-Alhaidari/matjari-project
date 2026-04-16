@@ -29,6 +29,8 @@ class OrderController extends BaseController
             'products.*.quantity' => 'required|integer|min:1',
             'total_price' => 'required|numeric',
             'payment_method' => 'required|string',
+            'address' => 'required|string',
+            'city' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -44,6 +46,8 @@ class OrderController extends BaseController
                 'store_id' => $request->store_id,
                 'total_amount' => $request->total_price,
                 'payment_method' => $request->payment_method,
+                'shipping_address' => $request->address,
+                'shipping_city' => $request->city,
                 'status' => 'pending',
                 'payment_status' => 'pending',
             ]);
@@ -55,7 +59,7 @@ class OrderController extends BaseController
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                     'price' => $product->price,
-                    'total_price' => $product->price * $item['quantity'],
+                    'total' => $product->price * $item['quantity'],
                 ]);
             }
 
@@ -67,5 +71,22 @@ class OrderController extends BaseController
             DB::rollBack();
             return $this->sendError('حدث خطأ أثناء معالجة الطلب.', ['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Get order details by ID for tracking.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id): JsonResponse
+    {
+        $order = Order::with(['orderItems.product', 'store'])->find($id);
+
+        if (!$order) {
+            return $this->sendError('لم يتم العثور على بيانات الطلب.', [], 404);
+        }
+
+        return $this->sendResponse($order, 'تم جلب بيانات الطلب بنجاح');
     }
 }

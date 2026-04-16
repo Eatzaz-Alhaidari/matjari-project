@@ -40,8 +40,12 @@ class ProductController extends Controller
     public function create()
     {
         $stores = Store::active()->get();
-        // Get all categories marked as brands
-        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        // Get all unique categories marked as brands
+        $brands = Category::where('is_brand', true)
+            ->select('name', \Illuminate\Support\Facades\DB::raw('MIN(id) as id'))
+            ->groupBy('name')
+            ->orderBy('name')
+            ->get();
         $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('admin.products.create', compact('stores', 'brands', 'categories'));
     }
@@ -143,7 +147,11 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $stores = Store::active()->get();
-        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $brands = Category::where('is_brand', true)
+            ->select('name', \Illuminate\Support\Facades\DB::raw('MIN(id) as id'))
+            ->groupBy('name')
+            ->orderBy('name')
+            ->get();
         $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('admin.products.edit', compact('product', 'stores', 'brands', 'categories'));
     }

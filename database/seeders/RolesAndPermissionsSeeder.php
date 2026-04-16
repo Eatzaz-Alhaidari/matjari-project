@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // إنشاء الأدوار التي سنستخدمها في نظامنا
         Role::create(['name' => 'super-admin']); // الأدمن الأعلى له كل الصلاحيات
         Role::create(['name' => 'vendor']);      // البائع له صلاحيات محدودة
+        Role::create(['name' => 'customer']);    // العميل (تطبيق الهاتف)
 
         // إنشاء مستخدم Super Admin افتراضي
         // نستخدم User::create لأن $fillable تم تحديده في Model User

@@ -6,16 +6,6 @@
     <div class="py-6" x-data="{ openStatusModal: false, activeShipment: null, openCreateModal: false }">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="mb-4 px-4 py-2 bg-red-100 border border-red-200 text-red-700 rounded-md">
-                    {{ session('error') }}
-                </div>
-            @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Shipments Table -->

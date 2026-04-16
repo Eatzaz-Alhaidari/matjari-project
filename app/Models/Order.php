@@ -72,6 +72,7 @@ class Order extends Model
             'pending' => 'yellow',
             'processing' => 'blue',
             'shipped' => 'purple',
+            'ready_for_pickup' => 'indigo',
             'delivered' => 'green',
             'cancelled' => 'red',
             default => 'gray',
@@ -82,9 +83,10 @@ class Order extends Model
     {
         return match ($this->status) {
             'pending' => 'في الانتظار',
-            'processing' => 'قيد المعالجة',
-            'shipped' => 'تم الشحن',
-            'delivered' => 'تم التسليم',
+            'processing' => 'قيد التجهيز',
+            'shipped' => 'قيد التوصيل',
+            'ready_for_pickup' => 'قيد الاستلام',
+            'delivered' => 'تم الاستلام',
             'cancelled' => 'ملغي',
             default => 'غير محدد',
         };

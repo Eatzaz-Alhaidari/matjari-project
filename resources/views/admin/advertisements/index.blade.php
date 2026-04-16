@@ -6,14 +6,6 @@
     <div class="py-6" x-data="{ rejectAdId: null, rejectAdTitle: '', rejectionReason: '' }">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md shadow-sm flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-xl border border-gray-100 font-cairo">
                 <div class="p-6 bg-white border-b border-gray-100">
