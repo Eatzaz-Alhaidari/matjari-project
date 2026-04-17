@@ -72,4 +72,21 @@ class OrderController extends BaseController
             return $this->sendError('حدث خطأ أثناء معالجة الطلب.', ['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Get order details by ID for tracking.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id): JsonResponse
+    {
+        $order = Order::with(['orderItems.product', 'store'])->find($id);
+
+        if (!$order) {
+            return $this->sendError('لم يتم العثور على بيانات الطلب.', [], 404);
+        }
+
+        return $this->sendResponse($order, 'تم جلب بيانات الطلب بنجاح');
+    }
 }

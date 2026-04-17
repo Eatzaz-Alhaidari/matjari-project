@@ -40,7 +40,11 @@
                 <div class="flex items-center justify-center mt-6 mb-2 flex-shrink-0">
                     <div class="flex flex-col items-center">
                         <div class="transition-transform hover:scale-105 duration-300 bg-white/95 px-4 py-2 rounded-2xl shadow-lg ring-4 ring-white/10 mx-4">
-                            <x-application-logo class="w-36 h-14 object-contain" />
+                            @if(Auth::user()->store && Auth::user()->store->logo_path)
+                                <img src="{{ asset('storage/' . Auth::user()->store->logo_path) }}" class="w-36 h-14 object-contain" alt="{{ Auth::user()->store->name }}">
+                            @else
+                                <x-application-logo class="w-36 h-14 object-contain" />
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -139,7 +143,11 @@
                                     <span class="text-sm font-bold text-gray-800 group-hover:text-brand-orange-700">{{ Auth::user()->name }}</span>
                                 </div>
                                 <div class="w-10 h-10 rounded-full border-2 border-brand-orange-500/10 p-1 bg-transparent overflow-hidden shadow-sm group-hover:border-brand-orange-500/30 transition-colors text-center">
-                                    <x-application-logo class="w-full h-full" />
+                                    @if(Auth::user()->store && Auth::user()->store->logo_path)
+                                        <img src="{{ asset('storage/' . Auth::user()->store->logo_path) }}" class="w-full h-full object-cover rounded-full" alt="{{ Auth::user()->store->name }}">
+                                    @else
+                                        <x-application-logo class="w-full h-full" />
+                                    @endif
                                 </div>
                                 <svg class="w-4 h-4 text-gray-400 group-hover:text-brand-orange-700 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

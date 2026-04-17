@@ -44,7 +44,11 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $brands = \App\Models\Category::where('is_brand', true)
+            ->select('name', \Illuminate\Support\Facades\DB::raw('MIN(id) as id'))
+            ->groupBy('name')
+            ->orderBy('name')
+            ->get();
         $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('vendor.products.create', compact('categories', 'brands'));
     }
@@ -190,7 +194,11 @@ class ProductController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا المنتج');
         }
 
-        $brands = Category::where('is_brand', true)->orderBy('name')->get();
+        $brands = \App\Models\Category::where('is_brand', true)
+            ->select('name', \Illuminate\Support\Facades\DB::raw('MIN(id) as id'))
+            ->groupBy('name')
+            ->orderBy('name')
+            ->get();
         $categories = Category::with('children')->whereNull('parent_id')->where('is_brand', false)->get();
         return view('vendor.products.edit', compact('product', 'categories', 'brands'));
     }

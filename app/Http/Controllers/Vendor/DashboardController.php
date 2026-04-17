@@ -110,7 +110,7 @@ class DashboardController extends Controller
                 'products.full_description', 'products.price', 'products.cost_price',
                 'products.price_before', 'products.stock', 'products.min_stock', 'products.status',
                 'products.image', 'products.three_d_model', 'products.three_sixty_images',
-                'products.store_id', 'products.category_id', 'products.warranty_duration',
+                'products.store_id', 'products.category_id', 'products.category', 'products.warranty_duration',
                 'products.warranty_unit', 'products.created_at', 'products.updated_at',
                 'products.currency', 'products.size', 'products.color', 'products.region',
                 'products.ai_status', 'products.ai_notes'
