@@ -35,6 +35,8 @@ class Product extends Model
         'size',
         'color',
         'region',
+        'ai_status',
+        'ai_notes',
     ];
 
     protected $casts = [
@@ -45,18 +47,19 @@ class Product extends Model
         'min_stock' => 'integer',
         'status' => 'string',
         'three_sixty_images' => 'array',
+        'ai_notes' => 'array',
     ];
 
     protected $appends = ['three_d_model_url', 'three_sixty_images_urls', 'image_url'];
 
     public function getImageUrlAttribute()
     {
-        return $this->image ? url('api/image/' . $this->image) : null;
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
     public function getThreeDModelUrlAttribute()
     {
-        return $this->three_d_model ? url('api/image/' . $this->three_d_model) : null;
+        return $this->three_d_model ? asset('storage/' . $this->three_d_model) : null;
     }
 
     public function getThreeSixtyImagesUrlsAttribute()
@@ -65,7 +68,7 @@ class Product extends Model
             return [];
         }
         return array_map(function ($path) {
-            return url('api/image/' . $path);
+            return asset('storage/' . $path);
         }, $this->three_sixty_images);
     }
 

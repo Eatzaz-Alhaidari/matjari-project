@@ -27,7 +27,7 @@ class AuthController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors(), 422);
         }
 
-        $code = rand(1000, 9999);
+        $code = rand(100000, 999999);
         $identifier = $request->phone;
 
         OtpCode::updateOrCreate(
@@ -79,8 +79,23 @@ class AuthController extends BaseController
             return $this->sendError('المستخدم غير موجود، يرجى إنشاء حساب أولاً', [], 404);
         }
 
+        // التأكد من إسناد دور العميل
+        if (!$user->hasRole('customer')) {
+            $user->assignRole('customer');
+            $user->update(['role' => 'customer']);
+        }
+
+        // تسجيل نشاط الدخول في "بطاقة سجل أنشطة العملاء"
+        \App\Models\CustomerActivity::create([
+            'user_id' => $user->id,
+            'activity_type' => 'login',
+            'description' => 'تسجيل دخول من تطبيق الهاتف',
+            'ip_address' => $request->ip(),
+            'device_info' => $request->header('User-Agent'),
+        ]);
+
         $success['token'] =  $user->createToken('MatjariApp')->plainTextToken;
-        $success['name'] =  $user->name;
+        $success['user'] = $user;
 
         return $this->sendResponse($success, 'تم التحقق وتسجيل الدخول بنجاح');
     }
@@ -114,5 +129,18 @@ class AuthController extends BaseController
         ]);
 
         return $this->sendResponse([], 'تم تغيير كلمة المرور بنجاح');
+    }
+
+    /**
+     * Logout user and revoke token.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->sendResponse([], 'تم تسجيل الخروج بنجاح');
     }
 }

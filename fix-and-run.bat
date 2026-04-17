@@ -20,6 +20,6 @@ call npm run build
 
 echo [4/4] Starting Server...
 start http://127.0.0.1:8000
-php artisan serve --port=8000
+php artisan serve --host=0.0.0.0 --port=8000
 
 pause

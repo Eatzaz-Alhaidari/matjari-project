@@ -9,6 +9,22 @@ use Illuminate\Support\Facades\DB;
 class ProductController extends BaseController
 {
     /**
+     * Get all active products.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        $products = Product::active()
+            ->with(['store', 'category'])
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        return $this->sendResponse($products, 'تم جلب جميع المنتجات بنجاح');
+    }
+
+    /**
      * Get top selling products.
      *
      * @return JsonResponse

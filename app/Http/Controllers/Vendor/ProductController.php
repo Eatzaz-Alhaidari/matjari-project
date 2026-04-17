@@ -10,6 +10,7 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Services\ImageService;
+use App\Jobs\AnalyzeProductJob;
 
 class ProductController extends Controller
 {
@@ -86,6 +87,26 @@ class ProductController extends Controller
             $data['image'] = ImageService::processAndStore($request->file('image'), 'products', 'product');
         }
 
+        // --- AI Synchronous Validation ---
+        $tempProduct = new Product($data);
+        $qualityService = new \App\Services\ProductQualityService();
+        
+        // Pass the absolute path of the newly uploaded image for analysis
+        $imageAbsolutePath = $request->hasFile('image') ? storage_path('app/public/' . $data['image']) : null;
+        $aiResult = $qualityService->analyze($tempProduct, $imageAbsolutePath);
+
+        if ($aiResult['status'] === 'rejected') {
+            // Delete the uploaded image since the product is rejected
+            if (isset($data['image'])) {
+                Storage::disk('public')->delete($data['image']);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'فشل في إضافة المنتج: ' . $aiResult['reason'])
+                ->with('ai_suggestions', $aiResult['suggestions']);
+        }
+
         if ($request->hasFile('three_d_model')) {
             $data['three_d_model'] = $request->file('three_d_model')->store('products/3d', 'public');
         }
@@ -99,6 +120,16 @@ class ProductController extends Controller
         }
 
         $product = Product::create($data);
+
+        // Update AI status on the created product
+        $product->update([
+            'ai_status' => $aiResult['status'],
+            'ai_notes' => $aiResult,
+        ]);
+
+        if ($aiResult['status'] === 'failed_service') {
+            $product->update(['status' => 'inactive']); // Require manual review if AI failed
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
@@ -131,7 +162,9 @@ class ProductController extends Controller
         }
 
         return redirect()->route('vendor.products.index')
-            ->with('success', 'تم إضافة المنتج بنجاح');
+            ->with('success', 'تم إضافة المنتج بنجاح وتم التحقق بواسطة الذكاء الاصطناعي.');
+        // --- End AI Validation ---
+
     }
 
     /**
@@ -201,12 +234,10 @@ class ProductController extends Controller
 
         $data = $request->except(['images', 'sizes', 'colors', 'image', 'three_d_model', 'three_sixty_images']);
         $data['warranty_unit'] = 'days';
-        $data['currency'] = $request->currency; // Force update currency
+        $data['currency'] = $request->currency;
 
-        \Illuminate\Support\Facades\Log::info('Vendor Product Update - Final Data:', $data);
-
-        $updated = $product->update($data);
-        \Illuminate\Support\Facades\Log::info('Vendor Product Update - Result:', ['updated' => $updated, 'new_currency' => $product->fresh()->currency]);
+        // Check if anything changed that requires a new AI analysis
+        $needsAnalysis = $request->hasFile('image') || $request->name !== $product->name || $request->description !== $product->description;
 
         if ($request->hasFile('image')) {
             if ($product->image) {
@@ -236,6 +267,29 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+
+        if ($needsAnalysis) {
+            $qualityService = new \App\Services\ProductQualityService();
+            $imageAbsolutePath = $request->hasFile('image') ? storage_path('app/public/' . $data['image']) : ($product->image ? storage_path('app/public/' . $product->image) : null);
+            
+            $aiResult = $qualityService->analyze($product, $imageAbsolutePath);
+
+            if ($aiResult['status'] === 'rejected') {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'فشل في تحديث المنتج: ' . $aiResult['reason'])
+                    ->with('ai_suggestions', $aiResult['suggestions']);
+            }
+
+            $product->update([
+                'ai_status' => $aiResult['status'],
+                'ai_notes' => $aiResult,
+            ]);
+
+            if ($aiResult['status'] === 'failed_service') {
+                $product->update(['status' => 'inactive']);
+            }
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
@@ -274,7 +328,8 @@ class ProductController extends Controller
         }
 
         return redirect()->route('vendor.products.index')
-            ->with('success', 'تم تعديل المنتج بنجاح');
+            ->with('success', 'تم تعديل المنتج بنجاح وتحديث التحقق.');
+
     }
 
     /**
@@ -309,6 +364,11 @@ class ProductController extends Controller
             abort(403, 'غير مصرح لك بتعديل هذا المنتج');
         }
 
+        if ($product->status === 'inactive' && $product->ai_status === 'rejected') {
+            return redirect()->route('vendor.products.index')
+                ->with('error', 'لا يمكن تفعيل المنتج لأنه مرفوض من قبل الذكاء الاصطناعي. يرجى تعديل المنتج أو طلب مراجعة جديدة.');
+        }
+
         $product->status = $product->status === 'active' ? 'inactive' : 'active';
         $product->save();
 
@@ -316,5 +376,17 @@ class ProductController extends Controller
 
         return redirect()->route('vendor.products.index')
             ->with('success', $message);
+    }
+
+    public function reReview(Product $product)
+    {
+        if ($product->store_id !== auth()->user()->store->id) {
+            abort(403);
+        }
+
+        $product->update(['ai_status' => 'pending']);
+        AnalyzeProductJob::dispatch($product);
+
+        return redirect()->back()->with('success', 'تم إرسال طلب إعادة المراجعة بنجاح.');
     }
 }

@@ -12,6 +12,30 @@
                     <form action="{{ route('vendor.products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
+                        @if(session('error'))
+                            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm animate-pulse">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="mr-4">
+                                        <h3 class="text-lg font-bold text-red-800">تنبيه من الذكاء الاصطناعي</h3>
+                                        <div class="mt-1 text-sm text-red-700">
+                                            {{ session('error') }}
+                                        </div>
+                                        @if(session('ai_suggestions'))
+                                            <div class="mt-3 p-3 bg-white/50 rounded-lg border border-red-100">
+                                                <p class="text-xs font-bold text-red-600 mb-1">خطوات مقترحة للإصلاح:</p>
+                                                <p class="text-xs text-red-800">{{ session('ai_suggestions') }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Product Code -->
                             <div>

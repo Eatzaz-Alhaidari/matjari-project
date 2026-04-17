@@ -29,6 +29,8 @@ class OrderController extends BaseController
             'products.*.quantity' => 'required|integer|min:1',
             'total_price' => 'required|numeric',
             'payment_method' => 'required|string',
+            'address' => 'required|string',
+            'city' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -44,6 +46,8 @@ class OrderController extends BaseController
                 'store_id' => $request->store_id,
                 'total_amount' => $request->total_price,
                 'payment_method' => $request->payment_method,
+                'shipping_address' => $request->address,
+                'shipping_city' => $request->city,
                 'status' => 'pending',
                 'payment_status' => 'pending',
             ]);
@@ -55,7 +59,7 @@ class OrderController extends BaseController
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                     'price' => $product->price,
-                    'total_price' => $product->price * $item['quantity'],
+                    'total' => $product->price * $item['quantity'],
                 ]);
             }
 

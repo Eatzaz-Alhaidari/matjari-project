@@ -111,7 +111,9 @@ class FinancialReportController extends Controller
                 'products.currency',
                 'products.size',
                 'products.color',
-                'products.region'
+                'products.region',
+                'products.ai_status',
+                'products.ai_notes'
             )
             ->orderByDesc('revenue')
             ->limit(10)

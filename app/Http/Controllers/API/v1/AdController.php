@@ -14,8 +14,8 @@ class AdController extends BaseController
      */
     public function adminAds(): JsonResponse
     {
-        $ads = Advertisement::where('is_admin', true)
-            ->where('status', 1) // Active
+        $ads = Advertisement::where('status', 1) // Active
+            ->with('store:id,name,logo_path')
             ->latest()
             ->get();
 

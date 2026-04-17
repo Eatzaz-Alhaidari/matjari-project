@@ -39,9 +39,19 @@ class AuthenticatedSessionController extends Controller
         }
         // ##### نهاية الكود المضاف #####
 
+        // منع العملاء من دخول لوحة الويب
+        if ($request->user()->hasRole('customer')) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/login')->withErrors([
+                'email' => 'هذا الحساب مخصص لتطبيق الهاتف فقط. يرجى تسجيل الدخول من خلال التطبيق.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
-        // ... (باقي كود التوجيه لا يتغير)
         // توجيه المستخدم حسب الصلاحية
         if ($request->user()->hasRole('super-admin')) {
             return redirect()->intended(route('admin.dashboard'));

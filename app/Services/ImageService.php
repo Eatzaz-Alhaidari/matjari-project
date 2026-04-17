@@ -23,6 +23,7 @@ class ImageService
             $dimensions = match ($type) {
                 'advertisement' => ['width' => 1200, 'height' => 500], // Wide Banner
                 'logo', 'category' => ['width' => 512, 'height' => 512], // Square Icon
+                'store_logo' => ['height' => 50], // Small height-constrained logo
                 default => ['width' => 800, 'height' => 800], // Standard Product
             };
 
@@ -34,15 +35,21 @@ class ImageService
 
             // Process based on type
             if ($type === 'advertisement') {
-                // Cover / Crop for banners
                 $image->cover($dimensions['width'], $dimensions['height']);
+            } elseif ($type === 'store_logo') {
+                // Scale to specific height
+                $image->scale(height: $dimensions['height']);
             } else {
-                // Fit for products/logos to maintain aspect ratio and avoid stretching
-                $image->scaleDown(width: $dimensions['width'], height: $dimensions['height']);
+                $image->scaleDown(width: $dimensions['width'] ?? null, height: $dimensions['height'] ?? null);
             }
 
-            // Save as high quality JPG (90)
-            $encoded = $image->encodeByMediaType('image/jpeg', quality: 90);
+            // Save as PNG for logos to support transparency, otherwise JPG
+            if ($type === 'store_logo' || $type === 'logo') {
+                $encoded = $image->encodeByMediaType('image/png');
+                $path = str_replace('.jpg', '.png', $path);
+            } else {
+                $encoded = $image->encodeByMediaType('image/jpeg', quality: 90);
+            }
 
             // Store in the specified disk (public)
             Storage::disk('public')->put($path, (string) $encoded);

@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\v1\ReviewController;
 use App\Http\Controllers\Api\v1\ComplaintController;
 use App\Http\Controllers\Api\v1\SupportController;
 use App\Http\Controllers\Api\v1\MessageController;
+use App\Http\Controllers\Api\v1\InventoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,25 +30,60 @@ use App\Http\Controllers\Api\v1\MessageController;
 
 Route::prefix('v1')->group(function () {
 
-    // 1-11 المسارات السابقة
+    // 1-11 المسارات السابقة المنشئة
+    
+    // 1. جلب جميع التصنيفات
     Route::get('/categories', [CategoryController::class, 'index']);
+
+    // 2. جلب إعلانات الأدمن النشطة
     Route::get('/admin/ads', [AdController::class, 'adminAds']);
+
+    // 3. جلب جميع المنتجات
+    Route::get('/products', [ProductController::class, 'index']);
+
+    // 4. جلب المنتجات الأكثر طلبًا
     Route::get('/products/top-selling', [ProductController::class, 'topSelling']);
+
+    // 4. جلب جميع الخصومات النشطة (أدمن + متاجر)
+    Route::get('/discounts', [DiscountController::class, 'index']);
+
+    // 5. جلب خصومات الأدمن
     Route::get('/admin/discounts', [DiscountController::class, 'adminDiscounts']);
+
+    // 5. جلب المتاجر النشطة
     Route::get('/stores', [StoreController::class, 'index']);
+
+    // 6. جلب إعلانات التاجر
     Route::get('/stores/{id}/ads', [StoreController::class, 'ads']);
+
+    // 7. جلب خصومات التاجر
     Route::get('/stores/{id}/discounts', [StoreController::class, 'discounts']);
+
+    // 8. جلب قواعد الشات بوت
+    Route::get('/chatbot/rules', [ChatbotController::class, 'rules']);
+
+    // 8. استقبال ردود الشات بوت
     Route::post('/chatbot/responses', [ChatbotController::class, 'storeResponse']);
+
+    // 9. جلب إشعارات مستخدم محدد
+    Route::get('/notifications/{user_id}', [NotificationController::class, 'index']);
+
+    // 9. استقبال إشعارات العملاء
     Route::post('/notifications', [NotificationController::class, 'store']);
+
+    // 10. استقبال بيانات العملاء (تسجيل جديد)
     Route::post('/customers', [CustomerController::class, 'register']);
     
+    // 11. إرسال وتأكيد رمز التحقق (OTP)
     Route::prefix('auth')->group(function () {
+        // إرسال كود التحقق
         Route::post('/send-code', [AuthController::class, 'sendCode']);
+        // التأكد من كود التحقق
         Route::post('/verify-code', [AuthController::class, 'verifyCode']);
     });
 
     /* -------------------------------------------------------------------------- */
-    /* التكملة المطلوبة (12-22) */
+    /* التكملة المطلوبة (12-23) */
     /* -------------------------------------------------------------------------- */
 
     // 12. استقبال عناوين الشحن
@@ -80,10 +116,18 @@ Route::prefix('v1')->group(function () {
     // 21. استقبال الرسائل الخاصة بالتجار
     Route::post('/messages', [MessageController::class, 'store']);
 
-    // 22. تغيير كلمة المرور للعملاء (محمي بـ Sanctum)
+    // 22. تغيير كلمة المرور و 23. تسجيل الخروج (محمي بـ Sanctum)
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
+        Route::post('/auth/logout', [AuthController::class, 'logout']); // مسار تسجيل الخروج الجديد
     });
+
+    /* -------------------------------------------------------------------------- */
+    /* استعادة تكامل C# (Inventory) */
+    /* -------------------------------------------------------------------------- */
+    
+    // مزامنة المخزون وتحديث الكميات لحظياً (تطبيق C#)
+    Route::post('/inventory/sync', [InventoryController::class, 'syncProducts']);
 
 });
 
