@@ -13,7 +13,7 @@ class Product extends Model
         'product_code',
         'sku',
         'name',
-        'brand',
+        'manual_brand',
         'description',
         'full_description',
         'price',
@@ -35,7 +35,7 @@ class Product extends Model
         'size',
         'color',
         'region',
-        'category',
+        'manual_category',
     ];
 
     protected $casts = [
@@ -48,7 +48,14 @@ class Product extends Model
         'three_sixty_images' => 'array',
     ];
 
-    protected $appends = ['three_d_model_url', 'three_sixty_images_urls', 'image_url'];
+    protected $appends = ['three_d_model_url', 'three_sixty_images_urls', 'image_url', 'images_urls'];
+
+    public function getImagesUrlsAttribute()
+    {
+        return $this->images->map(function ($img) {
+            return asset('storage/' . $img->image_path);
+        });
+    }
 
     public function getImageUrlAttribute()
     {

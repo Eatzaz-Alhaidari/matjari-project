@@ -62,7 +62,7 @@ class InventoryController extends BaseController
                     'status' => 'inactive',
                     'store_id' => $defaultStore ? $defaultStore->id : 1,
                     'category_id' => $defaultCategory ? $defaultCategory->id : 1,
-                    'category' => 'غير مصنف', // Default category value to fix 500 error
+                    'manual_category' => 'غير مصنف', // Use manual_category to avoid conflict
                     'description' => 'تم استيراده تلقائياً من تطبيق C#',
                     'currency' => 'YER',
                 ]);

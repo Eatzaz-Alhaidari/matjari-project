@@ -135,7 +135,18 @@ class AdvertisementController extends Controller
             'target_url' => 'nullable|url',
         ]);
 
-        $data = $request->except('image');
+        $data = $request->except(['image', 'status']);
+
+        // Map status strings to integers
+        if ($request->has('status')) {
+            $statusMap = [
+                'pending' => 0,
+                'active' => 1,
+                'rejected' => 2,
+                'inactive' => 3,
+            ];
+            $data['status'] = $statusMap[$request->status] ?? 0;
+        }
 
         if ($request->hasFile('image')) {
             // Delete old image if exists

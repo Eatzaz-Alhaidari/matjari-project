@@ -40,6 +40,7 @@ Route::prefix('v1')->group(function () {
 
     // 3. جلب جميع المنتجات
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
 
     // 4. جلب المنتجات الأكثر طلبًا
     Route::get('/products/top-selling', [ProductController::class, 'topSelling']);
