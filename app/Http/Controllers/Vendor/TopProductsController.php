@@ -73,7 +73,9 @@ class TopProductsController extends Controller
                 'products.currency',
                 'products.size',
                 'products.color',
-                'products.region'
+                'products.region',
+                'products.ai_status',
+                'products.ai_notes'
             )
             ->orderByDesc('total_quantity_sold')
             ->limit(50); // الحصول على أكثر من 5 للفلترة

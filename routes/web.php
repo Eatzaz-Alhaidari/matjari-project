@@ -182,6 +182,7 @@ Route::prefix('vendor')
         // Products
         Route::resource('products', \App\Http\Controllers\Vendor\ProductController::class);
         Route::patch('products/{product}/toggle-status', [\App\Http\Controllers\Vendor\ProductController::class, 'toggleStatus'])->name('products.toggleStatus');
+        Route::post('products/{product}/re-review', [\App\Http\Controllers\Vendor\ProductController::class, 'reReview'])->name('products.reReview');
 
         // Orders
         Route::resource('orders', \App\Http\Controllers\Vendor\OrderController::class)->except(['edit', 'destroy']);

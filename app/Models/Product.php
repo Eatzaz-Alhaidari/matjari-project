@@ -35,6 +35,9 @@ class Product extends Model
         'size',
         'color',
         'region',
+        'ai_status',
+        'ai_notes',
+        'category',
         'manual_category',
     ];
 
@@ -46,6 +49,7 @@ class Product extends Model
         'min_stock' => 'integer',
         'status' => 'string',
         'three_sixty_images' => 'array',
+        'ai_notes' => 'array',
     ];
 
     protected $appends = ['three_d_model_url', 'three_sixty_images_urls', 'image_url', 'images_urls'];

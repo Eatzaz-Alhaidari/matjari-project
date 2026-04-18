@@ -32,6 +32,7 @@ class InventoryController extends BaseController
             'products.*.product_code' => 'required|string',
             'products.*.name' => 'nullable|string',
             'products.*.price' => 'nullable|numeric',
+            'products.*.stock' => 'nullable|integer',
             // Allow stock OR qty OR quantity
         ]);
 
@@ -40,7 +41,7 @@ class InventoryController extends BaseController
         }
 
         $syncedCount = 0;
-        $defaultStore = Store::first();
+        $defaultStore = Store::first(); // Or use a specific C# Integration Store
         $defaultCategory = Category::first();
 
         foreach ($data['products'] as $item) {
@@ -50,16 +51,18 @@ class InventoryController extends BaseController
             $product = Product::where('product_code', $item['product_code'])->first();
 
             if ($product) {
+                // If product exists, only update stock to preserve manual edits in Dashboard
                 $product->update([
                     'stock' => $stock
                 ]);
             } else {
+                // If new product, create with default values
                 $product = Product::create([
                     'product_code' => $item['product_code'],
                     'name' => $item['name'] ?? ('جديد - ' . $item['product_code']),
                     'price' => $item['price'] ?? 0,
                     'stock' => $stock,
-                    'status' => 'inactive',
+                    'status' => 'inactive', // Default to inactive for admin review
                     'store_id' => $defaultStore ? $defaultStore->id : 1,
                     'category_id' => $defaultCategory ? $defaultCategory->id : 1,
                     'manual_category' => 'غير مصنف', // Use manual_category to avoid conflict
@@ -68,6 +71,7 @@ class InventoryController extends BaseController
                 ]);
             }
 
+            // Trigger real-time update in Dashboard
             event(new ProductQtyUpdated($product->product_code, $product->stock));
             $syncedCount++;
         }
