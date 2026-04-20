@@ -30,7 +30,7 @@ class ProductQualityService
     {
         try {
             $imagePath = $temporaryImagePath ?: storage_path('app/public/' . $product->image);
-            
+
             if (!$imagePath || !file_exists($imagePath)) {
                 return [
                     'status' => 'rejected',
@@ -52,7 +52,7 @@ class ProductQualityService
 
         } catch (\Exception $e) {
             Log::error("ProductQualityService Exception ({$this->driver}): " . $e->getMessage());
-            
+
             // If OpenAI fails and we have Gemini configured, try fallback
             if ($this->driver === 'openai' && config('ai-agent.drivers.gemini.api_key')) {
                 Log::info("Attempting fallback to Gemini due to OpenAI failure.");
@@ -132,7 +132,7 @@ class ProductQualityService
 
         $content = $response->json('candidates.0.content.parts.0.text');
         $result = json_decode($content, true);
-        
+
         return $this->formatResult($result);
     }
 

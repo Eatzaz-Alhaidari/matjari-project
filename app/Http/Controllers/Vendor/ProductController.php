@@ -94,7 +94,7 @@ class ProductController extends Controller
         // --- AI Synchronous Validation ---
         $tempProduct = new Product($data);
         $qualityService = new \App\Services\ProductQualityService();
-        
+
         // Pass the absolute path of the newly uploaded image for analysis
         $imageAbsolutePath = $request->hasFile('image') ? storage_path('app/public/' . $data['image']) : null;
         $aiResult = $qualityService->analyze($tempProduct, $imageAbsolutePath);
@@ -279,7 +279,7 @@ class ProductController extends Controller
         if ($needsAnalysis) {
             $qualityService = new \App\Services\ProductQualityService();
             $imageAbsolutePath = $request->hasFile('image') ? storage_path('app/public/' . $data['image']) : ($product->image ? storage_path('app/public/' . $product->image) : null);
-            
+
             $aiResult = $qualityService->analyze($product, $imageAbsolutePath);
 
             if ($aiResult['status'] === 'rejected') {
