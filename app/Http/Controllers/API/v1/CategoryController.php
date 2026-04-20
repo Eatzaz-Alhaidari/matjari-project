@@ -14,12 +14,20 @@ class CategoryController extends BaseController
      */
     public function index(): JsonResponse
     {
-        $categories = Category::where('is_brand', false)->get();
-        $brands = Category::where('is_brand', true)->get();
+        // جلب الأقسام الرئيسية (التي ليس لها أب) مع تحميل أبنائها وماركاتها
+        $categories = Category::whereNull('parent_id')
+            ->where('is_brand', false)
+            ->with(['children', 'brands']) // Simplified: removed nested closures
+            ->get();
+
+        // جلب الماركات العامة (اختياري، إذا كنت تريد عرض ماركات غير مرتبطة بقسم معين)
+        $standaloneBrands = Category::where('is_brand', true)
+            ->whereNull('parent_id')
+            ->get();
 
         return $this->sendResponse([
             'categories' => $categories,
-            'brands' => $brands
-        ], 'تم جلب التصنيفات والماركات بنجاح');
+            'brands' => $standaloneBrands
+        ], 'تم جلب التصنيفات والماركات بنجاح بنظام الشجرة');
     }
 }

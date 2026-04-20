@@ -75,33 +75,17 @@ class StoreController extends Controller
         $logoPath = $store->logo_path;
         if ($request->hasFile('logo')) {
             if ($logoPath) {
-                // Delete old logo
                 Storage::disk('public')->delete($logoPath);
             }
-            
-            $file = $request->file('logo');
-            
-            // قراءة الصورة ومعالجتها
-            $image = Image::read($file);
-            
-            // تغيير الحجم ليكون الارتفاع 50 بكسل مع الحفاظ على التناسب كما طلب المستخدم
-            $image->scale(height: 50);
-            
-            // تحويل الخلفية البيضاء أو السوداء إلى شفافة
-            // ملاحظة: نقوم بتحويل الصورة إلى PNG لدعم الشفافية
-            $encoded = $image->encode(new PngEncoder());
-            
-            $filename = 'stores/logos/' . hexdec(uniqid()) . '.png';
-            Storage::disk('public')->put($filename, (string) $encoded);
-            $logoPath = $filename;
+            $logoPath = \App\Services\ImageService::processAndStore($request->file('logo'), 'stores/logos', 'store_logo');
         }
 
         $coverPath = $store->cover_image_path;
         if ($request->hasFile('cover_image')) {
             if ($coverPath) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($coverPath);
+                Storage::disk('public')->delete($coverPath);
             }
-            $coverPath = $request->file('cover_image')->store('stores/covers', 'public');
+            $coverPath = \App\Services\ImageService::processAndStore($request->file('cover_image'), 'stores/covers', 'advertisement');
         }
 
         $store->update([

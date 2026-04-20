@@ -6,11 +6,6 @@
     <div class="py-6">
         <div class="max-w-full mx-auto sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <!-- إحصائيات -->
             <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">

@@ -51,12 +51,12 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->image ? url('api/image/' . $this->image) : null;
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
     public function getThreeDModelUrlAttribute()
     {
-        return $this->three_d_model ? url('api/image/' . $this->three_d_model) : null;
+        return $this->three_d_model ? asset('storage/' . $this->three_d_model) : null;
     }
 
     public function getThreeSixtyImagesUrlsAttribute()
@@ -65,7 +65,7 @@ class Product extends Model
             return [];
         }
         return array_map(function ($path) {
-            return url('api/image/' . $path);
+            return asset('storage/' . $path);
         }, $this->three_sixty_images);
     }
 

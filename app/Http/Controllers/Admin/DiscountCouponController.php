@@ -52,8 +52,8 @@ class DiscountCouponController extends Controller
         ]);
 
         $data['min_order_amount'] = $data['min_order_amount'] ?? 0;
-        // store_id = 0 for global admin coupons
-        $data['store_id'] = 0;
+        // store_id = null for global admin coupons
+        $data['store_id'] = null;
         $data['used_count'] = 0;
 
         DB::table('discounts')->insert(array_merge($data, [

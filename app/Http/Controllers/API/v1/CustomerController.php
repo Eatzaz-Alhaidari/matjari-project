@@ -35,6 +35,18 @@ class CustomerController extends BaseController
 
         $user = User::create($input);
 
+        // إسناد الدور (Spatie Permission)
+        $user->assignRole('customer');
+
+        // تسجيل نشاط التسجيل في "بطاقة سجل أنشطة العملاء"
+        \App\Models\CustomerActivity::create([
+            'user_id' => $user->id,
+            'activity_type' => 'registration',
+            'description' => 'تسجيل حساب جديد من تطبيق الهاتف',
+            'ip_address' => $request->ip(),
+            'device_info' => $request->header('User-Agent'),
+        ]);
+
         $success['token'] =  $user->createToken('MatjariApp')->plainTextToken;
         $success['name'] =  $user->name;
 

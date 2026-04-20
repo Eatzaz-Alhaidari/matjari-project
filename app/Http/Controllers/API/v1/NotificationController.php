@@ -10,6 +10,21 @@ use Illuminate\Support\Facades\Validator;
 class NotificationController extends BaseController
 {
     /**
+     * Get notifications for a specific user.
+     *
+     * @param int $user_id
+     * @return JsonResponse
+     */
+    public function index($user_id): JsonResponse
+    {
+        $notifications = Notification::where('user_id', $user_id)
+            ->latest()
+            ->get();
+
+        return $this->sendResponse($notifications, 'تم جلب الإشعارات بنجاح');
+    }
+
+    /**
      * Store a notification sent from the app.
      *
      * @param Request $request

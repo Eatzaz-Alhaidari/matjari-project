@@ -15,16 +15,6 @@
                         </a>
                     </div>
 
-                    @if (session('success'))
-                        <div class="mb-4 px-4 py-2 bg-green-100 border border-green-200 text-green-700 rounded-md">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-200 text-red-700 rounded-md">
-                            {{ session('error') }}
-                        </div>
-                    @endif
 
                     <form action="{{ route('vendor.store.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf

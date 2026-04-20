@@ -1,0 +1,439 @@
+{
+  "info": {
+    "_postman_id": "4a1b5a47-4c6c-4983-b82e-be2d4e255658",
+    "name": "Payment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52403444",
+    "_collection_link": "https://go.postman.co/collection/52403444-4a1b5a47-4c6c-4983-b82e-be2d4e255658?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "P2MCL",
+      "item": [
+        {
+          "name": "send money (p2mcl)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TAIBAH( 2 )-MERCHANT-TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "merchant",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"source_wallet_id\" : 10000,\r\n    \"request_id\" : \"{{$timestamp}}\",\r\n\t\"target_phone\": 967772777317,\r\n    \"amount\": 100,\r\n    \"purpose\": \"محمد حليف تجريبي \"\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/merchant/p2mcl",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "merchant",
+                "p2mcl"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "confirm (p2mcl)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TAIBAH( 2 )-MERCHANT-TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "merchant",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"otp\":123456,\r\n    \"purchase_id\":898\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/merchant/p2mcl/confirm",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "merchant",
+                "p2mcl",
+                "confirm"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refund (p2mcl)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TAIBAH( 2 )-MERCHANT-TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "merchant",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"transaction_id\":1863,\r\n    \"request_id\":{{$timestamp}},\r\n    \"amount\":10\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/merchant/p2mcl/refund",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "merchant",
+                "p2mcl",
+                "refund"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "check status Copy",
+      "item": [
+        {
+          "name": "send",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TAIBAH( 2 )-MERCHANT-TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "mobile",
+                "type": "text"
+              },
+              {
+                "key": "x-device-uuid",
+                "value": "{{TAIBAH-X-DEVICE-UUID}}",
+                "type": "text"
+              },
+              {
+                "key": "x-device-brand",
+                "value": "{{TAIBAH-X-DEVICE-BRAND}}",
+                "type": "text"
+              },
+              {
+                "key": "x-device-model",
+                "value": "{{TAIBAH-X-DEVICE-MODEL}}",
+                "type": "text"
+              },
+              {
+                "key": "x-device-os",
+                "value": "{{TAIBAH-X-DEVICE-OS}}",
+                "type": "text"
+              },
+              {
+                "key": "x-device-os-version",
+                "value": "{{TAIBAH-X-DEVICE-OS-VERSION}}",
+                "type": "text"
+              },
+              {
+                "key": "x-app-version",
+                "value": "{{TAIBAH-X-APP-VERSION}}",
+                "type": "text"
+              },
+              {
+                "key": "x-device-token",
+                "value": "{{TAIBAH-X-DEVICE-TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"request_id\" : \"42793561\"\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/agent/check-status",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "agent",
+                "check-status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign in Copy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "agent",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": 967700000000,\r\n    \"password\": 100000\r\n}\r\n"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/auth/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forget password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "agent",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": 967704092273,\r\n    \"identity_number\": 12345552101\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/auth/forget-password",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forget-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "x-channel",
+                "value": "agent",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": 967704092273,\r\n    \"otp\": 255021,\r\n    \"new_password\":112233\r\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/v1/auth/change-password",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "MERCHANT_WALLET",
+      "value": ""
+    },
+    {
+      "key": "URL",
+      "value": ""
+    },
+    {
+      "key": "TAIBAH( 2 )-MERCHANT-TOKEN",
+      "value": ""
+    },
+    {
+      "key": "merchant_phone",
+      "value": ""
+    },
+    {
+      "key": "merchant_pass",
+      "value": ""
+    }
+  ]
+}

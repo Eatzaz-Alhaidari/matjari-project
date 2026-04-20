@@ -79,7 +79,7 @@ class DashboardController extends Controller
             'delivered_orders' => Order::where('store_id', $storeId)->where('status', 'delivered')->count(),
             'total_sales' => Order::where('store_id', $storeId)->where('status', 'delivered')->sum('total_amount'),
             'low_stock_products' => Product::where('store_id', $storeId)->whereRaw('stock <= min_stock')->count(),
-            'active_advertisements' => Advertisement::where('store_id', $storeId)->where('status', 'active')->count(),
+            'active_advertisements' => Advertisement::where('store_id', $storeId)->where('status', 1)->count(),
             'active_discounts' => Discount::where('store_id', $storeId)->where('status', 'active')->count(),
             'total_reviews' => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->count(),
             'pending_reviews' => Review::whereHas('product', fn($q) => $q->where('store_id', $storeId))->where('status', 'pending')->count(),
