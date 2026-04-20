@@ -65,6 +65,11 @@ class Order extends Model
         return $this->belongsTo(Address::class, 'address_id');
     }
 
+    public function floosakPaymentAttempts(): HasMany
+    {
+        return $this->hasMany(FloosakPaymentAttempt::class);
+    }
+
     // Helper methods
     public function getStatusColorAttribute()
     {

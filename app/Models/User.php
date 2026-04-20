@@ -83,4 +83,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Wishlist::class);
     }
+
+    public function floosakPaymentAttempts()
+    {
+        return $this->hasMany(FloosakPaymentAttempt::class);
+    }
 }

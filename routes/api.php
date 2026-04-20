@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\v1\NotificationController;
 use App\Http\Controllers\Api\v1\CustomerController;
 use App\Http\Controllers\Api\v1\AddressController;
 use App\Http\Controllers\Api\v1\PaymentController;
+use App\Http\Controllers\Api\v1\FloosakPaymentController;
 use App\Http\Controllers\Api\v1\OrderController;
 use App\Http\Controllers\Api\v1\ActivityController;
 use App\Http\Controllers\Api\v1\ReturnController;
@@ -83,6 +84,10 @@ Route::prefix('v1')->group(function () {
     // 22. تغيير كلمة المرور للعملاء (محمي بـ Sanctum)
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
+
+        Route::post('/orders/{order}/payments/floosak/initiate', [FloosakPaymentController::class, 'initiate']);
+        Route::post('/payments/floosak/{attempt}/confirm', [FloosakPaymentController::class, 'confirm']);
+        Route::get('/payments/floosak/{attempt}', [FloosakPaymentController::class, 'show']);
     });
 
 });
