@@ -31,10 +31,23 @@ class OrderController extends BaseController
             'payment_method' => 'required|string',
             'address' => 'required|string',
             'city' => 'nullable|string',
+            'address_id' => 'nullable|exists:addresses,id',
         ]);
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors(), 422);
+        }
+
+        $lat = null;
+        $long = null;
+
+        if ($request->filled('address_id')) {
+            $addressModel = \App\Models\Address::find($request->address_id);
+            if ($addressModel) {
+                // Notice the Address migration uses 'lng' for longitude, but order uses 'long'.
+                $lat = $addressModel->lat;
+                $long = $addressModel->lng; 
+            }
         }
 
         try {
@@ -44,10 +57,13 @@ class OrderController extends BaseController
                 'order_number' => 'ORD-' . strtoupper(Str::random(8)),
                 'user_id' => $request->user_id,
                 'store_id' => $request->store_id,
+                'address_id' => $request->address_id,
                 'total_amount' => $request->total_price,
                 'payment_method' => $request->payment_method,
                 'shipping_address' => $request->address,
                 'shipping_city' => $request->city,
+                'lat' => $lat,
+                'long' => $long,
                 'status' => 'pending',
                 'payment_status' => 'pending',
             ]);

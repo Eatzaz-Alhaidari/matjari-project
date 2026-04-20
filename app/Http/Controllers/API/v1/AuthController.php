@@ -143,4 +143,36 @@ class AuthController extends BaseController
 
         return $this->sendResponse([], 'تم تسجيل الخروج بنجاح');
     }
+
+    /**
+     * Login user via identifier (email/phone) and password.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function login(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'identifier' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors(), 422);
+        }
+
+        $identifier = $request->identifier;
+        $user = User::where('email', $identifier)->orWhere('phone', $identifier)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return $this->sendError('بيانات الدخول غير صحيحة.', [], 401);
+        }
+
+        // Return token and role
+        $success['token'] =  $user->createToken('MatjariAppAuth')->plainTextToken;
+        $success['user'] = $user;
+        $success['role'] = $user->role ?? 'customer'; // Default to customer if not set
+
+        return $this->sendResponse($success, 'تم تسجيل الدخول بنجاح');
+    }
 }

@@ -68,4 +68,38 @@ class ReviewController extends BaseController
 
         return $this->sendResponse($review, 'تم استقبال تقييم المتجر بنجاح', 201);
     }
+
+    /**
+     * Get product reviews.
+     *
+     * @param int $product_id
+     * @return JsonResponse
+     */
+    public function getProductReviews($product_id): JsonResponse
+    {
+        $reviews = Review::where('product_id', $product_id)
+            ->where('status', 'approved')
+            ->with(['user:id,name,profile_photo_path'])
+            ->latest()
+            ->get();
+
+        return $this->sendResponse($reviews, 'تم جلب تقييمات المنتج بنجاح');
+    }
+
+    /**
+     * Get store reviews.
+     *
+     * @param int $store_id
+     * @return JsonResponse
+     */
+    public function getStoreReviews($store_id): JsonResponse
+    {
+        $reviews = Review::where('store_id', $store_id)
+            ->where('status', 'approved')
+            ->with(['user:id,name,profile_photo_path'])
+            ->latest()
+            ->get();
+
+        return $this->sendResponse($reviews, 'تم جلب تقييمات المتجر بنجاح');
+    }
 }

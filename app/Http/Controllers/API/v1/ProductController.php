@@ -16,7 +16,7 @@ class ProductController extends BaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Product::active()->with(['store', 'category', 'images']);
+        $query = Product::active()->with(['store', 'category', 'brand', 'images', 'colors', 'sizes']);
 
         // 1. فلترة حسب القسم (يدعم الأقسام الفرعية تلقائياً)
         if ($request->filled('category') || $request->filled('category_id')) {

@@ -74,7 +74,7 @@ Route::prefix('v1')->group(function () {
 
     // 10. استقبال بيانات العملاء (تسجيل جديد)
     Route::post('/customers', [CustomerController::class, 'register']);
-    
+
     // 11. إرسال وتأكيد رمز التحقق (OTP)
     Route::prefix('auth')->group(function () {
         // إرسال كود التحقق
@@ -103,11 +103,13 @@ Route::prefix('v1')->group(function () {
     // 16. استقبال المنتجات المسترجعة
     Route::post('/returns', [ReturnController::class, 'store']);
 
-    // 17. استقبال تقييمات المنتجات
+    // 17. استقبال وجلب تقييمات المنتجات
     Route::post('/product-reviews', [ReviewController::class, 'storeProductReview']);
+    Route::get('/products/{id}/reviews', [ReviewController::class, 'getProductReviews']);
 
-    // 18. استقبال تقييمات المتاجر
+    // 18. استقبال وجلب تقييمات المتاجر
     Route::post('/store-reviews', [ReviewController::class, 'storeStoreReview']);
+    Route::get('/stores/{id}/reviews', [ReviewController::class, 'getStoreReviews']);
 
     // 19. استقبال شكاوى العملاء
     Route::post('/complaints', [ComplaintController::class, 'store']);
@@ -122,6 +124,12 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']); // مسار تسجيل الخروج الجديد
+
+        // مسارات المندوب (Driver Routes)
+        Route::prefix('driver')->group(function () {
+            Route::get('/orders', [\App\Http\Controllers\Api\v1\DriverController::class, 'index']);
+            Route::post('/orders/{id}/update-status', [\App\Http\Controllers\Api\v1\DriverController::class, 'updateStatus']);
+        });
     });
 
     /* -------------------------------------------------------------------------- */
@@ -132,6 +140,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/inventory/sync', [InventoryController::class, 'syncProducts']);
 
 });
+
+// مسار تسجيل الدخول العام تطبيق المندوب وغيرها
+Route::post('/login', [App\Http\Controllers\Api\v1\AuthController::class, 'login']);
 
 // مسار متوافق مع تطبيق السي شارب (Compatibility Route)
 Route::post('/sync-inventory', [App\Http\Controllers\Api\v1\InventoryController::class, 'syncProducts']);

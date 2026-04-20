@@ -46,6 +46,18 @@ class Store extends Model
         });
     }
 
+    protected $appends = ['logo_url', 'cover_image_url'];
+
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo_path ? asset('storage/' . $this->logo_path) : null;
+    }
+
+    public function getCoverImageUrlAttribute()
+    {
+        return $this->cover_image_path ? asset('storage/' . $this->cover_image_path) : null;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
