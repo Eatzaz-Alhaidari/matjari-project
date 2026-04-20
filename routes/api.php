@@ -45,6 +45,9 @@ Route::prefix('v1')->group(function () {
     // 4. جلب المنتجات الأكثر طلبًا
     Route::get('/products/top-selling', [ProductController::class, 'topSelling']);
 
+    // تفاصيل المنتج يجب أن تأتي بعد المسارات الثابتة مثل top-selling
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+
     // 4. جلب جميع الخصومات النشطة (أدمن + متاجر)
     Route::get('/discounts', [DiscountController::class, 'index']);
 
@@ -93,8 +96,9 @@ Route::prefix('v1')->group(function () {
     // 13. إرسال طرق الدفع
     Route::get('/payment-methods', [PaymentController::class, 'index']);
 
-    // 14. استقبال الطلبات
+    // 14. استقبال الطلبات وتتبعها
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
 
     // 15. استقبال سجل أنشطة العملاء
     Route::post('/customer-activities', [ActivityController::class, 'store']);
@@ -135,6 +139,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/inventory/sync', [InventoryController::class, 'syncProducts']);
 
 });
+
+// مسار متوافق مع تطبيق السي شارب (Compatibility Route)
+Route::post('/sync-inventory', [App\Http\Controllers\Api\v1\InventoryController::class, 'syncProducts']);
 
 /*
 |--------------------------------------------------------------------------

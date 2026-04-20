@@ -48,8 +48,8 @@ class TopProductsController extends Controller
                 'products.id',
                 'products.product_code',
                 'products.name',
-                'products.brand',
                 'products.brand_id',
+                'products.manual_brand',
                 'products.description',
                 'products.notes',
                 'products.full_description',
@@ -64,6 +64,7 @@ class TopProductsController extends Controller
                 'products.three_sixty_images',
                 'products.store_id',
                 'products.category_id',
+                'products.manual_category',
                 'products.created_at',
                 'products.updated_at',
                 'products.warranty_duration',
@@ -72,7 +73,9 @@ class TopProductsController extends Controller
                 'products.currency',
                 'products.size',
                 'products.color',
-                'products.region'
+                'products.region',
+                'products.ai_status',
+                'products.ai_notes'
             )
             ->orderByDesc('total_quantity_sold')
             ->limit(50); // الحصول على أكثر من 5 للفلترة

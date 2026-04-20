@@ -52,6 +52,7 @@
                                     <th scope="col" class="px-5 py-3 text-right text-xs font-bold text-brand-orange-800 uppercase tracking-wider whitespace-nowrap">المنطقة</th>
                                     <th scope="col" class="px-5 py-3 text-right text-xs font-bold text-brand-orange-800 uppercase tracking-wider whitespace-nowrap">الضمان</th>
                                     <th scope="col" class="px-5 py-3 text-center text-xs font-bold text-brand-orange-800 uppercase tracking-wider whitespace-nowrap">الحالة</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-bold text-brand-orange-800 uppercase tracking-wider whitespace-nowrap">مراجعة AI</th>
                                     <th scope="col" class="px-5 py-3 text-center text-xs font-bold text-brand-orange-800 uppercase tracking-wider whitespace-nowrap">الإجراءات</th>
                                 </tr>
                             </thead>
@@ -123,8 +124,22 @@
                                             <div class="text-xs text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded">{{ $product->warranty_duration > 0 ? $product->warranty_duration . ' ' . ($product->warranty_unit == 'months' ? 'شهر' : ($product->warranty_unit == 'years' ? 'سنة' : 'يوم')) : 'لا يوجد' }}</div>
                                         </td>
                                         <td class="px-5 py-4 whitespace-nowrap text-center">
-                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $product->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                                {{ $product->status === 'active' ? 'نشط' : 'معطل' }}
+                                            @php
+                                                $ai_badge_class = match($product->ai_status) {
+                                                    'approved' => 'bg-green-100 text-green-800',
+                                                    'rejected' => 'bg-red-100 text-red-800',
+                                                    'needs_edit' => 'bg-yellow-100 text-yellow-800',
+                                                    default => 'bg-blue-100 text-blue-800',
+                                                };
+                                                $ai_status_text = match($product->ai_status) {
+                                                    'approved' => 'مقبول',
+                                                    'rejected' => 'مرفوض',
+                                                    'needs_edit' => 'تعديل',
+                                                    default => 'قيد الانتظار',
+                                                };
+                                            @endphp
+                                            <span class="px-2 py-0.5 inline-flex text-[10px] leading-5 font-bold rounded-full {{ $ai_badge_class }}">
+                                                {{ $ai_status_text }}
                                             </span>
                                         </td>
                                         <td class="px-5 py-4 whitespace-nowrap text-center text-sm font-medium" onclick="event.stopPropagation()">
@@ -150,7 +165,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="12" class="px-6 py-12 text-center text-gray-500">
+                                        <td colspan="13" class="px-6 py-12 text-center text-gray-500">
                                             <div class="flex flex-col items-center justify-center">
                                                 <svg class="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                                 <p class="text-lg font-medium text-gray-900">لا توجد منتجات حالياً</p>

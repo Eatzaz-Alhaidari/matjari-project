@@ -14,6 +14,52 @@
                         @csrf
                         @method('PUT')
 
+                        @if(session('error'))
+                            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm animate-pulse">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="mr-4">
+                                        <h3 class="text-lg font-bold text-red-800">تنبيه من الذكاء الاصطناعي</h3>
+                                        <div class="mt-1 text-sm text-red-700">
+                                            {{ session('error') }}
+                                        </div>
+                                        @if(session('ai_suggestions'))
+                                            <div class="mt-3 p-3 bg-white/50 rounded-lg border border-red-100">
+                                                <p class="text-xs font-bold text-red-600 mb-1">خطوات مقترحة للإصلاح:</p>
+                                                <p class="text-xs text-red-800">{{ session('ai_suggestions') }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($product->ai_status === 'rejected' || $product->ai_status === 'needs_edit')
+                            <div class="mb-6 p-4 rounded-xl border {{ $product->ai_status === 'rejected' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200' }}">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="p-1.5 rounded-lg {{ $product->ai_status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                    </div>
+                                    <h3 class="font-bold {{ $product->ai_status === 'rejected' ? 'text-red-800' : 'text-yellow-800' }}">
+                                        {{ $product->ai_status === 'rejected' ? 'ملاحظة: المنتج مرفوض من مراجعة الجودة الذكية' : 'تبيه: المنتج يحتاج إلى تعديلات حسب مراجعة الجودة' }}
+                                    </h3>
+                                </div>
+                                <p class="text-sm {{ $product->ai_status === 'rejected' ? 'text-red-700' : 'text-yellow-700' }} leading-relaxed mb-3">
+                                    {{ $product->ai_notes['reason'] ?? '' }}
+                                </p>
+                                @if(!empty($product->ai_notes['suggestions']))
+                                    <div class="text-[11px] font-bold uppercase tracking-wider mb-1 {{ $product->ai_status === 'rejected' ? 'text-red-500' : 'text-yellow-600' }}">اقتراحات الحل:</div>
+                                    <p class="text-sm {{ $product->ai_status === 'rejected' ? 'text-red-600' : 'text-yellow-600' }}">
+                                        {{ $product->ai_notes['suggestions'] }}
+                                    </p>
+                                @endif
+                            </div>
+                        @endif
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Product Code -->
                             <div>

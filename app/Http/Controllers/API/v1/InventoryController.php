@@ -21,12 +21,19 @@ class InventoryController extends BaseController
      */
     public function syncProducts(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        // Handle direct array payloads (sent by older/simple REST clients)
+        $data = $request->all();
+        if (isset($data[0])) {
+            $data = ['products' => $data];
+        }
+
+        $validator = Validator::make($data, [
             'products' => 'required|array',
             'products.*.product_code' => 'required|string',
             'products.*.name' => 'nullable|string',
             'products.*.price' => 'nullable|numeric',
-            'products.*.stock' => 'required|integer',
+            'products.*.stock' => 'nullable|integer',
+            // Allow stock OR qty OR quantity
         ]);
 
         if ($validator->fails()) {
@@ -37,13 +44,16 @@ class InventoryController extends BaseController
         $defaultStore = Store::first(); // Or use a specific C# Integration Store
         $defaultCategory = Category::first();
 
-        foreach ($request->products as $item) {
+        foreach ($data['products'] as $item) {
+            // Determine stock value from various possible keys
+            $stock = $item['stock'] ?? ($item['qty'] ?? ($item['quantity'] ?? 0));
+
             $product = Product::where('product_code', $item['product_code'])->first();
 
             if ($product) {
                 // If product exists, only update stock to preserve manual edits in Dashboard
                 $product->update([
-                    'stock' => $item['stock']
+                    'stock' => $stock
                 ]);
             } else {
                 // If new product, create with default values
@@ -51,10 +61,11 @@ class InventoryController extends BaseController
                     'product_code' => $item['product_code'],
                     'name' => $item['name'] ?? ('جديد - ' . $item['product_code']),
                     'price' => $item['price'] ?? 0,
-                    'stock' => $item['stock'],
+                    'stock' => $stock,
                     'status' => 'inactive', // Default to inactive for admin review
                     'store_id' => $defaultStore ? $defaultStore->id : 1,
                     'category_id' => $defaultCategory ? $defaultCategory->id : 1,
+                    'manual_category' => 'غير مصنف', // Use manual_category to avoid conflict
                     'description' => 'تم استيراده تلقائياً من تطبيق C#',
                     'currency' => 'YER',
                 ]);
@@ -62,7 +73,7 @@ class InventoryController extends BaseController
 
             // Trigger real-time update in Dashboard
             event(new ProductQtyUpdated($product->product_code, $product->stock));
-            
+
             $syncedCount++;
         }
 

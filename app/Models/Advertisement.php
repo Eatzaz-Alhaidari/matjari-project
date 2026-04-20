@@ -54,4 +54,9 @@ class Advertisement extends Model
             default => 'غير معروف',
         };
     }
+
+    public function isActive()
+    {
+        return $this->status === 1;
+    }
 }
