@@ -27,7 +27,7 @@
         .text-brand-orange { color: #FFA931; } /* Accent */
         .bg-brand-blue { background-color: #015C92; }
         .bg-brand-orange { background-color: #FFA931; }
-        
+
         .text-main-dark { color: #0f172a; } /* Dark navy/black for headings */
 
         .nav-link {
@@ -142,7 +142,7 @@
     </header>
 
     <main class="pt-[80px]">
-        
+
         <!-- Hero Section (Dark Slate text, Orange accent) -->
         <section id="hero" class="bg-white py-20 lg:py-28 flex flex-col items-center justify-center text-center px-6">
             <h1 class="text-4xl lg:text-6xl font-black text-brand-blue leading-[1.3] mb-4">
@@ -150,7 +150,7 @@
                 <br>
                 <span class="text-brand-orange mt-2 block">متجر صخر</span>
             </h1>
-            
+
             <p class="text-[17px] lg:text-lg text-gray-500 max-w-2xl mx-auto mt-4 mb-10 font-medium leading-relaxed">
                 متجر صخر هو بوابتك الموثوقة للوصول إلى أفضل المنتجات وإدارة مبيعاتك بكل احترافية. ابدأ متجرك الآن مع أحدث التقنيات وأفضل الخدمات.
             </p>
@@ -222,11 +222,11 @@
         <!-- How It Works Section (White background, light gray cards, formatted UI mockups) -->
         <section id="how" class="bg-white py-16 px-4 lg:px-12 text-center pb-0">
             <h2 class="text-3xl lg:text-[2.5rem] font-bold text-main-dark mb-16 flex items-center justify-center gap-3">
-                كيف يعمل النظام؟ <span class="text-brand-orange text-3xl">✨</span> 
+                كيف يعمل النظام؟ <span class="text-brand-orange text-3xl">✨</span>
             </h2>
 
             <div class="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-                
+
                 <div class="bg-[#f8fafc] rounded-[2rem] rounded-b-none pt-12 px-6 flex flex-col items-center h-[460px] border border-[#f1f5f9]">
                     <!-- Pill number -->
                     <div class="px-6 py-2 bg-[#e0eff8] text-brand-blue rounded-full font-bold text-lg mb-8">1</div>
@@ -234,7 +234,7 @@
                     <p class="text-gray-500 text-[13px] leading-relaxed px-4 mb-auto max-w-[260px]">
                         قم بإنشاء حسابك وإعداد ملفك التجاري وجهز متجرك لاستقبال العملاء الجدد بكل سهولة.
                     </p>
-                    
+
                     <!-- Clean formatted UI mockup (not totally empty) -->
                     <div class="css-phone mt-8">
                         <div class="phone-header flex items-center justify-center text-[10px] font-bold text-gray-400">ملف المتجر</div>
@@ -261,7 +261,7 @@
                     <p class="text-gray-500 text-[13px] leading-relaxed px-4 mb-auto max-w-[260px]">
                         ارفع منتجاتك بالخيارات المتعددة وادفع بمبيعاتك للأمام بأسلوب عرض احترافي وواضح.
                     </p>
-                    
+
                     <div class="css-phone mt-8">
                         <div class="phone-header flex items-center justify-center text-[10px] font-bold text-gray-400">المنتجات</div>
                         <div class="phone-content p-2 grid grid-cols-2 gap-2">
@@ -293,7 +293,7 @@
                     <p class="text-gray-500 text-[13px] leading-relaxed px-4 mb-auto max-w-[260px]">
                         תلقى إشعارات الطلبات وحدّث حالات الشحن لحظياً لتبقي عملائك على علم بكل التطورات.
                     </p>
-                    
+
                     <div class="css-phone mt-8">
                         <div class="phone-header flex items-center justify-between px-4 text-[10px] font-bold text-gray-400">
                             <i class="fa-solid fa-arrow-right"></i>
@@ -350,7 +350,7 @@
                         <i class="fa-solid fa-chevron-down text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''"></i>
                     </div>
                 </div>
-                
+
                 <div x-data="{ open: false }" class="bg-[#f8fafc] rounded-2xl cursor-pointer" @click="open = !open">
                     <div class="px-6 py-4 flex justify-between items-center text-[17px] font-bold text-main-dark">
                         <span>ما هي تكلفة فتح متجر عبر المنصة؟</span>

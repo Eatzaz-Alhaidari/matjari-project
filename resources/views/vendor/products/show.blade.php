@@ -121,7 +121,7 @@
                                             <div>
                                                 <h4 class="text-sm font-bold text-gray-700 mb-2 uppercase tracking-tight">نوع التعارض</h4>
                                                 <div class="p-3 rounded-lg border {{ ($product->ai_notes['mismatch_type'] ?? '') == 'unclear' ? 'bg-yellow-50 border-yellow-100 text-yellow-700' : 'bg-red-50 border-red-100 text-red-700' }} text-sm font-bold text-center">
-                                                    {{ match($product->ai_notes['mismatch_type'] ?? '') { 
+                                                    {{ match($product->ai_notes['mismatch_type'] ?? '') {
                                                         'name_vs_image' => 'اسم المنتج لا يطابق الصورة',
                                                         'description_vs_image' => 'الوصف لا يطابق الصورة',
                                                         'unclear' => 'البيانات غير واضحة',

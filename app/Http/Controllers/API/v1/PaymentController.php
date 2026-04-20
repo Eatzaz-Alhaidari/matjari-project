@@ -31,6 +31,24 @@ class PaymentController extends BaseController
             ]
         ];
 
+        if ($this->floosakIsAvailable()) {
+            $methods[] = [
+                'id' => 'floosak_wallet',
+                'name' => 'محفظة فلوسك',
+                'icon' => 'wallet-outline',
+            ];
+        }
+
         return $this->sendResponse($methods, 'تم جلب طرق الدفع بنجاح');
+    }
+
+    private function floosakIsAvailable(): bool
+    {
+        return (bool) config('floosak.enabled')
+            && filled(config('floosak.base_url'))
+            && filled(config('floosak.merchant_phone'))
+            && filled(config('floosak.merchant_password'))
+            && is_numeric(config('floosak.source_wallet_id'))
+            && (int) config('floosak.source_wallet_id') > 0;
     }
 }

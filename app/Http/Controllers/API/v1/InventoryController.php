@@ -47,7 +47,7 @@ class InventoryController extends BaseController
         foreach ($data['products'] as $item) {
             // Determine stock value from various possible keys
             $stock = $item['stock'] ?? ($item['qty'] ?? ($item['quantity'] ?? 0));
-            
+
             $product = Product::where('product_code', $item['product_code'])->first();
 
             if ($product) {
@@ -73,6 +73,7 @@ class InventoryController extends BaseController
 
             // Trigger real-time update in Dashboard
             event(new ProductQtyUpdated($product->product_code, $product->stock));
+
             $syncedCount++;
         }
 
