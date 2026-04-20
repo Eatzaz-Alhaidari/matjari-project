@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\v1\NotificationController;
 use App\Http\Controllers\Api\v1\CustomerController;
 use App\Http\Controllers\Api\v1\AddressController;
 use App\Http\Controllers\Api\v1\PaymentController;
+use App\Http\Controllers\Api\v1\FloosakPaymentController;
 use App\Http\Controllers\Api\v1\OrderController;
 use App\Http\Controllers\Api\v1\ActivityController;
 use App\Http\Controllers\Api\v1\ReturnController;
@@ -31,7 +32,7 @@ use App\Http\Controllers\Api\v1\InventoryController;
 Route::prefix('v1')->group(function () {
 
     // 1-11 المسارات السابقة المنشئة
-    
+
     // 1. جلب جميع التصنيفات
     Route::get('/categories', [CategoryController::class, 'index']);
 
@@ -43,6 +44,9 @@ Route::prefix('v1')->group(function () {
 
     // 4. جلب المنتجات الأكثر طلبًا
     Route::get('/products/top-selling', [ProductController::class, 'topSelling']);
+
+    // تفاصيل المنتج يجب أن تأتي بعد المسارات الثابتة مثل top-selling
+    Route::get('/products/{id}', [ProductController::class, 'show']);
 
     // 4. جلب جميع الخصومات النشطة (أدمن + متاجر)
     Route::get('/discounts', [DiscountController::class, 'index']);
@@ -121,6 +125,10 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']); // مسار تسجيل الخروج الجديد
+
+        Route::post('/orders/{order}/payments/floosak/initiate', [FloosakPaymentController::class, 'initiate']);
+        Route::post('/payments/floosak/{attempt}/confirm', [FloosakPaymentController::class, 'confirm']);
+        Route::get('/payments/floosak/{attempt}', [FloosakPaymentController::class, 'show']);
     });
 
     /* -------------------------------------------------------------------------- */

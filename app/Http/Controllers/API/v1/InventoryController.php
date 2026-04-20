@@ -47,7 +47,7 @@ class InventoryController extends BaseController
         foreach ($data['products'] as $item) {
             // Determine stock value from various possible keys
             $stock = $item['stock'] ?? ($item['qty'] ?? ($item['quantity'] ?? 0));
-            
+
             $product = Product::where('product_code', $item['product_code'])->first();
 
             if ($product) {
@@ -65,7 +65,7 @@ class InventoryController extends BaseController
                     'status' => 'inactive', // Default to inactive for admin review
                     'store_id' => $defaultStore ? $defaultStore->id : 1,
                     'category_id' => $defaultCategory ? $defaultCategory->id : 1,
-                    'category' => 'غير مصنف', // Default category value to fix 500 error
+                    'manual_category' => 'غير مصنف', // Use manual_category to avoid conflict
                     'description' => 'تم استيراده تلقائياً من تطبيق C#',
                     'currency' => 'YER',
                 ]);
@@ -73,6 +73,7 @@ class InventoryController extends BaseController
 
             // Trigger real-time update in Dashboard
             event(new ProductQtyUpdated($product->product_code, $product->stock));
+
             $syncedCount++;
         }
 

@@ -66,14 +66,6 @@ class User extends Authenticatable
         return $this->hasMany(Store::class, 'user_id', 'id');
     }
 
-    /**
-     * Get the notifications for the user.
-     */
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
-
     public function addresses()
     {
         return $this->hasMany(Address::class);
@@ -82,5 +74,10 @@ class User extends Authenticatable
     public function wishlist()
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    public function floosakPaymentAttempts()
+    {
+        return $this->hasMany(FloosakPaymentAttempt::class);
     }
 }
