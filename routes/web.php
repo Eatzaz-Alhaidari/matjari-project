@@ -238,7 +238,8 @@ Route::prefix('vendor')
     });
     Route::get('/fix-api', function() {
         try {
-            // 1. تنظيف الكاش بشكل كامل
+            // 1. تنظيف الكاش بشكل معمق
+            \Artisan::call('optimize:clear'); 
             \Artisan::call('route:clear');
             \Artisan::call('config:clear');
             \Artisan::call('cache:clear');

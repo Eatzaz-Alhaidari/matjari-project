@@ -70,7 +70,11 @@ class DashboardController extends Controller
                 'top5Products' => collect(),
                 'salesChartLabels' => [],
                 'salesChartData' => [],
-                'ratingStats' => ['average' => 0, 'count' => 0, 'stars' => []],
+                'ratingStats' => [
+                    'average' => 0, 
+                    'count' => 0, 
+                    'stars' => [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0]
+                ],
                 'lowStockProducts' => collect(),
                 'latestPendingOrders' => collect(),
                 'errorMessage' => 'تنبيه: تعذر تحميل بعض البيانات الإحصائية بسبب مشكلة في قاعدة البيانات. يرجى التواصل مع الدعم.'
