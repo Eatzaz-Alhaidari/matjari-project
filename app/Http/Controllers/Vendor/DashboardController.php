@@ -25,40 +25,72 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        $store = auth()->user()->store;
-        if (!$store) {
-            abort(403, 'عذراً، حسابك كبائع لا يمتلك متجراً مرتبطاً به حالياً.');
+        try {
+            $store = auth()->user()->store;
+            if (!$store) {
+                abort(403, 'عذراً، حسابك كبائع لا يمتلك متجراً مرتبطاً به حالياً.');
+            }
+
+            $storeId = $store->id;
+
+            // 1. جلب الإحصائيات الأساسية والمتقدمة
+            $stats = $this->getStats($storeId);
+            
+            // 2. جلب أفضل 5 منتجات مبيعاً
+            $top5Products = $this->getTop5Products($storeId);
+            $stats['top_products_count'] = $top5Products->count();
+            $stats['top_products_total_sold'] = $top5Products->sum('total_quantity_sold');
+
+            // 3. بيانات الشارت (مبيعات آخر 7 أيام)
+            $chart = $this->getSalesChartData($storeId);
+            
+            // 4. إحصائيات التقييمات التفصيلية
+            $ratingStats = $this->getRatingStats($storeId, $stats['average_rating'], $stats['total_reviews']);
+
+            // 5. قوائم الجداول
+            $lowStockProducts = $this->getLowStockProducts($storeId);
+            $latestPendingOrders = $this->getLatestPendingOrders($storeId);
+
+            return view('vendor.dashboard', [
+                'stats' => $stats,
+                'top5Products' => $top5Products,
+                'salesChartLabels' => $chart['labels'],
+                'salesChartData' => $chart['data'],
+                'ratingStats' => $ratingStats,
+                'lowStockProducts' => $lowStockProducts,
+                'latestPendingOrders' => $latestPendingOrders,
+            ]);
+        } catch (\Exception $e) {
+            // في حال وجود خطأ (مثلاً جدول ناقص في الاستضافة)، نظهر رسالة خطأ بدلاً من كسر السيرفر
+            \Log::error("Vendor Dashboard Error: " . $e->getMessage());
+            
+            // نمرر قيم افتراضية فارغة لمنع كسر الـ Blade
+            return view('vendor.dashboard', [
+                'stats' => $this->getEmptyStats(),
+                'top5Products' => collect(),
+                'salesChartLabels' => [],
+                'salesChartData' => [],
+                'ratingStats' => ['average' => 0, 'count' => 0, 'stars' => []],
+                'lowStockProducts' => collect(),
+                'latestPendingOrders' => collect(),
+                'errorMessage' => 'تنبيه: تعذر تحميل بعض البيانات الإحصائية بسبب مشكلة في قاعدة البيانات. يرجى التواصل مع الدعم.'
+            ]);
         }
+    }
 
-        $storeId = $store->id;
-
-        // 1. جلب الإحصائيات الأساسية والمتقدمة
-        $stats = $this->getStats($storeId);
-        
-        // 2. جلب أفضل 5 منتجات مبيعاً
-        $top5Products = $this->getTop5Products($storeId);
-        $stats['top_products_count'] = $top5Products->count();
-        $stats['top_products_total_sold'] = $top5Products->sum('total_quantity_sold');
-
-        // 3. بيانات الشارت (مبيعات آخر 7 أيام)
-        $chart = $this->getSalesChartData($storeId);
-        
-        // 4. إحصائيات التقييمات التفصيلية
-        $ratingStats = $this->getRatingStats($storeId, $stats['average_rating'], $stats['total_reviews']);
-
-        // 5. قوائم الجداول
-        $lowStockProducts = $this->getLowStockProducts($storeId);
-        $latestPendingOrders = $this->getLatestPendingOrders($storeId);
-
-        return view('vendor.dashboard', [
-            'stats' => $stats,
-            'top5Products' => $top5Products,
-            'salesChartLabels' => $chart['labels'],
-            'salesChartData' => $chart['data'],
-            'ratingStats' => $ratingStats,
-            'lowStockProducts' => $lowStockProducts,
-            'latestPendingOrders' => $latestPendingOrders,
-        ]);
+    /**
+     * دالة مساعدة لبيانات فارغة في حال الخطأ
+     */
+    private function getEmptyStats(): array
+    {
+        return [
+            'total_products' => 0, 'active_products' => 0, 'inactive_products' => 0,
+            'total_orders' => 0, 'pending_orders' => 0, 'processing_orders' => 0,
+            'shipped_orders' => 0, 'delivered_orders' => 0, 'total_sales' => 0,
+            'low_stock_products' => 0, 'active_advertisements' => 0, 'active_discounts' => 0,
+            'total_reviews' => 0, 'pending_reviews' => 0, 'average_rating' => 0,
+            'wallet_balance' => 0, 'total_earnings' => 0
+        ];
     }
 
     /**

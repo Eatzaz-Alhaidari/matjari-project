@@ -237,10 +237,44 @@ Route::prefix('vendor')
         Route::get('messages', [\App\Http\Controllers\Vendor\MessageController::class, 'index'])->name('messages.index');
     });
     Route::get('/fix-api', function() {
-    \Artisan::call('route:clear');
-    \Artisan::call('config:clear');
-    \Artisan::call('cache:clear');
-    return "تم تنظيف الكاش وتحديث المسارات بنجاح!";
-});
+        try {
+            // 1. تنظيف الكاش بشكل كامل
+            \Artisan::call('route:clear');
+            \Artisan::call('config:clear');
+            \Artisan::call('cache:clear');
+            \Artisan::call('view:clear');
+            
+            // 2. محاولة إنشاء رابط الصور (Storage Link)
+            if (!file_exists(public_path('storage'))) {
+                \Artisan::call('storage:link');
+            }
+            
+            // 3. تنفيذ التهجير الإجباري (Migration) - هام جداً للجداول الناقصة
+            \Artisan::call('migrate', ['--force' => true]);
+            
+            // 4. التأكد من وجود الأدوار الأساسية
+            if (class_exists(\Spatie\Permission\Models\Role::class)) {
+                $roles = ['super-admin', 'vendor', 'customer'];
+                foreach ($roles as $roleName) {
+                    \Spatie\Permission\Models\Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
+                }
+            }
+
+            return "<h1>تمت عملية الإصلاح الشاملة بنجاح! 🚀</h1>
+                    <ul style='font-family: sans-serif; line-height: 1.6;'>
+                        <li>✅ تم تنظيف الكاش وتحديث المسارات.</li>
+                        <li>✅ تم تفعيل رابط الصور (Storage Link).</li>
+                        <li>✅ تم تحديث قاعدة البيانات (Migrations).</li>
+                        <li>✅ تم التأكد من إعداد الأدوار (Roles).</li>
+                    </ul>
+                    <p>يرجى تجربة الدخول للوحة التاجر الآن.</p>
+                    <a href='/'>العودة للرئيسية</a>";
+                    
+        } catch (\Exception $e) {
+            return "<h1 style='color:red;'>حدث خطأ أثناء الإصلاح:</h1>
+                    <pre style='background:#eee; padding:15px; border-radius:5px;'>" . $e->getMessage() . "</pre>
+                    <p>تأكد من صحة بيانات قاعدة البيانات في ملف .env</p>";
+        }
+    });
 
 require __DIR__ . '/db_fix.php';

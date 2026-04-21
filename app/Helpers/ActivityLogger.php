@@ -34,16 +34,22 @@ class ActivityLogger
             }
         }
 
-        return ActivityLog::create([
-            'user_id' => $user ? $user->id : null,
-            'user_type' => $userType,
-            'action_type' => $actionType,
-            'subject_type' => $subjectType,
-            'subject_id' => $subjectId,
-            'description' => $description,
-            'ip_address' => Request::ip(),
-            'user_agent' => Request::userAgent(),
-            'severity' => $severity,
-        ]);
+        try {
+            return ActivityLog::create([
+                'user_id' => $user ? $user->id : null,
+                'user_type' => $userType,
+                'action_type' => $actionType,
+                'subject_type' => $subjectType,
+                'subject_id' => $subjectId,
+                'description' => $description,
+                'ip_address' => Request::ip(),
+                'user_agent' => Request::userAgent(),
+                'severity' => $severity,
+            ]);
+        } catch (\Exception $e) {
+            // في حال فشل تسجيل النشاط (مثلاً جدول غير موجود)، لا نعطل السيرفر
+            \Log::error("ActivityLogger failed: " . $e->getMessage());
+            return new ActivityLog(); // نرجع مودل فارغ لتجنب كسر الكود
+        }
     }
 }
