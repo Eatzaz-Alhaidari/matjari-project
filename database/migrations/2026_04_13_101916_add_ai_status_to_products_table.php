@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->enum('ai_status', ['pending', 'approved', 'rejected', 'needs_edit'])->default('pending')->after('status');
+            $table->enum('ai_status', ['pending', 'approved', 'rejected', 'needs_edit', 'failed_service'])->default('pending')->after('status');
             $table->json('ai_notes')->nullable()->after('ai_status');
         });
     }

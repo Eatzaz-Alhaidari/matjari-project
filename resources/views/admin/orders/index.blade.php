@@ -62,6 +62,9 @@
                                         تاريخ الطلب</th>
                                     <th scope="col"
                                         class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
+                                        المندوب</th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-right text-xs font-bold text-brand-blue-800 uppercase tracking-wider">
                                         الحالة</th>
                                     @if($tab == 'problem')
                                         <th scope="col"
@@ -99,37 +102,29 @@
                                             <div class="text-xs text-gray-500">{{ $order->created_at->diffForHumans() }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($order->status == 'pending')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
-                                                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full ml-1.5"></span>
-                                                    قيد الانتظار
-                                                </span>
-                                            @elseif($order->status == 'processing')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-                                                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full ml-1.5"></span>
-                                                    جاري التجهيز
-                                                </span>
-                                            @elseif($order->status == 'shipped')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-                                                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full ml-1.5"></span>
-                                                    تم الشحن
-                                                </span>
-                                            @elseif($order->status == 'delivered')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
-                                                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full ml-1.5"></span>
-                                                    تم التوصيل
-                                                </span>
-                                            @elseif($order->status == 'cancelled')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">
-                                                    <span class="w-1.5 h-1.5 bg-red-400 rounded-full ml-1.5"></span>
-                                                    ملغي
-                                                </span>
+                                            @if($order->driver)
+                                                <div class="text-sm font-bold text-gray-900">{{ $order->driver->name }}</div>
+                                                <div class="text-xs text-gray-500">#{{ $order->driver_id }}</div>
+                                            @else
+                                                <span class="text-xs text-gray-400 italic">غير مسند</span>
                                             @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @php
+                                                $colorMap = [
+                                                    'yellow' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                                    'blue' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                    'purple' => 'bg-purple-100 text-purple-800 border-purple-200',
+                                                    'indigo' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+                                                    'green' => 'bg-green-100 text-green-800 border-green-200',
+                                                    'red' => 'bg-red-100 text-red-800 border-red-200',
+                                                    'gray' => 'bg-gray-100 text-gray-800 border-gray-200',
+                                                ];
+                                                $colorClass = $colorMap[$order->status_color] ?? $colorMap['gray'];
+                                            @endphp
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $colorClass }}">
+                                                {{ $order->status_text }}
+                                            </span>
                                         </td>
 
                                         @if($tab == 'problem')
@@ -159,7 +154,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="{{ $tab == 'problem' ? 7 : 6 }}" class="px-6 py-12 text-center text-gray-500">
+                                        <td colspan="{{ $tab == 'problem' ? 8 : 7 }}" class="px-6 py-12 text-center text-gray-500">
                                             <div class="flex flex-col items-center justify-center">
                                                 <svg class="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">

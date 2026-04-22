@@ -162,9 +162,18 @@ class AuthController extends BaseController
         }
 
         $identifier = $request->identifier;
+        \Log::info('Login attempt', [
+            'identifier' => $identifier,
+            'password_length' => strlen($request->password),
+            'ip' => $request->ip()
+        ]);
         $user = User::where('email', $identifier)->orWhere('phone', $identifier)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            \Log::warning('Login failed', [
+                'user_found' => (bool)$user,
+                'identifier' => $identifier
+            ]);
             return $this->sendError('بيانات الدخول غير صحيحة.', [], 401);
         }
 

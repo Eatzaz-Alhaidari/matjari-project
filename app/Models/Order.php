@@ -48,6 +48,11 @@ class Order extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -79,8 +84,8 @@ class Order extends Model
         return match ($this->status) {
             'pending' => 'yellow',
             'processing' => 'blue',
-            'shipped' => 'purple',
-            'ready_for_pickup' => 'indigo',
+            'shipped', 'picked_up' => 'purple',
+            'ready_for_pickup', 'ready_to_pick' => 'indigo',
             'delivered' => 'green',
             'cancelled' => 'red',
             default => 'gray',
@@ -93,8 +98,9 @@ class Order extends Model
             'pending' => 'في الانتظار',
             'processing' => 'قيد التجهيز',
             'shipped' => 'قيد التوصيل',
-            'ready_for_pickup' => 'قيد الاستلام',
-            'delivered' => 'تم الاستلام',
+            'picked_up' => 'تم الاستلام من المندوب',
+            'ready_for_pickup', 'ready_to_pick' => 'جاهز للاستلام',
+            'delivered' => 'تم الاستلام النهائي',
             'cancelled' => 'ملغي',
             default => 'غير محدد',
         };

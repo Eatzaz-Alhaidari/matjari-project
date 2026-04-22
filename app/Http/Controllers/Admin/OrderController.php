@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['user', 'store'])->latest();
+        $query = Order::with(['user', 'store', 'driver'])->latest();
 
         // Search Logic
         if ($request->has('search')) {
@@ -50,7 +50,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['user', 'store', 'items.product']);
+        $order->load(['user', 'store', 'items.product', 'driver']);
         return view('admin.orders.show', compact('order'));
     }
 }
